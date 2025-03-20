@@ -1,0 +1,96 @@
+/* Font Family Helper Classes */
+
+/* KOAynama */
+.font-koaynama-sharp {
+  font-family: 'KOAynama-Sharp', sans-serif;
+}
+
+.font-koaynama-curved {
+  font-family: 'KOAynama-Curved', sans-serif;
+}
+
+/* KoShareb */
+.font-koshareb {
+  font-family: 'KoShareb', serif;
+}
+
+/* Ko_Banzeen */
+.font-kobanzeen {
+  font-family: 'Ko_Banzeen', sans-serif;
+}
+
+.font-kobanzeen-normal {
+  font-family: 'Ko_Banzeen', sans-serif;
+  font-style: normal;
+}
+
+.font-kobanzeen-slanted-left {
+  font-family: 'Ko_Banzeen', sans-serif;
+  font-style: italic;
+}
+
+.font-kobanzeen-slanted-right {
+  font-family: 'Ko_Banzeen', sans-serif;
+  font-style: oblique;
+}
+
+/* KoDongol */
+.font-kodongol {
+  font-family: 'KoDongol', serif;
+}
+
+/* KOLemaza */
+.font-kolemaza {
+  font-family: 'KOLemaza', sans-serif;
+}
+
+/* KoKhalaya */
+.font-kokhalaya {
+  font-family: 'KoKhalaya', sans-serif;
+}
+
+.font-kokhalaya-variable {
+  font-family: 'KoKhalaya-Variable', sans-serif;
+}
+
+/* KoKhalaya Weight Classes */
+.font-kokhalaya-500 {
+  font-family: 'KoKhalaya', sans-serif;
+  font-weight: 500;
+}
+
+.font-kokhalaya-600 {
+  font-family: 'KoKhalaya', sans-serif;
+  font-weight: 600;
+}
+
+.font-kokhalaya-700 {
+  font-family: 'KoKhalaya', sans-serif;
+  font-weight: 700;
+}
+
+.font-kokhalaya-800 {
+  font-family: 'KoKhalaya', sans-serif;
+  font-weight: 800;
+}
+
+.font-kokhalaya-900 {
+  font-family: 'KoKhalaya', sans-serif;
+  font-weight: 900;
+}
+
+/* KORubbama */
+.font-korubbama {
+  font-family: 'KORubbama', cursive;
+  font-weight: 900;
+}
+
+.font-korubbama-expanded {
+  font-family: 'KORubbama-Expanded', cursive;
+  font-weight: 900;
+}
+
+/* KoGaliModern */
+.font-kogalimodern {
+  font-family: 'KoGaliModern', monospace;
+} 
