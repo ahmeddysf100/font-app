@@ -127,7 +127,7 @@ onUnmounted(() => {
 
         <v-divider class="my-4 bg-grey-darken-3"></v-divider>
 
-        <v-list-item color="white" @click="themeStore.toggleDarkMode()" class="theme-toggle-item">
+        <!-- <v-list-item color="white" @click="themeStore.toggleDarkMode()" class="theme-toggle-item">
           <template v-slot:prepend>
             <v-icon color="white">
               {{ themeStore.darkMode ? "mdi-weather-sunny" : "mdi-weather-night" }}
@@ -136,7 +136,7 @@ onUnmounted(() => {
           <template v-slot:title>
             <span class="text-body-1">Toggle Theme</span>
           </template>
-        </v-list-item>
+        </v-list-item> -->
       </v-list>
     </v-navigation-drawer>
   </div>
@@ -168,10 +168,13 @@ onUnmounted(() => {
 .menu-item-col {
   height: 100%;
   border-right: 1px solid #333;
+  border-left: 1px solid #333;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
+
 
 .active-menu-item {
   background-color: #fff9de; /* Light yellow background for active tab */

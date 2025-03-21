@@ -14,6 +14,7 @@ const emit = defineEmits([
   "search",
   "filter-change",
   "font-size-change",
+  "toggle-theme",
 ]);
 
 // Mobile detection
@@ -172,6 +173,12 @@ const updateSampleText = () => {
   emit("filter-change", { type: "sampleText", value: sampleText.value });
 };
 
+const textDarkMode = ref(false);
+const toggleTheme = () => {
+  textDarkMode.value = !textDarkMode.value;
+  emit("toggle-theme", textDarkMode.value);
+};
+
 // Click outside handler for font size dropdown
 const fontSizeRef = ref(null);
 
@@ -248,7 +255,7 @@ onUnmounted(() => {
             </div>
 
             <!-- Properties Dropdown -->
-            <div class="ml-6 relative">
+            <!-- <div class="ml-6 relative">
               <v-menu>
                 <template v-slot:activator="{ props }">
                   <div v-bind="props" class="flex items-center cursor-pointer">
@@ -268,7 +275,7 @@ onUnmounted(() => {
                   </v-list-item>
                 </v-list>
               </v-menu>
-            </div>
+            </div> -->
 
             <!-- Font Size (Desktop) -->
             <div class="ml-auto flex items-center">
@@ -370,7 +377,7 @@ onUnmounted(() => {
             </div>
 
             <!-- Properties Dropdown Mobile -->
-            <div class="mobile-dropdown mb-3 w-full sm:w-1/2 sm:pl-2">
+            <!-- <div class="mobile-dropdown mb-3 w-full sm:w-1/2 sm:pl-2">
               <span class="text-gray-400 text-sm mb-1 block">Property</span>
               <v-menu location="bottom" :close-on-content-click="true">
                 <template v-slot:activator="{ props }">
@@ -394,7 +401,7 @@ onUnmounted(() => {
                   </v-list-item>
                 </v-list>
               </v-menu>
-            </div>
+            </div> -->
           </div>
         </div>
         
@@ -560,7 +567,7 @@ onUnmounted(() => {
               v-model="sampleText"
               type="text"
               placeholder="Type your sample text here"
-              class="bg-transparent border-none outline-none text-white w-full"
+              class=" border-none outline-none text-white w-full"
               @input="updateSampleText"
             />
           </div>
@@ -657,20 +664,21 @@ onUnmounted(() => {
 
           <!-- Theme Toggle -->
           <div class="ml-4 flex items-center">
-            <v-btn icon size="small" variant="text" color="white">
+            <v-btn icon size="small" variant="text" color="white" @click="toggleTheme()">
               <v-icon>{{
-                themeMode === "dark" ? "mdi-weather-night" : "mdi-weather-sunny"
+                textDarkMode ? "mdi-weather-night" : "mdi-weather-sunny"
               }}</v-icon>
             </v-btn>
-            <v-btn
+            <!-- <v-btn
               icon
               size="small"
               variant="text"
               color="grey-lighten-1"
               class="ml-2"
+              @click="toggleTheme('dark')"
             >
               <v-icon>mdi-moon-waning-crescent</v-icon>
-            </v-btn>
+            </v-btn> -->
           </div>
 
           <!-- Reset All -->

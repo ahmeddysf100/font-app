@@ -189,6 +189,11 @@ const handleFilterChange = (filter) => {
   }
 };
 
+const textDarkMode = ref(false);
+const handleToggleTheme = (theme) => {
+  textDarkMode.value = theme;
+};
+
 const handleFontSizeChange = (size) => {
   fontSize.value = size;
 };
@@ -347,6 +352,7 @@ const getSampleTextForFontComputed = computed(() => {
       @filter-change="handleFilterChange"
       @font-size-change="handleFontSizeChange"
       @reset="handleReset"
+      @toggle-theme="handleToggleTheme"
     />
 
     <!-- Font display options -->
@@ -433,7 +439,8 @@ const getSampleTextForFontComputed = computed(() => {
               :font="font" 
               :font-css="fontCss"
               :sample-text="getSampleTextForFontComputed(font)"
-              :key="`${font.id}-${filterState.textType}`"
+              :key="`${font.id}-${filterState.textType}-${textDarkMode}`"
+              :text-dark-mode="textDarkMode"
             />
           </v-col>
         </v-row>

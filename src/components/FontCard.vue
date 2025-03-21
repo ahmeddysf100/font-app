@@ -34,6 +34,10 @@ const props = defineProps({
     type: String,
     default: "السلام عليكم",
   },
+  textDarkMode: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const router = useRouter();
@@ -41,6 +45,7 @@ const fontStore = useFontStore();
 const showOptions = ref(false);
 const sittingsStore = useSittingsStore();
 // Font customization controls
+const textDarkMode = ref(props.textDarkMode);
 const fontWeight = ref(400);
 const fontSize = ref(props.fontSize);
 const fontStyle = ref("normal");
@@ -137,9 +142,9 @@ const toggleOptions = (e) => {
   // Don't trigger if we're clicking inside options panel or preview
   if (
     e.target.closest(".font-options-panel") ||
-    e.target.closest(".sample-text-editor") ||
-    e.target.closest("button") ||
-    e.target.closest(".v-btn")
+    e.target.closest(".sample-text-editor") 
+    // e.target.closest("button") ||
+    // e.target.closest(".v-btn")
   ) {
     return;
   }
@@ -230,12 +235,6 @@ const getWeightName = (value) => {
       return value.toString();
   }
 };
-console.log(props.font);
-// Font Style Selector
-const selectFontStyle = (weight, italic) => {
-  fontWeight.value = weight;
-  fontStyle.value = italic ? "italic" : "normal";
-};
 
 // New variables for the style dropdown
 const selectedStyle = ref(null);
@@ -318,6 +317,7 @@ const sampleTextStyle = computed(() => {
     textTransform: isAllCaps.value ? "uppercase" : "none",
     fontWeight: fontWeight.value,
     fontStyle: fontStyle.value,
+    color: textDarkMode ? "white" : "black",
   };
 
   // Add variable font settings if applicable
@@ -361,6 +361,13 @@ watch(
     initSelectedStyle();
   },
   { deep: true }
+);
+
+watch(
+  () => props.textDarkMode,
+  (newVal) => {
+    textDarkMode.value = newVal;
+  }
 );
 
 // Add a watch to track changes in the settings store
@@ -632,6 +639,8 @@ onMounted(() => {
           'preview-collapsed': showOptions,
           'auto-height': fontSize > 80,
           'arabic-font': font.category === 'Arabic',
+          'bg-dark-btn': textDarkMode,
+          'bg-light-btn': !textDarkMode,
         }"
         :style="previewContainerStyle"
         @click.stop
@@ -661,6 +670,8 @@ onMounted(() => {
           :class="[
             `weight-${fontWeight}`,
             { 'rtl-text': font.category === 'Arabic' },
+            { 'text-dark-btn': !textDarkMode },
+            { 'text-light-btn': textDarkMode },
           ]"
           :style="sampleTextStyle"
         ></p>
@@ -951,7 +962,7 @@ onMounted(() => {
           variant="text"
           color="gray"
           icon
-          @click.stop="toggleOptions"
+          @click="toggleOptions"
           class="customize-btn"
         >
           <v-icon>{{ showOptions ? "mdi-chevron-up" : "mdi-tune" }}</v-icon>
@@ -962,14 +973,22 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@font-face {
-  font-family: "KoShareb";
-  src: url("../assets/fonts/KoShareb/OTF/KoShareb-Display.otf")
-    format("opentype");
-  font-weight: normal;
-  font-style: normal;
+
+.text-dark-btn {
+  color: rgb(255,255,227) !important;
 }
 
+.text-light-btn {
+  color: black !important;
+}
+
+.bg-dark-btn {
+  background-color: rgb(255,255,227) !important;
+}
+
+.bg-light-btn {
+  background-color: black !important;
+}
 .font-card-container {
   margin-bottom: 20px;
 }
