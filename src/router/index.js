@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import FontsHome from '../components/FontsHome.vue'
 import FontDetailView from '../components/FontDetailView.vue'
+import ContactView from '../views/ContactView.vue'
+import TermsView from '../views/TermsView.vue'
 
 const routes = [
   {
@@ -36,6 +38,22 @@ const routes = [
     name: 'Licenses',
     // Lazy-loading route
     component: () => import('../components/LicensesView.vue')
+  },
+  {
+    path: '/about',
+    name: 'About',
+    // Lazy-loading route
+    component: () => import('../views/AboutView.vue')
+  },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: ContactView
+  },
+  {
+    path: '/terms',
+    name: 'Terms',
+    component: TermsView
   },
   // {
   //   path: '/font-demo',

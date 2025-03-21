@@ -1,5 +1,5 @@
 <template>
-  <div class="licenses-container">
+  <div class="licenses-container bg-black">
     <v-container>
       <h1 class="text-h3 font-weight-bold mb-6">Font Licenses</h1>
       <p class="text-body-1 mb-8">Information about how our fonts can be used in your projects.</p>

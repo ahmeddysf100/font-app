@@ -1,0 +1,972 @@
+<script setup>
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
+import { useThemeStore } from "../stores/theme.js";
+import logoImage from "../assets/kotype.svg"; // Import the SVG logo
+import { fonts } from "../utils/fontLoader";
+
+const themeStore = useThemeStore();
+const isMobile = ref(false);
+
+// Get Arabic fonts only
+const arabicFonts = computed(() => {
+  return fonts.filter(font => 
+    font.name.startsWith('KO') || font.name.startsWith('Ko')
+  );
+});
+
+// Currently displayed font in banner
+const currentFontIndex = ref(0);
+const currentFont = computed(() => arabicFonts.value[currentFontIndex.value] || {});
+
+// Arabic quotes for the rotating text
+const arabicQuotes = [
+  { text: "لا تفكـــر بشـــــعية ولكـن عليـا", translation: "Don't think normally, think higher" },
+  { text: "الخط العربي هو فن الروح", translation: "Arabic calligraphy is the art of the soul" },
+  { text: "كل حرف قصة", translation: "Every letter is a story" },
+  { text: "الجمال في التفاصيل", translation: "Beauty is in the details" },
+  { text: "إبداع بلا حدود", translation: "Creativity without limits" }
+];
+
+// Currently displayed quote
+const currentQuoteIndex = ref(0);
+const currentQuote = computed(() => arabicQuotes[currentQuoteIndex.value]);
+
+// Change font and quote periodically
+const changeDisplayedFont = () => {
+  currentFontIndex.value = (currentFontIndex.value + 1) % arabicFonts.value.length;
+  if (currentFontIndex.value === 0) {
+    // Change quote when we cycle through all fonts
+    currentQuoteIndex.value = (currentQuoteIndex.value + 1) % arabicQuotes.length;
+  }
+};
+
+let fontInterval;
+
+// Background colors - separate sets for light and dark mode
+const lightModeColors = ['#ff69b4', '#8a2be2', '#1e90ff', '#ff6347', '#00ced1', '#9932cc'];
+const darkModeColors = ['#ff1493', '#9370db', '#00bfff', '#ff4500', '#20b2aa', '#ba55d3'];
+const currentBgIndex = ref(0);
+
+// Select color based on theme
+const currentBgColor = computed(() => {
+  return themeStore.darkMode 
+    ? darkModeColors[currentBgIndex.value] 
+    : lightModeColors[currentBgIndex.value];
+});
+
+// Check screen size on mount and when window resizes
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+
+// Scroll reveal functionality (moved from script tag to Vue lifecycle)
+const initScrollReveal = () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('scroll-reveal-active');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.scroll-reveal').forEach(section => {
+    observer.observe(section);
+  });
+  
+  return observer;
+};
+
+let scrollObserver;
+
+// Update divider color based on theme
+const updateDividerColor = () => {
+  const isDark = themeStore.darkMode;
+  document.documentElement.style.setProperty('--bg-color', isDark ? '#0d0d0d' : 'white');
+  document.documentElement.style.setProperty('--accent-color', isDark ? '#ff1493' : '#ff69b4');
+  document.documentElement.style.setProperty('--accent-light-color', isDark ? 'rgba(255, 20, 147, 0.1)' : 'rgba(255, 105, 180, 0.1)');
+  document.documentElement.style.setProperty('--accent-medium-color', isDark ? 'rgba(255, 20, 147, 0.3)' : 'rgba(255, 105, 180, 0.3)');
+  document.documentElement.style.setProperty('--section-bg-color', isDark ? '#151515' : '#f8f8f8');
+  document.documentElement.style.setProperty('--footer-bg-color', isDark ? '#1a1a1a' : '#f0f0f0');
+  document.documentElement.style.setProperty('--text-color', isDark ? '#f5f5f5' : '#111');
+  document.documentElement.style.setProperty('--section-shadow', isDark ? '0 5px 15px rgba(0,0,0,0.2)' : '0 5px 15px rgba(0,0,0,0.03)');
+};
+
+// Call on component mount
+onMounted(async () => {
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+  
+  // Change font every 3 seconds
+  fontInterval = setInterval(() => {
+    changeDisplayedFont();
+    // Change background color every 2 font changes
+    if (currentFontIndex.value % 2 === 0) {
+      currentBgIndex.value = (currentBgIndex.value + 1) % darkModeColors.length;
+    }
+  }, 3000);
+  
+  // Wait for the DOM to be fully updated
+  await nextTick();
+  
+  // Initialize scroll reveal
+  scrollObserver = initScrollReveal();
+  
+  // Set initial divider color
+  updateDividerColor();
+});
+
+// Remove event listener on unmount
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize);
+  clearInterval(fontInterval);
+  
+  // Disconnect the intersection observer
+  if (scrollObserver) {
+    scrollObserver.disconnect();
+  }
+});
+
+// Banner styling based on current font and color
+const bannerStyle = computed(() => {
+  return {
+    backgroundColor: currentBgColor.value,
+    transition: 'background-color 1.5s ease'
+  };
+});
+
+// Quote font styling based on current font
+const quoteFontStyle = computed(() => {
+  if (!currentFont.value || !currentFont.value.fontFamily) {
+    return { fontFamily: 'Arial' };
+  }
+  
+  let fontStyle = {
+    fontFamily: `${currentFont.value.fontFamily}, Arial`,
+    fontWeight: 700,
+    direction: 'rtl'
+  };
+  
+  // If the font has styles, use the heaviest weight
+  if (currentFont.value.styles && currentFont.value.styles.length > 0) {
+    const weights = currentFont.value.styles
+      .map(s => s.weight)
+      .filter(w => w)
+      .sort((a, b) => b - a);
+    
+    if (weights.length > 0) {
+      fontStyle.fontWeight = weights[0];
+    }
+  }
+  
+  return fontStyle;
+});
+
+// Animate in/out animations for the quotes
+const isQuoteVisible = ref(true);
+
+// Watch for changes in quote to add animation
+watch([currentQuoteIndex], () => {
+  isQuoteVisible.value = false;
+  setTimeout(() => {
+    isQuoteVisible.value = true;
+  }, 300);
+});
+
+// Watch for changes in font to highlight the font name
+const isFontChanging = ref(false);
+watch([currentFontIndex], () => {
+  isFontChanging.value = true;
+  setTimeout(() => {
+    isFontChanging.value = false;
+  }, 700);
+});
+
+// Watch for theme changes to update divider color
+watch(() => themeStore.darkMode, () => {
+  updateDividerColor();
+});
+</script>
+
+<template>
+  <div class="about-view" :class="{ 'dark-theme': themeStore.darkMode }">
+    <!-- Banner Image -->
+    <div class="banner-image-container" :style="bannerStyle">
+      <div class="overlay"></div>
+      <div class="font-info">
+        <v-chip 
+          color="white" 
+          :class="['current-font-chip', {'pulse': isFontChanging}]"
+          variant="elevated"
+          size="large"
+        >
+          {{ currentFont.name || 'KO-TYPE' }}
+        </v-chip>
+      </div>
+      
+      <div class="banner-text">
+        <transition name="fade">
+          <div v-if="isQuoteVisible" class="quote-container">
+            <h1 class="arabic-quote" :style="quoteFontStyle">{{ currentQuote.text }}</h1>
+            <p class="quote-translation">{{ currentQuote.translation }}</p>
+          </div>
+        </transition>
+      </div>
+      
+      <div class="font-indicators">
+        <div 
+          v-for="(font, index) in arabicFonts" 
+          :key="font.id"
+          class="font-indicator"
+          :class="{ active: index === currentFontIndex }"
+          @click="currentFontIndex = index"
+        ></div>
+      </div>
+    </div>
+    
+    <!-- Header Section with improved layout -->
+    <section class="header-section">
+      <v-container>
+        <v-row align="center" class="header-row">
+          <v-col cols="12" md="6" class="d-flex align-center justify-center logo-col">
+            <div class="logo-container">
+              <img :src="logoImage" alt="Kotype Logo" class="kotype-logo" />
+              <div class="logo-flare"></div>
+            </div>
+          </v-col>
+          <v-col cols="12" md="6" class="d-flex flex-column justify-center">
+            <div class="section-heading">
+              <div class="section-title-container">
+                <h2 class="section-title">What Is Kotype!</h2>
+                <div class="title-underline"></div>
+              </div>
+              <div class="section-text">
+                <p>This is KO-type. The move you probably anticipated, that will knock all free font-haters out of their chairs. That was a joke. Kotype is a community dedicated to the love of Arabic fonts. Whether it's appreciation, creation, or simply usage, we are all connected by the love of Arabic Fonts, just like our love for the Arabic language.</p>
+              </div>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
+
+    <!-- Content Section with auto-revealing sections -->
+    <section class="content-section">
+      <v-container>
+        <v-row>
+          <v-col cols="12">
+            <div class="section mb-5 scroll-reveal">
+              <div class="section-heading">
+                <div class="section-title-container">
+                  <h2 class="section-title">Our Mission</h2>
+                  <div class="title-underline"></div>
+                </div>
+                <div class="section-text">
+                  <div class="quote-block">
+                    <v-icon color="pink" class="quote-icon">mdi-format-quote-open</v-icon>
+                    <p class="mission-quote"><em>Give a man a fish, and you feed him for a day; teach a man to fish, and you feed him for a lifetime.</em></p>
+                    <v-icon color="pink" class="quote-icon quote-close">mdi-format-quote-close</v-icon>
+                  </div>
+                  <p>At Kotype, we hand out rods so you can go happily fishing. We will do our best to teach the community how fonts are created and share tips of the process and results.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="section mb-5 scroll-reveal">
+              <div class="section-heading">
+                <div class="section-title-container">
+                  <h2 class="section-title">Our Vision</h2>
+                  <div class="title-underline"></div>
+                </div>
+                <div class="section-text">
+                  <p>The limited resources and repeated Arabic font designs are killing this saturated market. We need more hands to work, more minds unafraid to explore, to push those limits and create more resources for the next generation, hopefully.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="section mb-5 scroll-reveal">
+              <div class="section-heading">
+                <div class="section-title-container">
+                  <h2 class="section-title">Honestly</h2>
+                  <div class="title-underline"></div>
+                </div>
+                <div class="section-text">
+                  <p>We are done with pirated libraries continue to steal the efforts of designers, exploiting creations that may have taken years of work, research, and development. This affects many designers' determination to create or forces them to only design for clients.</p>
+                  <p>We aren't making any promises that we are going to create a utopia. Instead, we are trying to highlight the work of talented designers, share the expert process, and create a positive vibe around the Arabic design community.</p>
+                </div>
+              </div>
+            </div>
+
+            <v-divider class="my-8 divider-fancy"></v-divider>
+
+            <div class="section mb-5 scroll-reveal">
+              <div class="section-heading">
+                <div class="section-title-container">
+                  <h2 class="section-title">Font License</h2>
+                  <div class="title-underline"></div>
+                </div>
+                <div class="section-text">
+                  <p>All fonts available on our platform are copyrighted and owned by the respective designers who have submitted them. By submitting fonts, the designer confirms that they are the original creator and hold the necessary rights to distribute the font.</p>
+                  <p>Any inquiries regarding modifications or alterations to a font should be directed to the designer of the font. We do not facilitate or mediate requests for modified versions of any fonts.</p>
+                  
+                  <v-list class="license-list transparent">
+                    <v-list-item v-for="(item, i) in 5" :key="i" class="px-0 license-item">
+                      <template v-slot:prepend>
+                        <div class="license-icon-container">
+                          <v-icon color="pink" size="small">mdi-checkbox-marked-circle</v-icon>
+                        </div>
+                      </template>
+                      <v-list-item-title>
+                        <span v-if="i === 0">Kotype Arabic fonts are free to use in personal and commercial works.</span>
+                        <span v-else-if="i === 1">Kotype fonts can be used on any medium: poster, logo, magazine, website, app, t-shirt, music video, bike trailer… Remember to credit the name of the type designer or the foundry whenever you use the fonts.</span>
+                        <span v-else-if="i === 2">Redistribution of the fonts without written permission is not allowed.</span>
+                        <span v-else-if="i === 3">Modification of the font file without written permission is not allowed.</span>
+                        <span v-else-if="i === 4">Kotype Free Arabic fonts may not be added to or used within any online or offline design tools or apps (e.g., Canva, photoshop) that allow users to create, edit, or distribute images using the fonts without proper licensing from Kotype or the designer of the typeface.</span>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </div>
+              </div>
+            </div>
+
+            <div class="section mb-5 scroll-reveal">
+              <div class="section-heading">
+                <div class="section-title-container">
+                  <h2 class="section-title">Support Us</h2>
+                  <div class="title-underline"></div>
+                </div>
+                <div class="section-text">
+                  <p>If you like our Free fonts and our activities, please consider donating. This will allow us to continue distributing new quality, free fonts and improving our existing catalogue. Visit our donation page.</p>
+                  <v-btn color="pink" variant="elevated" size="large" class="mt-5 support-btn" href="https://ko-fi.com/kotype" target="_blank">
+                    <v-icon start class="support-icon">mdi-heart</v-icon>
+                    Donate
+                  </v-btn>
+                </div>
+              </div>
+            </div>
+
+            <div class="section mb-5 scroll-reveal">
+              <div class="section-heading">
+                <div class="section-title-container">
+                  <h2 class="section-title">About the Team</h2>
+                  <div class="title-underline"></div>
+                </div>
+                <div class="section-text">
+                  <p>We are a collective from different countries, united by a common goal: to share our knowledge of type design and typography by creating free fonts that highlight the process of font creation. These fonts are provided as working product examples, with the design process documented and shared as educational materials.</p>
+                  
+                  <div class="team-highlight">
+                    <p>The project is currently managed by kotype team, with special thanks to everyone who embraced the idea and worked tirelessly to bring it to life, especially:</p>
+                    <ul class="team-members">
+                      <li><a href="https://www.heyporterposter.com/" target="_blank">Hey Porter! (Tawfiq Dawi)</a></li>
+                      <li><a href="http://abdomohamed.com/" target="_blank">Abdo Mohamed</a></li>
+                      <li><a href="https://www.instagram.com/ibrohamdi/" target="_blank">Ibrahim Hamdi</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
+    
+    <!-- Footer with font credits -->
+    <div class="footer-section" :class="{ 'dark-footer': themeStore.darkMode }">
+      <v-container>
+        <div class="font-credits">
+          <p>Explore our Arabic fonts:</p>
+          <div class="font-tags">
+            <v-chip 
+              v-for="font in arabicFonts" 
+              :key="font.id" 
+              variant="outlined"
+              class="font-tag"
+              color="pink"
+              @click="currentFontIndex = arabicFonts.indexOf(font)"
+            >
+              {{ font.name }}
+            </v-chip>
+          </div>
+        </div>
+      </v-container>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.about-view {
+  background-color: #fff;
+  color: #111;
+  padding-bottom: 0;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.about-view.dark-theme {
+  background-color: #0d0d0d;
+  color: #f5f5f5;
+}
+
+/* Banner Image */
+.banner-image-container {
+  position: relative;
+  height: 500px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.banner-text {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.font-info {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 3;
+}
+
+.current-font-chip {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #111 !important;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.pulse {
+  animation: pulse-animation 0.7s ease-in-out;
+}
+
+@keyframes pulse-animation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.quote-container {
+  max-width: 90%;
+  padding: 20px;
+}
+
+.arabic-quote {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.quote-translation {
+  font-size: 1.5rem;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+  font-weight: 300;
+  font-style: italic;
+}
+
+.font-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 3;
+}
+
+.font-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.font-indicator.active {
+  background-color: white;
+  transform: scale(1.2);
+}
+
+/* Header Section - IMPROVED */
+.header-section {
+  padding: 80px 0;
+  background-color: var(--section-bg-color, #f8f8f8);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--section-shadow, 0 5px 15px rgba(0,0,0,0.03));
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.logo-col {
+  min-height: 180px;
+}
+
+.logo-container {
+  position: relative;
+  display: inline-block;
+}
+
+.kotype-logo {
+  max-width: 300px;
+  height: auto;
+  filter: hue-rotate(280deg); /* Pink color */
+  position: relative;
+  z-index: 2;
+  transition: all 0.5s ease;
+}
+
+.kotype-logo:hover {
+  transform: scale(1.05);
+  filter: hue-rotate(280deg) drop-shadow(0 0 8px rgba(255, 105, 180, 0.5));
+}
+
+.dark-theme .kotype-logo {
+  filter: hue-rotate(280deg) brightness(1.2);
+}
+
+.logo-flare {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(ellipse at center, var(--accent-light-color, rgba(255,105,180,0.2)) 0%, rgba(255,105,180,0) 70%);
+  z-index: 1;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: rotate 15s infinite linear;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Content Section - IMPROVED */
+.content-section {
+  padding: 60px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.content-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, var(--section-bg-color, rgba(248, 248, 248, 0.8)) 0%, rgba(248, 248, 248, 0) 100%);
+  z-index: -1;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.section {
+  margin-bottom: 60px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  position: relative;
+}
+
+.section.scroll-reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-heading {
+  margin-bottom: 30px;
+}
+
+.section-title-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  display: inline-block;
+  background-color: var(--accent-color, #ff69b4);
+  color: white;
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-size: 1.6rem;
+  margin-bottom: 5px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.2));
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.title-underline {
+  height: 4px;
+  background-color: var(--accent-color, #ff69b4);
+  width: 50%;
+  position: relative;
+  left: 25%;
+  border-radius: 2px;
+  margin-top: -2px;
+  opacity: 0.6;
+  transition: background-color 0.3s ease;
+}
+
+.section-text {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-color, #111);
+  transition: color 0.3s ease;
+}
+
+.section-text p {
+  margin-bottom: 1.2rem;
+}
+
+.quote-block {
+  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.05));
+  border-left: 4px solid var(--accent-color, #ff69b4);
+  padding: 20px;
+  margin: 20px 0;
+  position: relative;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 2px 8px var(--accent-light-color, rgba(255, 105, 180, 0.05));
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mission-quote {
+  font-size: 1.3rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 10px 40px;
+  text-align: center;
+}
+
+.quote-icon {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  opacity: 0.6;
+  color: var(--accent-color, #ff69b4) !important;
+  transition: color 0.3s ease;
+}
+
+.quote-close {
+  top: auto;
+  left: auto;
+  right: 15px;
+  bottom: 15px;
+}
+
+.license-list {
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+.license-item {
+  margin-bottom: 10px;
+  transition: background-color 0.3s ease;
+  border-radius: 8px;
+}
+
+.license-item:hover {
+  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.05)) !important;
+}
+
+.license-icon-container {
+  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.1));
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.license-list :deep(.v-list-item-title) {
+  white-space: normal;
+  line-height: 1.6;
+  color: var(--text-color, #111);
+  transition: color 0.3s ease;
+}
+
+.transparent {
+  background-color: transparent !important;
+}
+
+.divider-fancy {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent-color, rgba(255, 105, 180, 0.5)), transparent);
+  overflow: visible;
+  margin: 60px 0;
+  transition: background 0.3s ease;
+}
+
+.divider-fancy::after {
+  content: '❖';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--bg-color, white);
+  padding: 0 15px;
+  color: var(--accent-color, #ff69b4);
+  font-size: 16px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.support-btn {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.3));
+  background-color: var(--accent-color, #ff69b4) !important;
+  color: white !important;
+}
+
+.support-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-medium-color, rgba(255, 105, 180, 0.4));
+}
+
+.support-icon {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.team-highlight {
+  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.05));
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 10px var(--accent-light-color, rgba(255, 105, 180, 0.05));
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-members {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.team-members li {
+  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.1));
+  padding: 8px 15px;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.team-members li a {
+  color: var(--text-color, #111);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.team-members li:hover {
+  background-color: var(--accent-medium-color, rgba(255, 105, 180, 0.2));
+  transform: translateY(-2px);
+}
+
+.footer-section {
+  background-color: var(--footer-bg-color, #f0f0f0);
+  padding: 40px 0;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark-footer {
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.font-credits {
+  text-align: center;
+  color: var(--text-color, #111);
+  transition: color 0.3s ease;
+}
+
+.font-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.font-tag {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  color: var(--accent-color, #ff69b4) !important;
+  border-color: var(--accent-color, #ff69b4) !important;
+}
+
+.font-tag:hover {
+  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.1));
+  transform: translateY(-2px);
+}
+
+/* Fade transition */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@media (max-width: 767px) {
+  .banner-image-container {
+    height: 400px;
+  }
+  
+  .arabic-quote {
+    font-size: 2.5rem;
+  }
+  
+  .quote-translation {
+    font-size: 1.2rem;
+  }
+  
+  .header-section {
+    padding: 40px 0;
+  }
+  
+  .header-row {
+    min-height: auto;
+  }
+  
+  .logo-col {
+    min-height: 150px;
+    margin-bottom: 20px;
+  }
+  
+  .content-section {
+    padding: 40px 0;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+    padding: 8px 20px;
+  }
+  
+  .section-text {
+    font-size: 1rem;
+  }
+  
+  .kotype-logo {
+    max-width: 200px;
+  }
+  
+  .mission-quote {
+    font-size: 1.1rem;
+    padding: 5px 30px;
+  }
+  
+  .team-members {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .font-tags {
+    gap: 8px;
+  }
+  
+  .divider-fancy {
+    margin: 40px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-image-container {
+    height: 350px;
+  }
+  
+  .arabic-quote {
+    font-size: 2rem;
+  }
+  
+  .quote-translation {
+    font-size: 1rem;
+  }
+  
+  .font-info {
+    top: 10px;
+    left: 10px;
+  }
+  
+  .current-font-chip {
+    font-size: 0.8rem !important;
+    height: auto !important;
+    padding: 4px 8px !important;
+  }
+}
+</style>
+
+<script>
+// Add scroll reveal after component is mounted
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('scroll-reveal-active');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.scroll-reveal').forEach(section => {
+    observer.observe(section);
+  });
+});
+
+// Set background color for divider-fancy pseudo element
+document.addEventListener('DOMContentLoaded', () => {
+  const updateDividerColor = () => {
+    const isDark = document.querySelector('.about-view').classList.contains('dark-theme');
+    document.documentElement.style.setProperty('--bg-color', isDark ? '#0d0d0d' : 'white');
+  };
+  
+  // Initial update
+  updateDividerColor();
+  
+  // Monitor for theme changes
+  const observer = new MutationObserver(updateDividerColor);
+  observer.observe(document.querySelector('.about-view'), { 
+    attributes: true, 
+    attributeFilter: ['class'] 
+  });
+});
+</script> 

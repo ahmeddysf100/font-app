@@ -36,7 +36,7 @@ import KoGaliModernHeavy from "../assets/fonts/KoGaliModern/KoGaliModern-Heavy.o
 import KoGaliModernUltraBold from "../assets/fonts/KoGaliModern/KoGaliModern-Regular.otf";
 import KoGaliModernUltraLight from "../assets/fonts/KoGaliModern/KoGaliModern-UltraLight.otf";
 
-// KoKhalaya - Static Weights (selected weights)
+// KoKhalaya
 import KoKhalaya55 from "../assets/fonts/KoKhalaya/weights/KoKhalaya-5-5.otf";
 import KoKhalaya56 from "../assets/fonts/KoKhalaya/weights/KoKhalaya-5-6.otf";
 import KoKhalaya57 from "../assets/fonts/KoKhalaya/weights/KoKhalaya-5-7.otf";
@@ -92,685 +92,336 @@ import SatoshiVariable from "../assets/fonts/Satoshi/Satoshi-Variable.woff";
 import SatoshiVariableItalic2 from "../assets/fonts/Satoshi/Satoshi-VariableItalic.woff2";
 import SatoshiVariableItalic from "../assets/fonts/Satoshi/Satoshi-VariableItalic.woff";
 
-// Add export statement for fontToImport
-export const fontToImport = [
+// Combined fonts configuration
+export const fonts = [
   {
     id: 1,
     name: "Ko_Banzeen",
     fontFamily: "Ko_Banzeen",
-    styles: [KoBanzeenNormal, KoBanzeenSlantedL, KoBanzeenSlantedR],
-    styleNames: ["Normal", "Slanted Left", "Slanted Right"],
+    category: "Display",
+    styles: [
+      { file: KoBanzeenNormal, name: "Normal", style: "normal", weight: 400 },
+      { file: KoBanzeenSlantedL, name: "Slanted Left", style: "italic", weight: 400, variationSettings: "'slnt' -15" },
+      { file: KoBanzeenSlantedR, name: "Slanted Right", style: "oblique", weight: 400, variationSettings: "'slnt' 15" }
+    ],
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 3,
+    styleCount: 3
   },
   {
     id: 2,
     name: "KOAynama",
-    fontFamily: "KOAynama",
-    styles: [KOAynamaSharp, KOAynamaCurved],
-    styleNames: ["Sharp", "Curved"],
+    category: "Sans-serif",
+    styles: [
+      { file: KOAynamaSharp, name: "Sharp", style: "normal", weight: 400, fontFamily: "KOAynama-Sharp" },
+      { file: KOAynamaCurved, name: "Curved", style: "normal", weight: 400, fontFamily: "KOAynama-Curved" }
+    ],
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 2,
+    styleCount: 2
   },
   {
     id: 3,
     name: "KoDongol",
     fontFamily: "KoDongol",
-    styles: [KoDongolRegular],
-    styleNames: ["Regular"],
+    category: "Serif",
+    styles: [
+      { file: KoDongolRegular, name: "Regular", style: "normal", weight: 400 }
+    ],
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 1,
+    styleCount: 1
   },
   {
     id: 4,
     name: "KoGaliModern",
     fontFamily: "KoGaliModern",
+    category: "Mono",
     styles: [
-      KoGaliModernBlack,
-      KoGaliModernBold,
-      KoGaliModernExtraBold,
-      KoGaliModernMedium,
-      KoGaliModernSemiBold,
-      KoGaliModernLight,
-      KoGaliModernExtraLight,
-      KoGaliModernHeavy,
-      KoGaliModernUltraBold,
-      KoGaliModernUltraLight,
-    ],
-    styleNames: [
-      "Black",
-      "Bold",
-      "ExtraBold",
-      "Medium",
-      "SemiBold",
-      "Light",
-      "ExtraLight",
-      "Heavy",
-      "Regular",
-      "UltraLight",
+      { file: KoGaliModernUltraLight, name: "UltraLight", weight: 100 },
+      { file: KoGaliModernExtraLight, name: "ExtraLight", weight: 200 },
+      { file: KoGaliModernLight, name: "Light", weight: 300 },
+      { file: KoGaliModernUltraBold, name: "Regular", weight: 400 },
+      { file: KoGaliModernMedium, name: "Medium", weight: 500 },
+      { file: KoGaliModernSemiBold, name: "SemiBold", weight: 600 },
+      { file: KoGaliModernBold, name: "Bold", weight: 700 },
+      { file: KoGaliModernExtraBold, name: "ExtraBold", weight: 800 },
+      { file: KoGaliModernBlack, name: "Black", weight: 900 },
+      { file: KoGaliModernHeavy, name: "Heavy", weight: 900 }
     ],
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 10,
+    styleCount: 10
   },
   {
-    id: 15,
+    id: 5,
     name: "KoKhalaya",
     fontFamily: "KoKhalaya",
+    category: "Sans-serif",
     styles: [
-      KoKhalaya55,
-      KoKhalaya56,
-      KoKhalaya57,
-      KoKhalaya58,
-      KoKhalaya59,
-      KoKhalaya65,
-      KoKhalaya66,
-      KoKhalaya67,
-      KoKhalaya68,
-      KoKhalaya69,
-      KoKhalaya75,
-      KoKhalaya76,
-      KoKhalaya77,
-      KoKhalaya78,
-      KoKhalaya79,
-      KoKhalaya85,
-      KoKhalaya86,
-      KoKhalaya87,
-      KoKhalaya88,
-      KoKhalaya89,
-      KoKhalaya95,
-      KoKhalaya96,
-      KoKhalaya97,
+      { file: KoKhalaya55, name: "55", weight: 600 },
+      { file: KoKhalaya56, name: "56", weight: 600 },
+      { file: KoKhalaya57, name: "57", weight: 600 },
+      { file: KoKhalaya58, name: "58", weight: 600 },
+      { file: KoKhalaya59, name: "59", weight: 600 },
+      { file: KoKhalaya65, name: "65", weight: 700 },
+      { file: KoKhalaya66, name: "66", weight: 700 },
+      { file: KoKhalaya67, name: "67", weight: 700 },
+      { file: KoKhalaya68, name: "68", weight: 700 },
+      { file: KoKhalaya69, name: "69", weight: 700 },
+      { file: KoKhalaya75, name: "75", weight: 800 },
+      { file: KoKhalaya76, name: "76", weight: 800 },
+      { file: KoKhalaya77, name: "77", weight: 800 },
+      { file: KoKhalaya78, name: "78", weight: 800 },
+      { file: KoKhalaya79, name: "79", weight: 800 },
+      { file: KoKhalaya85, name: "85", weight: 900 },
+      { file: KoKhalaya86, name: "86", weight: 900 },
+      { file: KoKhalaya87, name: "87", weight: 900 },
+      { file: KoKhalaya88, name: "88", weight: 900 },
+      { file: KoKhalaya89, name: "89", weight: 900 },
+      { file: KoKhalaya95, name: "95", weight: 1000 },
+      { file: KoKhalaya96, name: "96", weight: 1000 },
+      { file: KoKhalaya97, name: "97", weight: 1000 }
     ],
-    styleNames: [
-      "55",
-      "56",
-      "57",
-      "58",
-      "59",
-      "65",
-      "66",
-      "67",
-      "68",
-      "69",
-      "75",
-      "76",
-      "77",
-      "78",
-      "79",
-      "85",
-      "86",
-      "87",
-      "88",
-      "89",
-      "95",
-      "96",
-      "97",
+    variable: [
+      { file: KoKhalayaVF, style: "normal", fontFamily: "KoKhalaya-Variable" }
     ],
-    variable: [KoKhalayaVF],
-    variableFontFamily: "KoKhalaya-Variable",
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 10,
+    styleCount: 23
   },
   {
-    id: 16,
+    id: 6,
     name: "KOLemaza",
     fontFamily: "KOLemaza",
+    category: "Display",
     styles: [
-      KOLemazaBlack,
-      KOLemazaBold,
-      KOLemazaExtraBold,
-      KOLemazaMedium,
-      KOLemazaRegular,
-      KOLemazaSemiBold,
+      { file: KOLemazaRegular, name: "Regular", weight: 400 },
+      { file: KOLemazaMedium, name: "Medium", weight: 500 },
+      { file: KOLemazaSemiBold, name: "SemiBold", weight: 600 },
+      { file: KOLemazaBold, name: "Bold", weight: 700 },
+      { file: KOLemazaExtraBold, name: "ExtraBold", weight: 800 },
+      { file: KOLemazaBlack, name: "Black", weight: 900 }
     ],
-    styleNames: ["Black", "Bold", "ExtraBold", "Medium", "Regular", "SemiBold"],
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 6,
+    styleCount: 6
   },
   {
-    id: 17,
+    id: 7,
     name: "KORubbama",
     fontFamily: "KORubbama",
-    styles: [KORubbamaBlack, KORubbamaBlackExpanded],
-    styleNames: ["Black", "BlackExpanded"],
+    category: "Script",
+    styles: [
+      { file: KORubbamaBlack, name: "Black", weight: 900, fontFamily: "KORubbama" },
+      { file: KORubbamaBlackExpanded, name: "BlackExpanded", weight: 900, fontFamily: "KORubbama-Expanded" }
+    ],
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 2,
+    styleCount: 2
   },
   {
-    id: 18,
+    id: 8,
     name: "KoShareb",
     fontFamily: "KoShareb",
-    styles: [KoSharebDisplay],
-    styleNames: ["Display"],
+    category: "Serif",
+    styles: [
+      { file: KoSharebDisplay, name: "Display", style: "normal", weight: 400 }
+    ],
     designer: "Kotype",
     imageUrl: null,
     isPremium: false,
-    styleCount: 1,
+    styleCount: 1
   },
-  // Add Satoshi fonts
   {
-    id: 14,
+    id: 9,
     name: "Satoshi",
     fontFamily: "Satoshi",
+    category: "Sans-serif",
     styles: [
-      // Primary WOFF files (the WOFF2 versions will be used as fallbacks in the font-face declarations)
-      SatoshiBlack,
-      SatoshiBlackItalic,
-      SatoshiBold,
-      SatoshiBoldItalic,
-      SatoshiItalic,
-      SatoshiLight,
-      SatoshiLightItalic,
-      SatoshiMedium,
-      SatoshiMediumItalic,
-      SatoshiRegular
+      { 
+        files: [SatoshiLight2, SatoshiLight],
+        formats: ["woff2", "woff"],
+        name: "Light",
+        weight: 300,
+        style: "normal"
+      },
+      {
+        files: [SatoshiLightItalic2, SatoshiLightItalic],
+        formats: ["woff2", "woff"],
+        name: "Light Italic",
+        weight: 300,
+        style: "italic"
+      },
+      {
+        files: [SatoshiRegular2, SatoshiRegular],
+        formats: ["woff2", "woff"],
+        name: "Regular",
+        weight: 400,
+        style: "normal"
+      },
+      {
+        files: [SatoshiItalic2, SatoshiItalic],
+        formats: ["woff2", "woff"],
+        name: "Italic",
+        weight: 400,
+        style: "italic"
+      },
+      {
+        files: [SatoshiMedium2, SatoshiMedium],
+        formats: ["woff2", "woff"],
+        name: "Medium",
+        weight: 500,
+        style: "normal"
+      },
+      {
+        files: [SatoshiMediumItalic2, SatoshiMediumItalic],
+        formats: ["woff2", "woff"],
+        name: "Medium Italic",
+        weight: 500,
+        style: "italic"
+      },
+      {
+        files: [SatoshiBold2, SatoshiBold],
+        formats: ["woff2", "woff"],
+        name: "Bold",
+        weight: 700,
+        style: "normal"
+      },
+      {
+        files: [SatoshiBoldItalic2, SatoshiBoldItalic],
+        formats: ["woff2", "woff"],
+        name: "Bold Italic",
+        weight: 700,
+        style: "italic"
+      },
+      {
+        files: [SatoshiBlack2, SatoshiBlack],
+        formats: ["woff2", "woff"],
+        name: "Black",
+        weight: 900,
+        style: "normal"
+      },
+      {
+        files: [SatoshiBlackItalic2, SatoshiBlackItalic],
+        formats: ["woff2", "woff"],
+        name: "Black Italic",
+        weight: 900,
+        style: "italic"
+      }
     ],
-    styleNames: [
-      "Black",
-      "Black Italic",
-      "Bold",
-      "Bold Italic",
-      "Italic",
-      "Light",
-      "Light Italic",
-      "Medium",
-      "Medium Italic",
-      "Regular"
+    variable: [
+      {
+        files: [SatoshiVariable2, SatoshiVariable],
+        formats: ["woff2", "woff"],
+        style: "normal",
+        fontFamily: "Satoshi-Variable"
+      },
+      {
+        files: [SatoshiVariableItalic2, SatoshiVariableItalic],
+        formats: ["woff2", "woff"],
+        style: "italic",
+        fontFamily: "Satoshi-Variable"
+      }
     ],
-    variable: [SatoshiVariable, SatoshiVariableItalic],
-    variableFontFamily: "Satoshi-Variable",
     designer: "Deni Anggara",
     imageUrl: null,
     isPremium: true,
-    styleCount: 10,
+    styleCount: 10
   }
 ];
+
+// Helper function to get file format
+const getFileFormat = (filename) => {
+  if (filename.endsWith('.otf')) return 'opentype';
+  if (filename.endsWith('.ttf')) return 'truetype';
+  if (filename.endsWith('.woff')) return 'woff';
+  if (filename.endsWith('.woff2')) return 'woff2';
+  return 'truetype';
+};
 
 // Create CSS for the fonts
 const createFontFaces = () => {
   let fontFacesCSS = "";
 
-  // Add explicit font-face declarations for each font family
-  // KoShareb
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'KoShareb';
-      src: url('${KoSharebDisplay}') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-  `;
-  
-  // KoDongol
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'KoDongol';
-      src: url('${KoDongolRegular}') format('opentype');
-      font-weight: normal;
-      font-style: normal;
-    }
-  `;
-  
-  // KOAynama Sharp
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'KOAynama-Sharp';
-      src: url('${KOAynamaSharp}') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-  `;
-  
-  // KOAynama Curved
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'KOAynama-Curved';
-      src: url('${KOAynamaCurved}') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-    }
-  `;
-  
-  // Add special handling for Satoshi WOFF/WOFF2 formats
-  // Satoshi Regular
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiRegular2}') format('woff2'),
-           url('${SatoshiRegular}') format('woff');
-      font-weight: 400;
-      font-style: normal;
-    }
-  `;
-  
-  // Satoshi Italic
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiItalic2}') format('woff2'),
-           url('${SatoshiItalic}') format('woff');
-      font-weight: 400;
-      font-style: italic;
-    }
-  `;
-  
-  // Satoshi Light
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiLight2}') format('woff2'),
-           url('${SatoshiLight}') format('woff');
-      font-weight: 300;
-      font-style: normal;
-    }
-  `;
-  
-  // Satoshi Light Italic
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiLightItalic2}') format('woff2'),
-           url('${SatoshiLightItalic}') format('woff');
-      font-weight: 300;
-      font-style: italic;
-    }
-  `;
-  
-  // Satoshi Medium
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiMedium2}') format('woff2'),
-           url('${SatoshiMedium}') format('woff');
-      font-weight: 500;
-      font-style: normal;
-    }
-  `;
-  
-  // Satoshi Medium Italic
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiMediumItalic2}') format('woff2'),
-           url('${SatoshiMediumItalic}') format('woff');
-      font-weight: 500;
-      font-style: italic;
-    }
-  `;
-  
-  // Satoshi Bold
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiBold2}') format('woff2'),
-           url('${SatoshiBold}') format('woff');
-      font-weight: 700;
-      font-style: normal;
-    }
-  `;
-  
-  // Satoshi Bold Italic
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiBoldItalic2}') format('woff2'),
-           url('${SatoshiBoldItalic}') format('woff');
-      font-weight: 700;
-      font-style: italic;
-    }
-  `;
-  
-  // Satoshi Black
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiBlack2}') format('woff2'),
-           url('${SatoshiBlack}') format('woff');
-      font-weight: 900;
-      font-style: normal;
-    }
-  `;
-  
-  // Satoshi Black Italic
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi';
-      src: url('${SatoshiBlackItalic2}') format('woff2'),
-           url('${SatoshiBlackItalic}') format('woff');
-      font-weight: 900;
-      font-style: italic;
-    }
-  `;
-  
-  // Satoshi Variable
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi-Variable';
-      src: url('${SatoshiVariable2}') format('woff2'),
-           url('${SatoshiVariable}') format('woff');
-      font-weight: 300 900;
-      font-style: normal;
-      font-display: swap;
-    }
-  `;
-  
-  // Satoshi Variable Italic
-  fontFacesCSS += `
-    @font-face {
-      font-family: 'Satoshi-Variable';
-      src: url('${SatoshiVariableItalic2}') format('woff2'),
-           url('${SatoshiVariableItalic}') format('woff');
-      font-weight: 300 900;
-      font-style: italic;
-      font-display: swap;
-    }
-  `;
-
-  // Define the remaining fonts via the loop
-  fontToImport.forEach(font => {
-    // Skip the fonts we've already defined explicitly
-    if (font.name === "KOAynama" || 
-        font.name === "KoDongol" || 
-        font.name === "KoShareb" ||
-        font.name === "Satoshi") {
-      return;
-    }
-    
+  fonts.forEach(font => {
     // Process regular styles
-    font.styles.forEach((styleFile, index) => {
-      const styleName = font.styleNames ? font.styleNames[index] : 'Regular';
-      let fontStyle = 'normal';
-      let fontWeight = 400;
-      let variationSettings = '';
-      
-      // Handle special cases
-      if (font.name === "Ko_Banzeen") {
-        if (styleName === "Slanted Left") {
-          fontStyle = "italic";
-          variationSettings = "font-variation-settings: 'slnt' -15;";
-        } else if (styleName === "Slanted Right") {
-          fontStyle = "oblique";
-          variationSettings = "font-variation-settings: 'slnt' 15;";
-        }
-      } else {
-        // Map weight names to numeric values for weight-based styles
-        if (
-          ["Black", "Bold", "ExtraBold", "Medium", "SemiBold", 
-           "Light", "ExtraLight", "Heavy", "Regular", "UltraLight"].includes(styleName)
-        ) {
-          const weightMap = {
-            "UltraLight": 100,
-            "ExtraLight": 200,
-            "Light": 300,
-            "Regular": 400,
-            "Medium": 500,
-            "SemiBold": 600,
-            "Bold": 700,
-            "ExtraBold": 800,
-            "Heavy": 900,
-            "Black": 900
-          };
-          fontWeight = weightMap[styleName] || 400;
-        } 
-        // For KoKhalaya's numbered weights
-        else if (font.name === "KoKhalaya" && styleName.match(/^\d\d$/)) {
-          const firstDigit = parseInt(styleName.charAt(0));
-          fontWeight = firstDigit * 100 + 100; // 5-> 600, 6-> 700, etc.
-        }
-      }
-      
-      // Determine the format based on the file extension
-      const getFormat = (file) => {
-        if (file.endsWith('.otf')) return 'opentype';
-        if (file.endsWith('.ttf')) return 'truetype';
-        if (file.endsWith('.woff')) return 'woff';
-        if (file.endsWith('.woff2')) return 'woff2';
-        return 'truetype'; // default
-      };
-      
-      // Only add the font-face if we haven't skipped it
-      fontFacesCSS += `
-        @font-face {
-          font-family: '${font.fontFamily}';
-          src: url('${styleFile}') format('${getFormat(styleFile)}');
-          font-weight: ${fontWeight};
-          font-style: ${fontStyle};
-          ${variationSettings}
-          font-display: swap;
-        }
-      `;
-    });
-    
-    // Process variable font if available
-    if (font.variable) {
-      const variableFontFamily = font.variableFontFamily || `${font.fontFamily}-Variable`;
-      
-      // Handle multiple variable files (e.g., normal and italic)
-      font.variable.forEach((varFile, idx) => {
-        const isItalic = idx > 0; // Assume first is normal, second is italic
-        
+    font.styles.forEach(style => {
+      if (Array.isArray(style.files)) {
+        // Handle multiple format files (e.g., Satoshi with woff2 and woff)
+        const sources = style.files.map((file, index) => 
+          `url('${file}') format('${style.formats[index]}')`
+        ).join(',\n       ');
+
         fontFacesCSS += `
           @font-face {
-            font-family: '${variableFontFamily}';
-            src: url('${varFile}') format('${varFile.endsWith('.woff2') ? 'woff2' : 
-                                           varFile.endsWith('.woff') ? 'woff' : 'truetype'}')
-            ${varFile.endsWith('.ttf') ? ' tech(\'variations\')' : ''};
-            font-weight: 100 900;
-            font-style: ${isItalic ? 'italic' : 'normal'};
+            font-family: '${style.fontFamily || font.fontFamily}';
+            src: ${sources};
+            font-weight: ${style.weight};
+            font-style: ${style.style || 'normal'};
             font-display: swap;
           }
         `;
+      } else {
+        // Handle single file formats
+        fontFacesCSS += `
+          @font-face {
+            font-family: '${style.fontFamily || font.fontFamily}';
+            src: url('${style.file}') format('${getFileFormat(style.file)}');
+            font-weight: ${style.weight || 400};
+            font-style: ${style.style || 'normal'};
+            ${style.variationSettings ? `font-variation-settings: ${style.variationSettings};` : ''}
+            font-display: swap;
+          }
+        `;
+      }
+    });
+
+    // Process variable fonts if available
+    if (font.variable) {
+      font.variable.forEach(varFont => {
+        if (Array.isArray(varFont.files)) {
+          const sources = varFont.files.map((file, index) => 
+            `url('${file}') format('${varFont.formats[index]}')`
+          ).join(',\n       ');
+
+          fontFacesCSS += `
+            @font-face {
+              font-family: '${varFont.fontFamily}';
+              src: ${sources};
+              font-weight: 300 900;
+              font-style: ${varFont.style};
+              font-display: swap;
+            }
+          `;
+        } else {
+          fontFacesCSS += `
+            @font-face {
+              font-family: '${varFont.fontFamily}';
+              src: url('${varFont.file}') format('${getFileFormat(varFont.file)}');
+              font-weight: 300 900;
+              font-style: ${varFont.style};
+              font-display: swap;
+            }
+          `;
+        }
       });
     }
   });
-  
-  console.log('Created font-face declarations for all fonts');
-  
+
   // Create and append style element
   const style = document.createElement('style');
   style.type = 'text/css';
   style.appendChild(document.createTextNode(fontFacesCSS));
   document.head.appendChild(style);
 };
-
-// Define font data
-const localFonts = [
-  {
-    id: 1,
-    name: "KOAynama Sharp",
-    category: "Sans-serif",
-    style: "Regular",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KOAynama-Sharp",
-  },
-  {
-    id: 2,
-    name: "KOAynama Curved",
-    category: "Sans-serif",
-    style: "Regular",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KOAynama-Curved",
-  },
-  {
-    id: 3,
-    name: "KoShareb",
-    category: "Serif",
-    style: "Display",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KoShareb",
-  },
-  {
-    id: 4,
-    name: "Ko Banzeen",
-    category: "Display",
-    style: "Normal",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 3,
-    fontFamily: "Ko_Banzeen",
-    styles: [
-      { name: "Normal", value: "normal" },
-      { name: "Slanted Left", value: "italic" },
-      { name: "Slanted Right", value: "oblique" },
-    ],
-  },
-  {
-    id: 5,
-    name: "KoDongol",
-    category: "Serif",
-    style: "Regular",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KoDongol",
-  },
-  {
-    id: 6,
-    name: "KOLemaza",
-    category: "Display",
-    style: "Regular",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KOLemaza",
-  },
-  {
-    id: 7,
-    name: "KoKhalaya Variable",
-    category: "Sans-serif",
-    style: "Variable",
-    variable: true,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KoKhalaya-Variable",
-  },
-  {
-    id: 8,
-    name: "KoKhalaya",
-    category: "Sans-serif",
-    style: "Regular",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 5,
-    fontFamily: "KoKhalaya",
-    weights: [500, 600, 700, 800, 900],
-  },
-  {
-    id: 9,
-    name: "KORubbama",
-    category: "Script",
-    style: "Black",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KORubbama",
-  },
-  {
-    id: 10,
-    name: "KORubbama Expanded",
-    category: "Script",
-    style: "Black Expanded",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KORubbama-Expanded",
-  },
-  {
-    id: 11,
-    name: "KoGaliModern",
-    category: "Mono",
-    style: "Regular",
-    variable: false,
-    designer: "Kotype",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 1,
-    fontFamily: "KoGaliModern",
-  },
-  // Add Satoshi
-  {
-    id: 12,
-    name: "Satoshi",
-    category: "Sans-serif",
-    style: "Regular",
-    variable: false,
-    designer: "Deni Anggara",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 10,
-    fontFamily: "Satoshi",
-    weights: [300, 400, 500, 700, 900],
-    styles: [
-      { name: "Light", weight: 300, style: "normal" },
-      { name: "Light Italic", weight: 300, style: "italic" },
-      { name: "Regular", weight: 400, style: "normal" },
-      { name: "Italic", weight: 400, style: "italic" },
-      { name: "Medium", weight: 500, style: "normal" },
-      { name: "Medium Italic", weight: 500, style: "italic" },
-      { name: "Bold", weight: 700, style: "normal" },
-      { name: "Bold Italic", weight: 700, style: "italic" },
-      { name: "Black", weight: 900, style: "normal" },
-      { name: "Black Italic", weight: 900, style: "italic" },
-    ]
-  },
-  {
-    id: 13,
-    name: "Satoshi Variable",
-    category: "Sans-serif",
-    style: "Variable",
-    variable: true,
-    designer: "Deni Anggara",
-    imageUrl: null,
-    isPremium: false,
-    styleCount: 2,
-    fontFamily: "Satoshi-Variable",
-    variableAxes: ["weight"],
-    styles: [
-      { name: "Regular Variable", style: "normal" },
-      { name: "Italic Variable", style: "italic" }
-    ]
-  }
-];
 
 // Initialize fonts
 export const initializeFonts = () => {
@@ -781,11 +432,27 @@ export const initializeFonts = () => {
   const fontStore = useFontStore();
 
   // Add each font to the store
-  localFonts.forEach((font) => {
-    fontStore.addFont(font);
+  fonts.forEach((font) => {
+    fontStore.addFont({
+      id: font.id,
+      name: font.name,
+      category: font.category,
+      style: font.styles[0].name,
+      variable: !!font.variable,
+      designer: font.designer,
+      imageUrl: font.imageUrl,
+      isPremium: font.isPremium,
+      styleCount: font.styleCount,
+      fontFamily: font.fontFamily,
+      styles: font.styles.map(s => ({
+        name: s.name,
+        weight: s.weight,
+        style: s.style || 'normal'
+      }))
+    });
   });
 
-  console.log("Local fonts loaded into store:", localFonts.length);
+  console.log("Fonts loaded into store:", fonts.length);
 };
 
 export default initializeFonts;

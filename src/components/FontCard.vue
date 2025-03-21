@@ -3,14 +3,19 @@ import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useFontStore } from "../stores/fonts";
 import { useSittingsStore } from "../stores/sittings";
-import koSharebFont from '../assets/fonts/KoShareb/OTF/KoShareb-Display.otf';
+
 // Import the font utility functions
-import { FONT_FAMILIES, FONT_WEIGHTS, FONT_STYLES, generateFontStyle } from '../utils/fontUtils';
-// Import fontToImport from fontLoader
-import { fontToImport } from '../utils/fontLoader';
+import {
+  FONT_FAMILIES,
+  FONT_WEIGHTS,
+  FONT_STYLES,
+  generateFontStyle,
+} from "../utils/fontUtils";
+// Import fonts from fontLoader
+import { fonts } from "../utils/fontLoader";
 
 // Add development mode constant
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = import.meta.env.NODE_ENV === "development";
 
 const props = defineProps({
   font: {
@@ -36,15 +41,15 @@ const fontStore = useFontStore();
 const showOptions = ref(false);
 const sittingsStore = useSittingsStore();
 // Font customization controls
-const fontWeight = ref(400); // Use numeric weight values
-const fontSize = ref(60);
+const fontWeight = ref(400);
+const fontSize = ref(props.fontSize);
 const fontStyle = ref("normal");
 const leading = ref(1.2);
 const tracking = ref(0);
-const textAlign = ref("center");
+const textAlign = ref(props.textAlignment);
 const isAllCaps = ref(false);
 const features = ref({
-  ligatures: false,
+  ligatures: true,
   discretionaryLigatures: false,
   fractions: false,
   ordinals: false,
@@ -62,7 +67,7 @@ watch(
       textAlign.value = "center";
       isAllCaps.value = false;
       features.value = {
-        ligatures: false,
+        ligatures: true,
         discretionaryLigatures: false,
         fractions: false,
         ordinals: false,
@@ -235,158 +240,128 @@ const selectFontStyle = (weight, italic) => {
 // New variables for the style dropdown
 const selectedStyle = ref(null);
 const showStyleMenu = ref(false);
-const styleOptions = ref([]);
 
-// Get available font styles from the fontToImport data
-const loadFontStyles = () => {
-  if (!props.font || !props.font.name) return;
-  
-  // Find the matching font in fontToImport
-  const fontData = fontToImport.find(f => f.name === props.font.name);
-  
-  if (!fontData) {
-    console.warn(`Font data not found for: ${props.font.name}`);
-    // Fallback to standard style options
-    styleOptions.value = [
-      { title: "Regular", weight: 400, italic: false },
-      { title: "Bold", weight: 700, italic: false },
-    ];
-    return;
-  }
-  
-  // Map the styles based on the font's available styles
-  const styles = [];
-  
-  if (fontData.styleNames && fontData.styleNames.length > 0) {
-    fontData.styleNames.forEach((styleName, index) => {
-      // Map style names to weights and italic status
-      let weight = 400;
-      let italic = false;
-      
-      if (styleName.includes("Italic") || styleName === "Slanted Left") {
-        italic = true;
-      }
-      
-      // Handle weight mapping
-      if (styleName === "Thin" || styleName === "UltraLight") {
-        weight = 100;
-      } else if (styleName === "ExtraLight") {
-        weight = 200;
-      } else if (styleName === "Light") {
-        weight = 300;
-      } else if (styleName === "Regular" || styleName === "Normal") {
-        weight = 400;
-      } else if (styleName === "Medium") {
-        weight = 500;
-      } else if (styleName === "SemiBold") {
-        weight = 600;
-      } else if (styleName === "Bold") {
-        weight = 700;
-      } else if (styleName === "ExtraBold" || styleName === "UltraBold") {
-        weight = 800;
-      } else if (styleName === "Black" || styleName === "Heavy") {
-        weight = 900;
-      } else if (/^\d\d$/.test(styleName)) {
-        // Handle KoKhalaya's numbered weights (55, 65, etc.)
-        const firstDigit = parseInt(styleName.charAt(0));
-        weight = firstDigit * 100 + 100; // 5-> 600, 6-> 700, etc.
-      }
-      
-      // Special case for KOAynama
-      if (fontData.name === "KOAynama") {
-        if (styleName === "Sharp") {
-          styles.push({ 
-            title: "Sharp", 
-            weight: 400, 
-            italic: false,
-            fontFamily: FONT_FAMILIES.KOAYNAMA_SHARP
-          });
-        } else if (styleName === "Curved") {
-          styles.push({ 
-            title: "Curved", 
-            weight: 400, 
-            italic: false,
-            fontFamily: FONT_FAMILIES.KOAYNAMA_CURVED
-          });
-        }
-        return;
-      }
-      
-      // Special case for KORubbama
-      if (fontData.name === "KORubbama" && styleName === "BlackExpanded") {
-        styles.push({ 
-          title: "Expanded", 
-          weight: 900, 
-          italic: false,
-          fontFamily: FONT_FAMILIES.KORUBBAMA_EXPANDED
-        });
-        return;
-      }
-      
-      // Standard style
-      styles.push({ 
-        title: styleName, 
-        weight, 
-        italic,
-        fontFamily: fontData.fontFamily
-      });
-    });
-  } else {
-    // Fallback if no style names are defined
-    styles.push({ 
-      title: "Regular", 
-      weight: 400, 
-      italic: false,
-      fontFamily: fontData.fontFamily
-    });
-  }
-  
-  // Add variable font option if available
-  if (fontData.variable) {
-    styles.push({ 
-      title: "Variable", 
-      weight: 400, 
-      italic: false,
-      isVariable: true,
-      fontFamily: fontData.variableFontFamily || `${fontData.fontFamily}-Variable`
-    });
-  }
-  
-  styleOptions.value = styles;
-  console.log(`Loaded ${styles.length} styles for ${props.font.name}:`, styles);
-};
-
-const handleStyleChange = (item) => {
-  selectedStyle.value = item;
-  
-  // Apply style settings
-  fontWeight.value = item.weight;
-  fontStyle.value = item.italic ? "italic" : "normal";
-  
-  // If this style has a specific font family, update it
-  if (item.fontFamily) {
-    currentFontFamily.value = item.fontFamily;
-  }
-  
-  // Handle variable font
-  isVariableFont.value = item.isVariable || false;
-};
-
-// Track the current font family for this card
-const currentFontFamily = ref('');
-const isVariableFont = ref(false);
-
-// Initialize styles when the component is mounted
-onMounted(() => {
-  loadFontStyles();
-  initSelectedStyle();
+// Current font data from the new fonts array
+const currentFontData = computed(() => {
+  return fonts.find((f) => f.name === props.font.name) || null;
 });
 
-// Watch for changes in the font prop
-watch(() => props.font, () => {
-  loadFontStyles();
+// Available styles based on the new font structure
+const styleOptions = computed(() => {
+  if (!currentFontData.value) return [];
+
+  return currentFontData.value.styles
+    .map((style) => ({
+      title: style.name,
+      weight: style.weight || 400,
+      italic: style.style === "italic",
+      fontFamily: style.fontFamily || currentFontData.value.fontFamily,
+      isVariable: false,
+    }))
+    .concat(
+      currentFontData.value.variable
+        ? currentFontData.value.variable.map((varFont) => ({
+            title: "Variable" + (varFont.style === "italic" ? " Italic" : ""),
+            weight: 400,
+            italic: varFont.style === "italic",
+            fontFamily: varFont.fontFamily,
+            isVariable: true,
+          }))
+        : []
+    );
+});
+
+// Initialize style based on font data
+const initSelectedStyle = () => {
+  if (!styleOptions.value.length) return;
+
+  // Try to find a matching style based on current weight and style
+  const matchingStyle = styleOptions.value.find(
+    (style) =>
+      style.weight === fontWeight.value &&
+      style.italic === (fontStyle.value === "italic")
+  );
+
+  selectedStyle.value = matchingStyle || styleOptions.value[0];
+
+  // Apply the initial style
+  if (selectedStyle.value) {
+    currentFontFamily.value = selectedStyle.value.fontFamily;
+    isVariableFont.value = selectedStyle.value.isVariable;
+  }
+};
+
+// Style change handler with improved font switching
+const handleStyleChange = (style) => {
+  selectedStyle.value = style;
+  fontWeight.value = style.weight;
+  fontStyle.value = style.italic ? "italic" : "normal";
+  currentFontFamily.value = style.fontFamily;
+  isVariableFont.value = style.isVariable;
+};
+
+// Font family management
+const currentFontFamily = ref("");
+const isVariableFont = ref(false);
+
+// Enhanced sample text style computation
+const sampleTextStyle = computed(() => {
+  const style = {
+    fontFamily:
+      currentFontFamily.value ||
+      currentFontData.value?.fontFamily ||
+      props.font.fontFamily,
+    fontSize: `${fontSize.value}px`,
+    lineHeight: leading.value,
+    letterSpacing: `${tracking.value}px`,
+    textAlign: textAlign.value,
+    textTransform: isAllCaps.value ? "uppercase" : "none",
+    fontWeight: fontWeight.value,
+    fontStyle: fontStyle.value,
+  };
+
+  // Add variable font settings if applicable
+  if (isVariableFont.value) {
+    style.fontVariationSettings = `'wght' ${fontWeight.value}`;
+  }
+
+  // Add OpenType features
+  const featureSettings = [];
+  if (features.value.ligatures) featureSettings.push('"liga" 1');
+  if (features.value.discretionaryLigatures) featureSettings.push('"dlig" 1');
+  if (features.value.fractions) featureSettings.push('"frac" 1');
+  if (features.value.ordinals) featureSettings.push('"ordn" 1');
+
+  if (featureSettings.length > 0) {
+    style.fontFeatureSettings = featureSettings.join(", ");
+  }
+
+  return style;
+});
+
+// Initialize component
+onMounted(() => {
   initSelectedStyle();
-}, { deep: true });
+
+  // Set initial weight based on font style
+  if (currentFontData.value?.styles[0]?.weight) {
+    fontWeight.value = currentFontData.value.styles[0].weight;
+  }
+
+  // Enable appropriate features for Arabic fonts
+  if (props.font.category === "Arabic") {
+    features.value.ligatures = true;
+  }
+});
+
+// Watch for font changes
+watch(
+  () => props.font,
+  () => {
+    initSelectedStyle();
+  },
+  { deep: true }
+);
 
 // Add a watch to track changes in the settings store
 watch(
@@ -403,7 +378,9 @@ watch(
     // Update selected style based on new weight if possible
     if (styleOptions.value.length > 0) {
       const matchingStyle = styleOptions.value.find(
-        (style) => style.weight === newVal && style.italic === (fontStyle.value === "italic")
+        (style) =>
+          style.weight === newVal &&
+          style.italic === (fontStyle.value === "italic")
       );
       if (matchingStyle) {
         selectedStyle.value = matchingStyle;
@@ -447,152 +424,90 @@ watch(
   }
 );
 
-// Initialize selected style based on weight and style
-const initSelectedStyle = () => {
-  if (styleOptions.value.length === 0) {
-    return;
-  }
-  
-  const matchingStyle = styleOptions.value.find(
-    (style) =>
-      style.weight === fontWeight.value &&
-      style.italic === (fontStyle.value === "italic")
-  );
-  
-  selectedStyle.value = matchingStyle || styleOptions.value[0];
-  
-  // Apply the initial style
-  if (selectedStyle.value && selectedStyle.value.fontFamily) {
-    currentFontFamily.value = selectedStyle.value.fontFamily;
-  } else {
-    // Default to font's main font family
-    currentFontFamily.value = getFontFamilyForFont(props.font);
-  }
-  
-  isVariableFont.value = selectedStyle.value?.isVariable || false;
-};
-
-// Add a computed property for the sample text style using our font utilities
-const sampleTextStyle = computed(() => {
-  // Use the current font family (which updates based on style selection)
-  const fontName = currentFontFamily.value || getFontFamilyForFont(props.font);
-  
-  // Use generateFontStyle to create the base style with proper font family
-  let style = generateFontStyle(fontName, fontWeight.value, fontStyle.value);
-  
-  // Add the remaining style properties
-  style.fontSize = `${fontSize.value}px`;
-  style.lineHeight = leading.value;
-  style.letterSpacing = `${tracking.value}px`;
-  style.textTransform = isAllCaps.value ? 'uppercase' : 'none';
-  style.textAlign = textAlign.value;
-
-  // Add font variation settings for variable fonts if needed
-  if (isVariableFont.value) {
-    style.fontVariationSettings = `'wght' ${fontWeight.value}`;
-  }
-
-  // Add font feature settings if any are enabled
-  let featureSettings = "";
-  if (features.value.ligatures) featureSettings += '"liga" 1, ';
-  if (features.value.discretionaryLigatures) featureSettings += '"dlig" 1, ';
-  if (features.value.fractions) featureSettings += '"frac" 1, ';
-  if (features.value.ordinals) featureSettings += '"ordn" 1, ';
-  
-  // Remove trailing comma and space if any features are enabled
-  if (featureSettings.length > 0) {
-    style.fontFeatureSettings = featureSettings.slice(0, -2);
-  }
-
-  return style;
-});
-
 // Updated computed properties
 // Replace the fontStyles computed property with this:
 const previewContainerStyle = computed(() => {
   // Use the current font family (which updates based on style selection)
-  const fontName = currentFontFamily.value || getFontFamilyForFont(props.font);
-  
+  const fontName =
+    currentFontFamily.value ||
+    currentFontData.value?.fontFamily ||
+    props.font.fontFamily;
+
   // Use our font utilities to generate the base style
   let style = generateFontStyle(fontName, fontWeight.value, fontStyle.value);
-  
+
   // Add size and alignment properties
   style.fontSize = `${fontSize.value}px`;
   style.textAlign = textAlign.value;
   style.lineHeight = leading.value;
-  
+
   // Add variation settings for variable fonts if needed
   if (isVariableFont.value) {
     style.fontVariationSettings = `'wght' ${fontWeight.value}`;
   }
-  
+
   return style;
 });
 
 // Helper function to get font family based on font name
 const getFontFamilyForFont = (font) => {
-  if (!font) return '';
-  
-  console.log('Processing font:', font.name);
-  
+  if (!font) return "";
+
+  console.log("Processing font:", font.name);
+
   // Create a direct mapping for more reliable font family selection
   const fontMapping = {
-    'KOLemaza': FONT_FAMILIES.KOLEMAZA,
-    'KOAynama Sharp': FONT_FAMILIES.KOAYNAMA_SHARP,
-    'KOAynama Curved': FONT_FAMILIES.KOAYNAMA_CURVED,
-    'KoShareb': FONT_FAMILIES.KOSHAREB,
-    'Ko Banzeen': FONT_FAMILIES.KOBANZEEN,
-    'KoDongol': FONT_FAMILIES.KODONGOL,
-    'KoKhalaya': FONT_FAMILIES.KOKHALAYA,
-    'KoKhalaya Variable': FONT_FAMILIES.KOKHALAYA_VARIABLE,
-    'KORubbama': FONT_FAMILIES.KORUBBAMA,
-    'KORubbama Expanded': FONT_FAMILIES.KORUBBAMA_EXPANDED,
-    'KoGaliModern': FONT_FAMILIES.KOGALIMODERN,
-    'Satoshi': FONT_FAMILIES.SATOSHI,
-    'Satoshi Variable': FONT_FAMILIES.SATOSHI_VARIABLE
+    KOLemaza: FONT_FAMILIES.KOLEMAZA,
+    "KOAynama Sharp": FONT_FAMILIES.KOAYNAMA_SHARP,
+    "KOAynama Curved": FONT_FAMILIES.KOAYNAMA_CURVED,
+    KoShareb: FONT_FAMILIES.KOSHAREB,
+    "Ko Banzeen": FONT_FAMILIES.KOBANZEEN,
+    KoDongol: FONT_FAMILIES.KODONGOL,
+    KoKhalaya: FONT_FAMILIES.KOKHALAYA,
+    "KoKhalaya Variable": FONT_FAMILIES.KOKHALAYA_VARIABLE,
+    KORubbama: FONT_FAMILIES.KORUBBAMA,
+    "KORubbama Expanded": FONT_FAMILIES.KORUBBAMA_EXPANDED,
+    KoGaliModern: FONT_FAMILIES.KOGALIMODERN,
+    Satoshi: FONT_FAMILIES.SATOSHI,
+    "Satoshi Variable": FONT_FAMILIES.SATOSHI_VARIABLE,
   };
-  
+
   // Try to get the font family from our mapping
   if (fontMapping[font.name]) {
     return fontMapping[font.name];
   }
-  
+
   // Fallback to the conditional checks
-  return font.name === 'KOLemaza' ? FONT_FAMILIES.KOLEMAZA : 
-         font.name === 'KOAynama Sharp' ? FONT_FAMILIES.KOAYNAMA_SHARP :
-         font.name === 'KOAynama Curved' ? FONT_FAMILIES.KOAYNAMA_CURVED :
-         font.name === 'KoShareb' ? FONT_FAMILIES.KOSHAREB :
-         font.name === 'Ko Banzeen' ? FONT_FAMILIES.KOBANZEEN :
-         font.name === 'KoDongol' ? FONT_FAMILIES.KODONGOL :
-         font.name === 'KoKhalaya' ? FONT_FAMILIES.KOKHALAYA :
-         font.name === 'KoKhalaya Variable' ? FONT_FAMILIES.KOKHALAYA_VARIABLE :
-         font.name === 'KORubbama' ? FONT_FAMILIES.KORUBBAMA :
-         font.name === 'KORubbama Expanded' ? FONT_FAMILIES.KORUBBAMA_EXPANDED :
-         font.name === 'KoGaliModern' ? FONT_FAMILIES.KOGALIMODERN :
-         font.name === 'Satoshi' ? FONT_FAMILIES.SATOSHI :
-         font.name === 'Satoshi Variable' ? FONT_FAMILIES.SATOSHI_VARIABLE :
-         `'${font.name}'`;
+  return font.name === "KOLemaza"
+    ? FONT_FAMILIES.KOLEMAZA
+    : font.name === "KOAynama Sharp"
+    ? FONT_FAMILIES.KOAYNAMA_SHARP
+    : font.name === "KOAynama Curved"
+    ? FONT_FAMILIES.KOAYNAMA_CURVED
+    : font.name === "KoShareb"
+    ? FONT_FAMILIES.KOSHAREB
+    : font.name === "Ko Banzeen"
+    ? FONT_FAMILIES.KOBANZEEN
+    : font.name === "KoDongol"
+    ? FONT_FAMILIES.KODONGOL
+    : font.name === "KoKhalaya"
+    ? FONT_FAMILIES.KOKHALAYA
+    : font.name === "KoKhalaya Variable"
+    ? FONT_FAMILIES.KOKHALAYA_VARIABLE
+    : font.name === "KORubbama"
+    ? FONT_FAMILIES.KORUBBAMA
+    : font.name === "KORubbama Expanded"
+    ? FONT_FAMILIES.KORUBBAMA_EXPANDED
+    : font.name === "KoGaliModern"
+    ? FONT_FAMILIES.KOGALIMODERN
+    : font.name === "Satoshi"
+    ? FONT_FAMILIES.SATOSHI
+    : font.name === "Satoshi Variable"
+    ? FONT_FAMILIES.SATOSHI_VARIABLE
+    : `'${font.name}'`;
 };
 
 onMounted(() => {
-  // // Create a style element
-  // const style = document.createElement('style');
-  
-  // // Define the font face
-  // const fontFace = `
-  //   @font-face {
-  //     font-family: 'KoShareb';
-  //     src: url('${koSharebFont}') format('otf');
-  //     font-weight: normal;
-  //     font-style: normal;
-  //   }
-  // `;
-  
-  // // Add the font face to the style element
-  // style.appendChild(document.createTextNode(fontFace));
-  
-  // // Add the style element to the document head
-  // document.head.appendChild(style);
 });
 </script>
 
@@ -613,18 +528,24 @@ onMounted(() => {
         <div>
           <h3 class="font-bold text-xl">{{ font.name }}</h3>
           <div class="flex items-center mt-1">
-            <span 
+            <span
               class="text-gray-400 text-sm mr-2 cursor-pointer"
               @click.stop="showStyleMenu = !showStyleMenu"
             >
-              <span class="text-white">{{ selectedStyle?.title || 'Default' }}</span>
+              <span class="text-white">{{
+                selectedStyle?.title || "Regular"
+              }}</span>
               <span v-if="styleOptions.length > 1" class="style-count ml-2">
                 +{{ styleOptions.length - 1 }}
               </span>
             </span>
-            <span class="text-gray-400 text-sm ml-2">{{
-              isVariableFont ? "Variable" : "Static"
-            }}</span>
+            <span class="text-gray-400 text-sm ml-2">
+              {{
+                isVariableFont
+                  ? "Variable"
+                  : currentFontData?.category || font.category
+              }}
+            </span>
           </div>
         </div>
         <div class="flex items-center bg-black">
@@ -666,6 +587,7 @@ onMounted(() => {
                   :class="{
                     'style-list-item-active':
                       selectedStyle && selectedStyle.title === style.title,
+                    'style-list-item-variable': style.isVariable,
                   }"
                 >
                   <template v-slot:prepend>
@@ -678,9 +600,12 @@ onMounted(() => {
                       ></div>
                     </div>
                   </template>
-                  <v-list-item-title class="text-sm">{{
-                    style.title
-                  }}</v-list-item-title>
+                  <v-list-item-title class="text-sm">
+                    {{ style.title }}
+                    <span v-if="style.isVariable" class="variable-badge"
+                      >Variable</span
+                    >
+                  </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -705,29 +630,38 @@ onMounted(() => {
         class="font-preview px-6"
         :class="{
           'preview-collapsed': showOptions,
-          'auto-height': props.fontSize > 80,
+          'auto-height': fontSize > 80,
+          'arabic-font': font.category === 'Arabic',
         }"
         :style="previewContainerStyle"
         @click.stop
       >
         <!-- Debug info - only visible in development mode -->
-        <div v-if="!isDevelopment" class="font-debug-info">
-          <div class="font-debug-label">Font Name: {{ font.name }}</div>
-          <div class="font-debug-label">Font Family: {{ currentFontFamily.value || getFontFamilyForFont(font) }}</div>
-          <div class="font-debug-label">Style: 
-            <span class="font-monospace">
-              {{ selectedStyle?.title || 'Default' }} ({{ fontWeight }} {{ fontStyle }})
-            </span>
+        <div v-if="isDevelopment" class="font-debug-info">
+          <div class="font-debug-label">Font: {{ font.name }}</div>
+          <div class="font-debug-label">
+            Family: {{ currentFontFamily || currentFontData?.fontFamily }}
           </div>
-          <div class="font-debug-label">Variable: {{ isVariableFont ? 'Yes' : 'No' }}</div>
+          <div class="font-debug-label">
+            Style: {{ selectedStyle?.title }} ({{ fontWeight }} {{ fontStyle }})
+          </div>
+          <div class="font-debug-label">
+            Variable: {{ isVariableFont ? "Yes" : "No" }}
+          </div>
+          <div class="font-debug-label">
+            Category: {{ currentFontData?.category }}
+          </div>
         </div>
-        
+
         <p
           contenteditable="true"
           class="sample-text-editor m-0 text-wrap"
           @input="updateSampleText"
           v-text="localSampleText"
-          :class="`weight-${fontWeight}`"
+          :class="[
+            `weight-${fontWeight}`,
+            { 'rtl-text': font.category === 'Arabic' },
+          ]"
           :style="sampleTextStyle"
         ></p>
       </div>
@@ -800,8 +734,6 @@ onMounted(() => {
               </div>
             </div>
           </div>
-
-      
 
           <!-- Size/Leading Slider -->
           <div class="option-row flex items-center">
@@ -1031,8 +963,9 @@ onMounted(() => {
 
 <style scoped>
 @font-face {
-  font-family: 'KoShareb';
-  src: url('../assets/fonts/KoShareb/OTF/KoShareb-Display.otf') format('opentype');
+  font-family: "KoShareb";
+  src: url("../assets/fonts/KoShareb/OTF/KoShareb-Display.otf")
+    format("opentype");
   font-weight: normal;
   font-style: normal;
 }
@@ -1441,7 +1374,7 @@ onMounted(() => {
 }
 
 .font-monospace {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   padding: 1px 3px;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 2px;
@@ -1462,5 +1395,46 @@ onMounted(() => {
 .style-btn-active {
   color: #ffc107 !important;
   background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+/* New and enhanced styles */
+.rtl-text {
+  direction: rtl;
+  text-align: right;
+}
+
+.arabic-font {
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+.variable-badge {
+  font-size: 10px;
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  padding: 1px 4px;
+  border-radius: 8px;
+  margin-left: 4px;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.style-list-item-variable {
+  border-left: 2px solid #ffc107;
+}
+
+.font-debug-info {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #888;
+  z-index: 1;
+}
+
+/* Enhanced animation for style changes */
+.sample-text-editor {
+  transition: font-weight 0.3s ease, font-style 0.3s ease, font-size 0.3s ease;
 }
 </style>

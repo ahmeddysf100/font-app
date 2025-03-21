@@ -19,10 +19,10 @@ onMounted(() => {
       <router-view></router-view>
     </v-main>
     
-    <v-footer app class="py-4 text-center">
+    <v-footer  class="py-4 text-center bg-black">
       <div class="w-full">
         <p class="text-gray-600 dark:text-gray-400">
-          © {{ new Date().getFullYear() }} FontShare. All rights reserved.
+          © {{ new Date().getFullYear() }} Kotype. All rights reserved.
         </p>
         <div class="mt-2 flex justify-center space-x-4">
           <v-btn icon variant="text" size="small">
