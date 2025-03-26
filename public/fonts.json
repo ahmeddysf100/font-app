@@ -1,0 +1,525 @@
+[
+    {
+        "id": 1,
+        "name": "Ko_Banzeen",
+        "fontFamily": "Ko_Banzeen",
+        "category": "Display",
+        "styles": [
+            {
+                "file": "/fonts/Ko_Banzeen/Ko_Banzeen-Normal.otf",
+                "name": "Normal",
+                "style": "normal",
+                "weight": 400
+            },
+            {
+                "fontFamily": "KO Banzeen SLNTD-L",
+                "file": "/fonts/Ko_Banzeen/Ko_Banzeen-SlantedL.otf",
+                "name": "Slanted Left",
+                "style": "italic",
+                "weight": 400,
+                "variationSettings": "'slnt' -15"
+            },
+            {
+                "fontFamily": "KO Banzeen SLNTD-R",
+                "file": "/fonts/Ko_Banzeen/Ko_Banzeen-SlantedR.otf",
+                "name": "Slanted Right",
+                "style": "oblique",
+                "weight": 400,
+                "variationSettings": "'slnt' 15"
+            }
+        ],
+        "designer": "Kotype"
+    },
+    {
+        "id": 2,
+        "name": "KOAynama",
+        "fontFamily": "KOAynama",
+        "category": "Sans-serif",
+        "styles": [
+            {
+                "file": "/fonts/KOAynama/KOAynama-Sharp.ttf",
+                "name": "Sharp",
+                "style": "normal",
+                "weight": 400,
+                "fontFamily": "KOAynama-Sharp"
+            },
+            {
+                "file": "/fonts/KOAynama/KOAynama-Curved.ttf",
+                "name": "Curved",
+                "style": "normal",
+                "weight": 400,
+                "fontFamily": "KOAynama-Curved"
+            }
+        ],
+        "designer": "Kotype"
+    },
+    {
+        "id": 3,
+        "name": "KoDongol",
+        "fontFamily": "KoDongol",
+        "category": "Serif",
+        "styles": [
+            {
+                "file": "/fonts/KoDongol/KoDongol-Regular.otf",
+                "name": "Regular",
+                "style": "normal",
+                "weight": 400
+            }
+        ],
+        "designer": "Kotype"
+    },
+    {
+        "id": 4,
+        "name": "KoGaliModern",
+        "fontFamily": "KoGaliModern",
+        "category": "Mono",
+        "styles": [
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-UltraLight.otf",
+                "name": "UltraLight",
+                "weight": 100
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-ExtraLight.otf",
+                "name": "ExtraLight",
+                "weight": 200
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-Light.otf",
+                "name": "Light",
+                "weight": 300
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-Regular.otf",
+                "name": "Regular",
+                "weight": 400
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-Medium.otf",
+                "name": "Medium",
+                "weight": 500
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-SemiBold.otf",
+                "name": "SemiBold",
+                "weight": 600
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-Bold.otf",
+                "name": "Bold",
+                "weight": 700
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-ExtraBold.otf",
+                "name": "ExtraBold",
+                "weight": 800
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-Black.otf",
+                "name": "Black",
+                "weight": 900
+            },
+            {
+                "file": "/fonts/KoGaliModern/KoGaliModern-Heavy.otf",
+                "name": "Heavy",
+                "weight": 950
+            }
+        ],
+        "designer": "Kotype",
+        "imageUrl": null
+    },
+    {
+        "id": 5,
+        "name": "KoKhalaya",
+        "fontFamily": "KoKhalaya",
+        "category": "Sans-serif",
+        "styles": [
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-5-5.otf",
+                "name": "55",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-55"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-5-6.otf",
+                "name": "56",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-56"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-5-7.otf",
+                "name": "57",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-57"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-5-8.otf",
+                "name": "58",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-58"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-5-9.otf",
+                "name": "59",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-59"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-6-5.otf",
+                "name": "65",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-65"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-6-6.otf",
+                "name": "66",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-66"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-6-7.otf",
+                "name": "67",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-67"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-6-8.otf",
+                "name": "68",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-68"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-6-9.otf",
+                "name": "69",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-69"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-7-5.otf",
+                "name": "75",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-75"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-7-6.otf",
+                "name": "76",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-76"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-7-7.otf",
+                "name": "77",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-77"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-7-8.otf",
+                "name": "78",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-78"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-7-9.otf",
+                "name": "79",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-79"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-8-5.otf",
+                "name": "85",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-85"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-8-6.otf",
+                "name": "86",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-86"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-8-7.otf",
+                "name": "87",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-87"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-8-8.otf",
+                "name": "88",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-88"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-8-9.otf",
+                "name": "89",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-89"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-9-5.otf",
+                "name": "95",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-95"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-9-6.otf",
+                "name": "96",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-96"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-9-7.otf",
+                "name": "97",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-97"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-9-8.otf",
+                "name": "98",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-98"
+            },
+            {
+                "file": "/fonts/KoKhalaya/weights/KoKhalaya-9-9.otf",
+                "name": "99",
+                "weight": 500,
+                "fontFamily": "KoKhalaya-99"
+            }
+        ],
+        "variable": [
+            {
+                "file": "/fonts/KoKhalaya/variable/KoKhalayaVF.ttf",
+                "style": "normal",
+                "fontFamily": "KoKhalaya-Variable",
+                "variationSettings": "'wght' 100 900"
+            }
+        ],
+        "designer": "Kotype",
+        "imageUrl": null
+    },
+    {
+        "id": 6,
+        "name": "KOLemaza",
+        "fontFamily": "KOLemaza",
+        "category": "Display",
+        "styles": [
+            {
+                "file": "/fonts/KOLemaza/KOLemaza-Regular.otf",
+                "name": "Regular",
+                "weight": 400
+            },
+            {
+                "file": "/fonts/KOLemaza/KOLemaza-Medium.otf",
+                "name": "Medium",
+                "weight": 500
+            },
+            {
+                "file": "/fonts/KOLemaza/KOLemaza-SemiBold.otf",
+                "name": "SemiBold",
+                "weight": 600
+            },
+            {
+                "file": "/fonts/KOLemaza/KOLemaza-Bold.otf",
+                "name": "Bold",
+                "weight": 700
+            },
+            {
+                "file": "/fonts/KOLemaza/KOLemaza-ExtraBold.otf",
+                "name": "ExtraBold",
+                "weight": 800
+            },
+            {
+                "file": "/fonts/KOLemaza/KOLemaza-Black.otf",
+                "name": "Black",
+                "weight": 900
+            }
+        ],
+        "designer": "Kotype"
+    },
+    {
+        "id": 7,
+        "name": "KORubbama",
+        "fontFamily": "KORubbama",
+        "category": "Script",
+        "styles": [
+            {
+                "file": "/fonts/KORubbama/KORubbama-Black.otf",
+                "name": "Black",
+                "weight": 900,
+                "fontFamily": "KORubbama"
+            },
+            {
+                "file": "/fonts/KORubbama/KORubbamaExpanded-BlackExpanded.otf",
+                "name": "BlackExpanded",
+                "weight": 900,
+                "fontFamily": "KORubbama-Expanded"
+            }
+        ],
+        "designer": "Kotype"
+    },
+    {
+        "id": 8,
+        "name": "KoShareb",
+        "fontFamily": "KoShareb",
+        "category": "Serif",
+        "styles": [
+            {
+                "file": "/fonts/KoShareb/TTF/KoShareb-Display.ttf",
+                "name": "Display",
+                "style": "normal",
+                "weight": 400
+            }
+        ],
+        "designer": "Kotype"
+    },
+    {
+        "id": 9,
+        "name": "Satoshi",
+        "fontFamily": "Satoshi",
+        "category": "Sans-serif",
+        "styles": [
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-Light.woff2",
+                    "/fonts/Satoshi/Satoshi-Light.woff"
+                ],
+                "name": "Light",
+                "weight": 300,
+                "style": "normal"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-LightItalic.woff2",
+                    "/fonts/Satoshi/Satoshi-LightItalic.woff"
+                ],
+                "name": "Light Italic",
+                "weight": 300,
+                "style": "italic"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-Regular.woff2",
+                    "/fonts/Satoshi/Satoshi-Regular.woff"
+                ],
+                "name": "Regular",
+                "weight": 400,
+                "style": "normal"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-Italic.woff2",
+                    "/fonts/Satoshi/Satoshi-Italic.woff"
+                ],
+                "name": "Regular Italic",
+                "weight": 400,
+                "style": "italic"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-Medium.woff2",
+                    "/fonts/Satoshi/Satoshi-Medium.woff"
+                ],
+                "name": "Medium",
+                "weight": 500,
+                "style": "normal"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-MediumItalic.woff2",
+                    "/fonts/Satoshi/Satoshi-MediumItalic.woff"
+                ],
+                "name": "Medium Italic",
+                "weight": 500,
+                "style": "italic"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-Bold.woff2",
+                    "/fonts/Satoshi/Satoshi-Bold.woff"
+                ],
+                "name": "Bold",
+                "weight": 700,
+                "style": "normal"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-BoldItalic.woff2",
+                    "/fonts/Satoshi/Satoshi-BoldItalic.woff"
+                ],
+                "name": "Bold Italic",
+                "weight": 700,
+                "style": "italic"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-Black.woff2",
+                    "/fonts/Satoshi/Satoshi-Black.woff"
+                ],
+                "name": "Black",
+                "weight": 900,
+                "style": "normal"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-BlackItalic.woff2",
+                    "/fonts/Satoshi/Satoshi-BlackItalic.woff"
+                ],
+                "name": "Black Italic",
+                "weight": 900,
+                "style": "italic"
+            }
+        ],
+        "variable": [
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-Variable.woff2",
+                    "/fonts/Satoshi/Satoshi-Variable.woff"
+                ],
+                "style": "normal",
+                "fontFamily": "Satoshi Variable",
+                "variationSettings": "'wght' 100 900"
+            },
+            {
+                "files": [
+                    "/fonts/Satoshi/Satoshi-VariableItalic.woff2",
+                    "/fonts/Satoshi/Satoshi-VariableItalic.woff"
+                ],
+                "style": "italic",
+                "fontFamily": "Satoshi Variable",
+                "variationSettings": "'wght' 100 900, 'slnt' -15 15"
+            }
+        ],
+        "designer": "Deni Anggara"
+    },
+    {
+        "id": 10,
+        "name": "Monsieur La Doulaise",
+        "fontFamily": "Monsieur La Doulaise, cursive",
+        "category": "Display",
+        "styles": [
+            {
+                "file": "https://fonts.googleapis.com/css2?family=Bytesized&family=Monsieur+La+Doulaise&display=swap",
+                "name": "Regular",
+                "weight": 400
+            }
+        ],
+        "designer": "Monsieur La Doulaise"
+    },
+    {
+        "id": 11,
+        "name": "Honk",
+        "fontFamily": "Honk",
+        "category": "Display",
+        "styles": [],
+        "variable": [
+            {
+                "file": "https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@0..45,0..100&display=swap",
+                "name": "Variable",
+                "weight": "400",
+                "variationSettings": "'MORF' 15, 'SHLN' 50",
+                "fontFamily": "Honk"
+            }
+        ],
+        "designer": "Google Fonts",
+        "description": "A variable font with MORF (0-45) and SHLN (0-100) axes"
+    }
+]

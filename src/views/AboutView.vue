@@ -1,30 +1,152 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useThemeStore } from "../stores/theme.js";
 import logoImage from "../assets/kotype.svg"; // Import the SVG logo
-import { fonts } from "../utils/fontLoader";
-
+import fonts from "../../public/fonts.json";
+import { useSittingsStore } from "../stores/sittings.js"; 
+import { useRouter } from "vue-router";
+const router = useRouter();
 const themeStore = useThemeStore();
 const isMobile = ref(false);
-
+const settingsStore = useSittingsStore();
+const primaryColor = computed(() => settingsStore.primaryColor);
 // Get Arabic fonts only
 const arabicFonts = computed(() => {
-  return fonts.filter(font => 
-    font.name.startsWith('KO') || font.name.startsWith('Ko')
+  return fonts.filter(
+    (font) => font.name.startsWith("KO") || font.name.startsWith("Ko")
   );
 });
+console.log(arabicFonts.value);
 
 // Currently displayed font in banner
 const currentFontIndex = ref(0);
-const currentFont = computed(() => arabicFonts.value[currentFontIndex.value] || {});
+const currentFont = computed(
+  () => arabicFonts.value[currentFontIndex.value] || {}
+);
 
 // Arabic quotes for the rotating text
 const arabicQuotes = [
-  { text: "لا تفكـــر بشـــــعية ولكـن عليـا", translation: "Don't think normally, think higher" },
-  { text: "الخط العربي هو فن الروح", translation: "Arabic calligraphy is the art of the soul" },
-  { text: "كل حرف قصة", translation: "Every letter is a story" },
-  { text: "الجمال في التفاصيل", translation: "Beauty is in the details" },
-  { text: "إبداع بلا حدود", translation: "Creativity without limits" }
+  {
+    text: "وَمَا الحُبُّ إِلَّا لِلْحَبِيبِ الْأَوَّلِ",
+    translation: "True love is only for the first beloved",
+  },
+  {
+    text: "قَفَا نَبْكِ مِنْ ذِكْرَى حَبِيبٍ وَمَنْزِلِ",
+    translation: "Let us stop and weep at the memory of a beloved and a place",
+  },
+  {
+    text: "أَلَا لَيْتَ شِعْرِي هَلْ أَبِيتَنَّ لَيْلَةً",
+    translation: "Oh, I wish I knew if I would spend a night",
+  },
+  {
+    text: "وَإِنِّي لَتَعْرُونِي لِذِكْرَاكِ هِزَّةٌ",
+    translation: "And I tremble at your memory",
+  },
+  {
+    text: "إِذَا المَرْءُ لَمْ يَدْنَسْ مِنَ اللُؤْمِ عِرْضُهُ",
+    translation: "When a person's honor is not stained by baseness",
+  },
+  {
+    text: "وَمَا نَيْلُ المَطَالِبِ بِالتَّمَنِّي",
+    translation: "Goals are not achieved by mere wishes",
+  },
+  {
+    text: "العِلْمُ فِي الصِّغَرِ كَالنَّقْشِ عَلَى الحَجَرِ",
+    translation: "Learning in youth is like engraving on stone",
+  },
+  {
+    text: "مَنْ طَلَبَ العُلَا سَهِرَ اللَّيَالِي",
+    translation: "Whoever seeks glory stays up at night",
+  },
+  {
+    text: "الكِتَابُ خَيْرُ جَلِيسٍ",
+    translation: "A book is the best companion",
+  },
+  {
+    text: "لِكُلِّ مَقَامٍ مَقَالٌ",
+    translation: "For every situation, there is an appropriate speech",
+  },
+  {
+    text: "خَيْرُ الكَلَامِ مَا قَلَّ وَدَلَّ",
+    translation: "The best speech is concise and meaningful",
+  },
+  {
+    text: "الصَّبْرُ مِفْتَاحُ الفَرَجِ",
+    translation: "Patience is the key to relief",
+  },
+  {
+    text: "رُبَّ ضَارَّةٍ نَافِعَةٍ",
+    translation: "Sometimes harm brings benefit",
+  },
+  {
+    text: "مَنْ جَدَّ وَجَدَ",
+    translation: "Whoever strives shall succeed",
+  },
+  {
+    text: "العَقْلُ السَّلِيمُ فِي الجِسْمِ السَّلِيمِ",
+    translation: "A sound mind in a sound body",
+  },
+  {
+    text: "الوَقْتُ كَالسَّيْفِ إِنْ لَمْ تَقْطَعْهُ قَطَعَكَ",
+    translation: "Time is like a sword: if you don't cut it, it cuts you",
+  },
+  {
+    text: "خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ",
+    translation: "The best of people are those most beneficial to others",
+  },
+  {
+    text: "لَيْسَ الجَمَالُ بِأَثْوَابٍ تُزَيِّنُنَا",
+    translation: "Beauty is not in the clothes that adorn us",
+  },
+  {
+    text: "إِذَا تَمَّ العَقْلُ نَقَصَ الكَلَامُ",
+    translation: "When wisdom is complete, speech becomes less",
+  },
+  {
+    text: "لِسَانُكَ حِصَانُكَ إِنْ صُنْتَهُ صَانَكَ",
+    translation:
+      "Your tongue is your horse: if you take care of it, it takes care of you",
+  },
+  {
+    text: "الحَقُّ أَبْلَجُ وَالبَاطِلُ لَجْلَجٌ",
+    translation: "Truth is clear and falsehood stammers",
+  },
+  {
+    text: "مَنْ سَارَ عَلَى الدَّرْبِ وَصَلَ",
+    translation: "Whoever follows the path will reach the destination",
+  },
+  {
+    text: "لَا تُؤَجِّلْ عَمَلَ اليَوْمِ إِلَى الغَدِ",
+    translation: "Don't postpone today's work until tomorrow",
+  },
+  {
+    text: "الأَدَبُ خَيْرٌ مِنَ الذَّهَبِ",
+    translation: "Good manners are better than gold",
+  },
+  {
+    text: "الجَارُ قَبْلَ الدَّارِ",
+    translation: "The neighbor before the house",
+  },
+  {
+    text: "رُبَّ أَخٍ لَكَ لَمْ تَلِدْهُ أُمُّكَ",
+    translation: "Sometimes your brother is not from your mother",
+  },
+  {
+    text: "الصِّدْقُ مُنْجِيٌ وَالكَذِبُ مُهْلِكٌ",
+    translation: "Honesty saves and lying destroys",
+  },
+  {
+    text: "الصَّدِيقُ وَقْتَ الضِّيقِ",
+    translation: "A friend in need is a friend indeed",
+  },
+  {
+    text: "الحِكْمَةُ ضَالَّةُ المُؤْمِنِ",
+    translation: "Wisdom is the lost property of the believer",
+  },
+  {
+    text: "خَيْرُ الأُمُورِ الوَسَطُ",
+    translation: "The best of matters is the middle course",
+  },
 ];
 
 // Currently displayed quote
@@ -33,25 +155,65 @@ const currentQuote = computed(() => arabicQuotes[currentQuoteIndex.value]);
 
 // Change font and quote periodically
 const changeDisplayedFont = () => {
-  currentFontIndex.value = (currentFontIndex.value + 1) % arabicFonts.value.length;
+  currentFontIndex.value =
+    (currentFontIndex.value + 1) % arabicFonts.value.length;
   if (currentFontIndex.value === 0) {
     // Change quote when we cycle through all fonts
-    currentQuoteIndex.value = (currentQuoteIndex.value + 1) % arabicQuotes.length;
+    currentQuoteIndex.value =
+      (currentQuoteIndex.value + 1) % arabicQuotes.length;
   }
 };
 
 let fontInterval;
 
 // Background colors - separate sets for light and dark mode
-const lightModeColors = ['#ff69b4', '#8a2be2', '#1e90ff', '#ff6347', '#00ced1', '#9932cc'];
-const darkModeColors = ['#ff1493', '#9370db', '#00bfff', '#ff4500', '#20b2aa', '#ba55d3'];
+// const lightModeColors = [
+//   "#ff69b4",
+//   "#8a2be2",
+//   "#1e90ff",
+//   "#ff6347",
+//   "#00ced1",
+//   "#9932cc",
+// ];
+const darkModeColors = [
+  "#ff1493",
+  "#9370db",
+  "#00bfff",
+  "#ff4500",
+  "#20b2aa",
+  "#ba55d3",
+  "#8b008b",
+  "#4b0082",
+  "#800080",
+  "#9932cc",
+  "#8a2be2",
+  "#9400d3",
+  "#6a5acd",
+  "#483d8b",
+  "#7b68ee",
+  "#0000cd",
+  "#0000ff",
+  "#4169e1",
+  "#1e90ff",
+  "#00008b",
+  "#008080",
+  "#2e8b57",
+  "#006400",
+  "#228b22",
+  "#556b2f",
+  "#8b4513",
+  "#a0522d",
+  "#b22222",
+  "#dc143c",
+  "#c71585",
+];
 // const darkModeColors = ['#0d0d0d', '#1a1a1a', '#111111', '#151515', '#1e1e1e', '#0a0a0a'];
 const currentBgIndex = ref(0);
 
 // Select color based on theme
 const currentBgColor = computed(() => {
-  return themeStore.darkMode 
-    ? darkModeColors[currentBgIndex.value] 
+  return themeStore.darkMode
+    ? darkModeColors[currentBgIndex.value]
     : lightModeColors[currentBgIndex.value];
 });
 
@@ -62,18 +224,21 @@ const checkScreenSize = () => {
 
 // Scroll reveal functionality (moved from script tag to Vue lifecycle)
 const initScrollReveal = () => {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('scroll-reveal-active');
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("scroll-reveal-active");
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+  );
 
-  document.querySelectorAll('.scroll-reveal').forEach(section => {
+  document.querySelectorAll(".scroll-reveal").forEach((section) => {
     observer.observe(section);
   });
-  
+
   return observer;
 };
 
@@ -82,21 +247,45 @@ let scrollObserver;
 // Update divider color based on theme
 const updateDividerColor = () => {
   const isDark = themeStore.darkMode;
-  document.documentElement.style.setProperty('--bg-color', isDark ? '#0d0d0d' : 'white');
-  document.documentElement.style.setProperty('--accent-color', isDark ? '#ff1493' : '#ff69b4');
-  document.documentElement.style.setProperty('--accent-light-color', isDark ? 'rgba(255, 20, 147, 0.1)' : 'rgba(255, 105, 180, 0.1)');
-  document.documentElement.style.setProperty('--accent-medium-color', isDark ? 'rgba(255, 20, 147, 0.3)' : 'rgba(255, 105, 180, 0.3)');
-  document.documentElement.style.setProperty('--section-bg-color', isDark ? '#151515' : '#f8f8f8');
-  document.documentElement.style.setProperty('--footer-bg-color', isDark ? '#1a1a1a' : '#f0f0f0');
-  document.documentElement.style.setProperty('--text-color', isDark ? '#f5f5f5' : '#111');
-  document.documentElement.style.setProperty('--section-shadow', isDark ? '0 5px 15px rgba(0,0,0,0.2)' : '0 5px 15px rgba(0,0,0,0.03)');
+  document.documentElement.style.setProperty(
+    "--bg-color",
+    isDark ? primaryColor.value : "white"
+  );
+  document.documentElement.style.setProperty(
+    "--accent-color",
+    isDark ? primaryColor.value : "#ff69b4"
+  );
+  document.documentElement.style.setProperty(
+    "--accent-light-color",
+    isDark ? primaryColor.value : "rgba(255, 105, 180, 0.1)"
+  );
+  document.documentElement.style.setProperty(
+    "--accent-medium-color",
+    isDark ? "rgba(255, 20, 147, 0.3)" : "rgba(255, 105, 180, 0.3)"
+  );
+  document.documentElement.style.setProperty(
+    "--section-bg-color",
+    isDark ? "#151515" : "#f8f8f8"
+  );
+  document.documentElement.style.setProperty(
+    "--footer-bg-color",
+    isDark ? "#1a1a1a" : "#f0f0f0"
+  );
+  document.documentElement.style.setProperty(
+    "--text-color",
+    isDark ? "#f5f5f5" : "#111"
+  );
+  document.documentElement.style.setProperty(
+    "--section-shadow",
+    isDark ? "0 5px 15px rgba(0,0,0,0.2)" : "0 5px 15px rgba(0,0,0,0.03)"
+  );
 };
 
 // Call on component mount
 onMounted(async () => {
   checkScreenSize();
-  window.addEventListener('resize', checkScreenSize);
-  
+  window.addEventListener("resize", checkScreenSize);
+
   // Change font every 3 seconds
   fontInterval = setInterval(() => {
     changeDisplayedFont();
@@ -105,22 +294,22 @@ onMounted(async () => {
       currentBgIndex.value = (currentBgIndex.value + 1) % darkModeColors.length;
     }
   }, 3000);
-  
+
   // Wait for the DOM to be fully updated
   await nextTick();
-  
+
   // Initialize scroll reveal
   scrollObserver = initScrollReveal();
-  
+
   // Set initial divider color
   updateDividerColor();
 });
 
 // Remove event listener on unmount
 onUnmounted(() => {
-  window.removeEventListener('resize', checkScreenSize);
+  window.removeEventListener("resize", checkScreenSize);
   clearInterval(fontInterval);
-  
+
   // Disconnect the intersection observer
   if (scrollObserver) {
     scrollObserver.disconnect();
@@ -131,36 +320,39 @@ onUnmounted(() => {
 const bannerStyle = computed(() => {
   return {
     color: currentBgColor.value,
-    transition: 'background-color 1.5s ease'
+    transition: "background-color 1.5s ease",
   };
 });
 
 // Quote font styling based on current font
 const quoteFontStyle = computed(() => {
   if (!currentFont.value || !currentFont.value.fontFamily) {
-    return { fontFamily: 'Arial' };
+    return { fontFamily: "Arial" };
   }
-  
+  console.log(currentFont.value);
   let fontStyle = {
-    fontFamily: `${currentFont.value.fontFamily}, Arial`,
-    fontWeight: 700,
-    direction: 'rtl',
+    fontFamily:
+      currentFont.value.styles[0].fontFamily ||
+      currentFont.value.variable?.[0].fontFamily ||
+      currentFont.value.fontFamily,
+    fontWeight: 400,
+    direction: "rtl",
     color: currentBgColor.value,
-    transition: 'color 1.5s ease'
+    transition: "color 1.5s ease",
   };
-  
+
   // If the font has styles, use the heaviest weight
   if (currentFont.value.styles && currentFont.value.styles.length > 0) {
     const weights = currentFont.value.styles
-      .map(s => s.weight)
-      .filter(w => w)
+      .map((s) => s.weight)
+      .filter((w) => w)
       .sort((a, b) => b - a);
-    
+
     if (weights.length > 0) {
       fontStyle.fontWeight = weights[0];
     }
   }
-  
+
   return fontStyle;
 });
 
@@ -185,39 +377,46 @@ watch([currentFontIndex], () => {
 });
 
 // Watch for theme changes to update divider color
-watch(() => themeStore.darkMode, () => {
-  updateDividerColor();
-});
+watch(
+  () => themeStore.darkMode,
+  () => {
+    updateDividerColor();
+  }
+);
 </script>
 
 <template>
   <div class="about-view" :class="{ 'dark-theme': themeStore.darkMode }">
     <!-- Banner Image -->
-    <div class="banner-image-container bg-black" >
+    <div class="banner-image-container bg-black">
       <div class="overlay"></div>
       <div class="font-info">
-        <v-chip 
-          color="white" 
-          :class="['current-font-chip', {'pulse': isFontChanging}]"
+        <v-chip
+          :style="{ backgroundColor: primaryColor }"
+          :class="['current-font-chip', { pulse: isFontChanging }]"
           variant="elevated"
           size="large"
         >
-          {{ currentFont.name || 'KO-TYPE' }}
+          {{ currentFont.name || "KO-TYPE" }}
         </v-chip>
       </div>
-      
+
       <div class="banner-text">
         <transition name="fade">
           <div v-if="isQuoteVisible" class="quote-container">
-            <h1 class="arabic-quote" :style="quoteFontStyle">{{ currentQuote.text }}</h1>
-            <p class="quote-translation" :style="bannerStyle">{{ currentQuote.translation }}</p>
+            <h1 class="arabic-quote" :style="quoteFontStyle">
+              {{ currentQuote.text }}
+            </h1>
+            <p class="quote-translation" :style="bannerStyle">
+              {{ currentQuote.translation }}
+            </p>
           </div>
         </transition>
       </div>
-      
+
       <div class="font-indicators">
-        <div 
-          v-for="(font, index) in arabicFonts" 
+        <div
+          v-for="(font, index) in arabicFonts"
           :key="font.id"
           class="font-indicator"
           :class="{ active: index === currentFontIndex }"
@@ -225,15 +424,24 @@ watch(() => themeStore.darkMode, () => {
         ></div>
       </div>
     </div>
-    
+
     <!-- Header Section with improved layout -->
     <section class="header-section bg-black">
       <v-container>
         <v-row align="center" class="header-row">
-          <v-col cols="12" md="6" class="d-flex align-center justify-center logo-col">
+          <v-col
+            cols="12"
+            md="6"
+            class="d-flex align-center justify-center logo-col"
+          >
             <div class="logo-container">
-              <img :src="logoImage" alt="Kotype Logo" class="kotype-logo" />
-              <div class="logo-flare"></div>
+              <img
+                :src="logoImage"
+                alt="Kotype Logo"
+                class="kotype-logo"
+                width="300px"
+              />
+              <!-- <div class="logo-flare"></div> -->
             </div>
           </v-col>
           <v-col cols="12" md="6" class="d-flex flex-column justify-center">
@@ -243,7 +451,14 @@ watch(() => themeStore.darkMode, () => {
                 <div class="title-underline"></div>
               </div>
               <div class="section-text">
-                <p>This is KO-type. The move you probably anticipated, that will knock all free font-haters out of their chairs. That was a joke. Kotype is a community dedicated to the love of Arabic fonts. Whether it's appreciation, creation, or simply usage, we are all connected by the love of Arabic Fonts, just like our love for the Arabic language.</p>
+                <p>
+                  This is KO-type. The move you probably anticipated, that will
+                  knock all free font-haters out of their chairs. That was a
+                  joke. Kotype is a community dedicated to the love of Arabic
+                  fonts. Whether it's appreciation, creation, or simply usage,
+                  we are all connected by the love of Arabic Fonts, just like
+                  our love for the Arabic language.
+                </p>
               </div>
             </div>
           </v-col>
@@ -264,11 +479,24 @@ watch(() => themeStore.darkMode, () => {
                 </div>
                 <div class="section-text">
                   <div class="quote-block">
-                    <v-icon color="pink" class="quote-icon">mdi-format-quote-open</v-icon>
-                    <p class="mission-quote"><em>Give a man a fish, and you feed him for a day; teach a man to fish, and you feed him for a lifetime.</em></p>
-                    <v-icon color="pink" class="quote-icon quote-close">mdi-format-quote-close</v-icon>
+                    <v-icon color="pink" class="quote-icon"
+                      >mdi-format-quote-open</v-icon
+                    >
+                    <p class="mission-quote">
+                      <em
+                        >Give a man a fish, and you feed him for a day; teach a
+                        man to fish, and you feed him for a lifetime.</em
+                      >
+                    </p>
+                    <v-icon color="pink" class="quote-icon quote-close"
+                      >mdi-format-quote-close</v-icon
+                    >
                   </div>
-                  <p>At Kotype, we hand out rods so you can go happily fishing. We will do our best to teach the community how fonts are created and share tips of the process and results.</p>
+                  <p>
+                    At Kotype, we hand out rods so you can go happily fishing.
+                    We will do our best to teach the community how fonts are
+                    created and share tips of the process and results.
+                  </p>
                 </div>
               </div>
             </div>
@@ -280,7 +508,12 @@ watch(() => themeStore.darkMode, () => {
                   <div class="title-underline"></div>
                 </div>
                 <div class="section-text">
-                  <p>The limited resources and repeated Arabic font designs are killing this saturated market. We need more hands to work, more minds unafraid to explore, to push those limits and create more resources for the next generation, hopefully.</p>
+                  <p>
+                    The limited resources and repeated Arabic font designs are
+                    killing this saturated market. We need more hands to work,
+                    more minds unafraid to explore, to push those limits and
+                    create more resources for the next generation, hopefully.
+                  </p>
                 </div>
               </div>
             </div>
@@ -292,8 +525,19 @@ watch(() => themeStore.darkMode, () => {
                   <div class="title-underline"></div>
                 </div>
                 <div class="section-text">
-                  <p>We are done with pirated libraries continue to steal the efforts of designers, exploiting creations that may have taken years of work, research, and development. This affects many designers' determination to create or forces them to only design for clients.</p>
-                  <p>We aren't making any promises that we are going to create a utopia. Instead, we are trying to highlight the work of talented designers, share the expert process, and create a positive vibe around the Arabic design community.</p>
+                  <p>
+                    We are done with pirated libraries continue to steal the
+                    efforts of designers, exploiting creations that may have
+                    taken years of work, research, and development. This affects
+                    many designers' determination to create or forces them to
+                    only design for clients.
+                  </p>
+                  <p>
+                    We aren't making any promises that we are going to create a
+                    utopia. Instead, we are trying to highlight the work of
+                    talented designers, share the expert process, and create a
+                    positive vibe around the Arabic design community.
+                  </p>
                 </div>
               </div>
             </div>
@@ -307,22 +551,64 @@ watch(() => themeStore.darkMode, () => {
                   <div class="title-underline"></div>
                 </div>
                 <div class="section-text">
-                  <p>All fonts available on our platform are copyrighted and owned by the respective designers who have submitted them. By submitting fonts, the designer confirms that they are the original creator and hold the necessary rights to distribute the font.</p>
-                  <p>Any inquiries regarding modifications or alterations to a font should be directed to the designer of the font. We do not facilitate or mediate requests for modified versions of any fonts.</p>
-                  
+                  <p>
+                    All fonts available on our platform are copyrighted and
+                    owned by the respective designers who have submitted them.
+                    By submitting fonts, the designer confirms that they are the
+                    original creator and hold the necessary rights to distribute
+                    the font.
+                  </p>
+                  <p>
+                    Any inquiries regarding modifications or alterations to a
+                    font should be directed to the designer of the font. We do
+                    not facilitate or mediate requests for modified versions of
+                    any fonts.
+                  </p>
+
                   <v-list class="license-list transparent">
-                    <v-list-item v-for="(item, i) in 5" :key="i" class="px-0 license-item">
+                    <v-list-item
+                      v-for="(item, i) in 5"
+                      :key="i"
+                      class="px-0 license-item"
+                    >
                       <template v-slot:prepend>
-                        <div class="license-icon-container">
-                          <v-icon color="pink" size="small">mdi-checkbox-marked-circle</v-icon>
+                        <div
+                          class="license-icon-container"
+                          :style="{ backgroundColor: primaryColor }"
+                        >
+                          <v-icon color="black" size="small"
+                            >mdi-checkbox-marked-circle</v-icon
+                          >
                         </div>
                       </template>
                       <v-list-item-title>
-                        <span v-if="i === 0">Kotype Arabic fonts are free to use in personal and commercial works.</span>
-                        <span v-else-if="i === 1">Kotype fonts can be used on any medium: poster, logo, magazine, website, app, t-shirt, music video, bike trailer… Remember to credit the name of the type designer or the foundry whenever you use the fonts.</span>
-                        <span v-else-if="i === 2">Redistribution of the fonts without written permission is not allowed.</span>
-                        <span v-else-if="i === 3">Modification of the font file without written permission is not allowed.</span>
-                        <span v-else-if="i === 4">Kotype Free Arabic fonts may not be added to or used within any online or offline design tools or apps (e.g., Canva, photoshop) that allow users to create, edit, or distribute images using the fonts without proper licensing from Kotype or the designer of the typeface.</span>
+                        <span v-if="i === 0"
+                          >Kotype Arabic fonts are free to use in personal and
+                          commercial works.</span
+                        >
+                        <span v-else-if="i === 1"
+                          >Kotype fonts can be used on any medium: poster, logo,
+                          magazine, website, app, t-shirt, music video, bike
+                          trailer… Remember to credit the name of the type
+                          designer or the foundry whenever you use the
+                          fonts.</span
+                        >
+                        <span v-else-if="i === 2"
+                          >Redistribution of the fonts without written
+                          permission is not allowed.</span
+                        >
+                        <span v-else-if="i === 3"
+                          >Modification of the font file without written
+                          permission is not allowed.</span
+                        >
+                        <span v-else-if="i === 4"
+                          >Kotype Free Arabic fonts may not be added to or used
+                          within any online or offline design tools or apps
+                          (e.g., Canva, photoshop) that allow users to create,
+                          edit, or distribute images using the fonts without
+                          proper licensing from Kotype or the designer of the
+                          typeface.</span
+                        >
                       </v-list-item-title>
                     </v-list-item>
                   </v-list>
@@ -337,8 +623,20 @@ watch(() => themeStore.darkMode, () => {
                   <div class="title-underline"></div>
                 </div>
                 <div class="section-text">
-                  <p>If you like our Free fonts and our activities, please consider donating. This will allow us to continue distributing new quality, free fonts and improving our existing catalogue. Visit our donation page.</p>
-                  <v-btn color="pink" variant="elevated" size="large" class="mt-5 support-btn" href="https://ko-fi.com/kotype" target="_blank">
+                  <p>
+                    If you like our Free fonts and our activities, please
+                    consider donating. This will allow us to continue
+                    distributing new quality, free fonts and improving our
+                    existing catalogue. Visit our donation page.
+                  </p>
+                  <v-btn
+                    color="pink"
+                    variant="elevated"
+                    size="large"
+                    class="mt-5 support-btn"
+                    href="https://ko-fi.com/kotype"
+                    target="_blank"
+                  >
                     <v-icon start class="support-icon">mdi-heart</v-icon>
                     Donate
                   </v-btn>
@@ -353,14 +651,41 @@ watch(() => themeStore.darkMode, () => {
                   <div class="title-underline"></div>
                 </div>
                 <div class="section-text">
-                  <p>We are a collective from different countries, united by a common goal: to share our knowledge of type design and typography by creating free fonts that highlight the process of font creation. These fonts are provided as working product examples, with the design process documented and shared as educational materials.</p>
-                  
+                  <p>
+                    We are a collective from different countries, united by a
+                    common goal: to share our knowledge of type design and
+                    typography by creating free fonts that highlight the process
+                    of font creation. These fonts are provided as working
+                    product examples, with the design process documented and
+                    shared as educational materials.
+                  </p>
+
                   <div class="team-highlight">
-                    <p>The project is currently managed by kotype team, with special thanks to everyone who embraced the idea and worked tirelessly to bring it to life, especially:</p>
+                    <p>
+                      The project is currently managed by kotype team, with
+                      special thanks to everyone who embraced the idea and
+                      worked tirelessly to bring it to life, especially:
+                    </p>
                     <ul class="team-members">
-                      <li><a href="https://www.heyporterposter.com/" target="_blank">Hey Porter! (Tawfiq Dawi)</a></li>
-                      <li><a href="http://abdomohamed.com/" target="_blank">Abdo Mohamed</a></li>
-                      <li><a href="https://www.instagram.com/ibrohamdi/" target="_blank">Ibrahim Hamdi</a></li>
+                      <li>
+                        <a
+                          href="https://www.heyporterposter.com/"
+                          target="_blank"
+                          >Hey Porter! (Tawfiq Dawi)</a
+                        >
+                      </li>
+                      <li>
+                        <a href="http://abdomohamed.com/" target="_blank"
+                          >Abdo Mohamed</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          href="https://www.instagram.com/ibrohamdi/"
+                          target="_blank"
+                          >Ibrahim Hamdi</a
+                        >
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -370,20 +695,23 @@ watch(() => themeStore.darkMode, () => {
         </v-row>
       </v-container>
     </section>
-    
+
     <!-- Footer with font credits -->
-    <div class="footer-section bg-black" :class="{ 'dark-footer': themeStore.darkMode }">
+    <div
+      class="footer-section bg-black"
+      :class="{ 'dark-footer': themeStore.darkMode }"
+    >
       <v-container>
         <div class="font-credits">
           <p>Explore our Arabic fonts:</p>
           <div class="font-tags">
-            <v-chip 
-              v-for="font in arabicFonts" 
-              :key="font.id" 
+            <v-chip
+              v-for="font in arabicFonts"
+              :key="font.id"
               variant="outlined"
               class="font-tag"
               color="pink"
-              @click="currentFontIndex = arabicFonts.indexOf(font)"
+              @click=" router.push(`/fonts/${font.id}`)"
             >
               {{ font.name }}
             </v-chip>
@@ -426,7 +754,7 @@ watch(() => themeStore.darkMode, () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -451,7 +779,6 @@ watch(() => themeStore.darkMode, () => {
 }
 
 .current-font-chip {
-  background: rgba(255, 255, 255, 0.9) !important;
   color: #111 !important;
   font-weight: 600;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -462,9 +789,15 @@ watch(() => themeStore.darkMode, () => {
 }
 
 @keyframes pulse-animation {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .quote-container {
@@ -476,14 +809,14 @@ watch(() => themeStore.darkMode, () => {
   font-size: 4rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 .quote-translation {
   font-size: 1.5rem;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
   font-weight: 300;
   font-style: italic;
 }
@@ -519,7 +852,7 @@ watch(() => themeStore.darkMode, () => {
   background-color: var(--section-bg-color, #f8f8f8);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--section-shadow, 0 5px 15px rgba(0,0,0,0.03));
+  box-shadow: var(--section-shadow, 0 5px 15px rgba(0, 0, 0, 0.03));
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -535,7 +868,6 @@ watch(() => themeStore.darkMode, () => {
 .kotype-logo {
   max-width: 300px;
   height: auto;
-  filter: hue-rotate(280deg); /* Pink color */
   position: relative;
   z-index: 2;
   transition: all 0.5s ease;
@@ -543,11 +875,6 @@ watch(() => themeStore.darkMode, () => {
 
 .kotype-logo:hover {
   transform: scale(1.05);
-  filter: hue-rotate(280deg) drop-shadow(0 0 8px rgba(255, 105, 180, 0.5));
-}
-
-.dark-theme .kotype-logo {
-  filter: hue-rotate(280deg) brightness(1.2);
 }
 
 .logo-flare {
@@ -556,7 +883,11 @@ watch(() => themeStore.darkMode, () => {
   left: -20%;
   width: 140%;
   height: 140%;
-  background: radial-gradient(ellipse at center, var(--accent-light-color, rgba(255,105,180,0.2)) 0%, rgba(255,105,180,0) 70%);
+  background: radial-gradient(
+    ellipse at center,
+    var(--accent-light-color, rgba(255, 105, 180, 0.2)) 0%,
+    rgba(255, 105, 180, 0) 70%
+  );
   z-index: 1;
   border-radius: 50%;
   opacity: 0.7;
@@ -564,8 +895,12 @@ watch(() => themeStore.darkMode, () => {
 }
 
 @keyframes rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Content Section - IMPROVED */
@@ -576,13 +911,17 @@ watch(() => themeStore.darkMode, () => {
 }
 
 .content-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 120px;
-  background: linear-gradient(to bottom, var(--section-bg-color, rgba(248, 248, 248, 0.8)) 0%, rgba(248, 248, 248, 0) 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--section-bg-color, rgba(248, 248, 248, 0.8)) 0%,
+    rgba(248, 248, 248, 0) 100%
+  );
   z-index: -1;
   pointer-events: none;
   transition: background 0.3s ease;
@@ -656,7 +995,8 @@ watch(() => themeStore.darkMode, () => {
   position: relative;
   border-radius: 0 8px 8px 0;
   box-shadow: 0 2px 8px var(--accent-light-color, rgba(255, 105, 180, 0.05));
-  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .mission-quote {
@@ -695,11 +1035,15 @@ watch(() => themeStore.darkMode, () => {
 }
 
 .license-item:hover {
-  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.05)) !important;
+  background-color: var(
+    --accent-light-color,
+    rgba(255, 105, 180, 0.05)
+  ) !important;
 }
 
 .license-icon-container {
-  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.1));
+  background-color: var(--accent-light-color, v-bind(primaryColor));
+
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -724,14 +1068,19 @@ watch(() => themeStore.darkMode, () => {
 .divider-fancy {
   position: relative;
   height: 1px;
-  background: linear-gradient(to right, transparent, var(--accent-color, rgba(255, 105, 180, 0.5)), transparent);
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--accent-color, rgba(255, 105, 180, 0.5)),
+    transparent
+  );
   overflow: visible;
   margin: 60px 0;
   transition: background 0.3s ease;
 }
 
 .divider-fancy::after {
-  content: '❖';
+  content: "❖";
   position: absolute;
   left: 50%;
   top: 50%;
@@ -760,9 +1109,15 @@ watch(() => themeStore.darkMode, () => {
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .team-highlight {
@@ -807,12 +1162,12 @@ watch(() => themeStore.darkMode, () => {
 .footer-section {
   background-color: var(--footer-bg-color, #f0f0f0);
   padding: 40px 0;
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .dark-footer {
-  border-top: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .font-credits {
@@ -837,16 +1192,18 @@ watch(() => themeStore.darkMode, () => {
 }
 
 .font-tag:hover {
-  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.1));
+  /* background-color: var(--accent-light-color, rgba(255, 105, 180, 0.1)); */
   transform: translateY(-2px);
 }
 
 /* Fade transition */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
   transform: translateY(10px);
 }
@@ -855,59 +1212,59 @@ watch(() => themeStore.darkMode, () => {
   .banner-image-container {
     height: 400px;
   }
-  
+
   .arabic-quote {
     font-size: 2.5rem;
   }
-  
+
   .quote-translation {
     font-size: 1.2rem;
   }
-  
+
   .header-section {
     padding: 40px 0;
   }
-  
+
   .header-row {
     min-height: auto;
   }
-  
+
   .logo-col {
     min-height: 150px;
     margin-bottom: 20px;
   }
-  
+
   .content-section {
     padding: 40px 0;
   }
-  
+
   .section-title {
     font-size: 1.3rem;
     padding: 8px 20px;
   }
-  
+
   .section-text {
     font-size: 1rem;
   }
-  
+
   .kotype-logo {
     max-width: 200px;
   }
-  
+
   .mission-quote {
     font-size: 1.1rem;
     padding: 5px 30px;
   }
-  
+
   .team-members {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .font-tags {
     gap: 8px;
   }
-  
+
   .divider-fancy {
     margin: 40px 0;
   }
@@ -917,20 +1274,20 @@ watch(() => themeStore.darkMode, () => {
   .banner-image-container {
     height: 350px;
   }
-  
+
   .arabic-quote {
     font-size: 2rem;
   }
-  
+
   .quote-translation {
     font-size: 1rem;
   }
-  
+
   .font-info {
     top: 10px;
     left: 10px;
   }
-  
+
   .current-font-chip {
     font-size: 0.8rem !important;
     height: auto !important;
@@ -938,4 +1295,3 @@ watch(() => themeStore.darkMode, () => {
   }
 }
 </style>
-

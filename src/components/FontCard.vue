@@ -1,19 +1,14 @@
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useFontStore } from "../stores/fonts";
 import { useSittingsStore } from "../stores/sittings";
+import { useThemeStore } from "../stores/theme";
 
-// Import the font utility functions
-import {
-  FONT_FAMILIES,
-  FONT_WEIGHTS,
-  FONT_STYLES,
-  generateFontStyle,
-} from "../utils/fontUtils";
+
 // Import fonts from fontLoader
-import { fonts } from "../utils/fontLoader";
-
+import fonts from "../../public/fonts.json";
+// console.log("fonts", fonts);
 // Add development mode constant
 const isDevelopment = import.meta.env.NODE_ENV === "development";
 
@@ -44,6 +39,7 @@ const router = useRouter();
 const fontStore = useFontStore();
 const showOptions = ref(false);
 const sittingsStore = useSittingsStore();
+const themeStore = useThemeStore();
 // Font customization controls
 const textDarkMode = ref(props.textDarkMode);
 const fontWeight = ref(400);
@@ -59,6 +55,84 @@ const features = ref({
   fractions: false,
   ordinals: false,
 });
+
+// Add these variables for variable font parameters
+const variableFontParams = ref({});
+
+// A computed property to get available variable font axes for the current font
+const variableFontAxes = computed(() => {
+  if (
+    !currentFontData.value ||
+    !currentFontData.value.variable ||
+    currentFontData.value.variable.length === 0
+  ) {
+    return [];
+  }
+  // console.log("selectedStyle", selectedStyle.value);
+  const varFont = selectedStyle.value;
+  if (!varFont?.variationSettings) return [];
+
+  // Extract axes from variationSettings (e.g., "'MORF' 15, 'SHLN' 50" or "'wght' 400, 'slnt' 0")
+  const axesMatches =
+    varFont.variationSettings.match(/'([^']+)'\s+([0-9.-]+)/g) || [];
+
+  return axesMatches.map((match) => {
+    const [_, axis, value] = match.match(/'([^']+)'\s+([0-9.-]+)/);
+
+    // Define min/max ranges for known axes, defaults for unknown ones
+    let min = 0;
+    let max = 1000;
+    let step = 1;
+
+    // Set appropriate ranges for each axis type
+    switch (axis) {
+      case "wght":
+        min = 1;
+        max = 1000;
+        step = 1;
+        break;
+      case "slnt":
+        min = -15;
+        max = 15;
+        step = 1;
+        break;
+      case "MORF":
+        min = 0;
+        max = 45;
+        step = 1;
+        break;
+      case "SHLN":
+        min = 0;
+        max = 100;
+        step = 1;
+        break;
+    }
+
+    return {
+      axis,
+      value: parseFloat(value),
+      min,
+      max,
+      step,
+    };
+  });
+});
+
+// Check if the current font has variable font axes
+const hasVariableFontAxes = computed(() => {
+  return variableFontAxes.value.length > 0;
+});
+
+// Initialize variable font parameters
+const initVariableFontParams = () => {
+  if (variableFontAxes.value.length > 0) {
+    const params = {};
+    variableFontAxes.value.forEach((axis) => {
+      params[axis.axis] = axis.value;
+    });
+    variableFontParams.value = params;
+  }
+};
 
 watch(
   () => sittingsStore.resetFlag,
@@ -142,7 +216,7 @@ const toggleOptions = (e) => {
   // Don't trigger if we're clicking inside options panel or preview
   if (
     e.target.closest(".font-options-panel") ||
-    e.target.closest(".sample-text-editor") 
+    e.target.closest(".sample-text-editor")
     // e.target.closest("button") ||
     // e.target.closest(".v-btn")
   ) {
@@ -239,6 +313,13 @@ const getWeightName = (value) => {
 // New variables for the style dropdown
 const selectedStyle = ref(null);
 const showStyleMenu = ref(false);
+const showStyleMenuMobile = ref(false);
+const isMobile = ref(false);
+
+// Add this function to check screen size
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768; // or your breakpoint
+};
 
 // Current font data from the new fonts array
 const currentFontData = computed(() => {
@@ -249,22 +330,24 @@ const currentFontData = computed(() => {
 const styleOptions = computed(() => {
   if (!currentFontData.value) return [];
 
-  return currentFontData.value.styles
+  return currentFontData.value?.styles
     .map((style) => ({
       title: style.name,
       weight: style.weight || 400,
       italic: style.style === "italic",
       fontFamily: style.fontFamily || currentFontData.value.fontFamily,
       isVariable: false,
+      variationSettings: style.variationSettings,
     }))
     .concat(
-      currentFontData.value.variable
+      currentFontData.value?.variable
         ? currentFontData.value.variable.map((varFont) => ({
             title: "Variable" + (varFont.style === "italic" ? " Italic" : ""),
             weight: 400,
             italic: varFont.style === "italic",
             fontFamily: varFont.fontFamily,
             isVariable: true,
+            variationSettings: varFont.variationSettings,
           }))
         : []
     );
@@ -321,8 +404,18 @@ const sampleTextStyle = computed(() => {
   };
 
   // Add variable font settings if applicable
-  if (isVariableFont.value) {
-    style.fontVariationSettings = `'wght' ${fontWeight.value}`;
+  if (
+    isVariableFont.value &&
+    Object.keys(variableFontParams.value).length > 0
+  ) {
+    // Build font-variation-settings string from all available axes
+    const settings = Object.entries(variableFontParams.value)
+      .map(([axis, value]) => `'${axis}' ${value}`)
+      .join(", ");
+
+    if (settings) {
+      style.fontVariationSettings = settings;
+    }
   }
 
   // Add OpenType features
@@ -348,6 +441,9 @@ onMounted(() => {
     fontWeight.value = currentFontData.value.styles[0].weight;
   }
 
+  // Initialize variable font parameters
+  initVariableFontParams();
+
   // Enable appropriate features for Arabic fonts
   if (props.font.category === "Arabic") {
     features.value.ligatures = true;
@@ -359,6 +455,7 @@ watch(
   () => props.font,
   () => {
     initSelectedStyle();
+    initVariableFontParams();
   },
   { deep: true }
 );
@@ -441,7 +538,10 @@ const previewContainerStyle = computed(() => {
     props.font.fontFamily;
 
   // Use our font utilities to generate the base style
-  let style = generateFontStyle(fontName, fontWeight.value, fontStyle.value);
+  let style = {};
+  style.fontName = fontName;
+  style.fontWeight = fontWeight.value;
+  style.fontStyle = fontStyle.value;
 
   // Add size and alignment properties
   style.fontSize = `${fontSize.value}px`;
@@ -456,65 +556,26 @@ const previewContainerStyle = computed(() => {
   return style;
 });
 
-// Helper function to get font family based on font name
-const getFontFamilyForFont = (font) => {
-  if (!font) return "";
+const isDarkMode = computed(() => {
+  return themeStore.darkMode === true ? "white" : "black";
+});
 
-  console.log("Processing font:", font.name);
-
-  // Create a direct mapping for more reliable font family selection
-  const fontMapping = {
-    KOLemaza: FONT_FAMILIES.KOLEMAZA,
-    "KOAynama Sharp": FONT_FAMILIES.KOAYNAMA_SHARP,
-    "KOAynama Curved": FONT_FAMILIES.KOAYNAMA_CURVED,
-    KoShareb: FONT_FAMILIES.KOSHAREB,
-    "Ko Banzeen": FONT_FAMILIES.KOBANZEEN,
-    KoDongol: FONT_FAMILIES.KODONGOL,
-    KoKhalaya: FONT_FAMILIES.KOKHALAYA,
-    "KoKhalaya Variable": FONT_FAMILIES.KOKHALAYA_VARIABLE,
-    KORubbama: FONT_FAMILIES.KORUBBAMA,
-    "KORubbama Expanded": FONT_FAMILIES.KORUBBAMA_EXPANDED,
-    KoGaliModern: FONT_FAMILIES.KOGALIMODERN,
-    Satoshi: FONT_FAMILIES.SATOSHI,
-    "Satoshi Variable": FONT_FAMILIES.SATOSHI_VARIABLE,
-  };
-
-  // Try to get the font family from our mapping
-  if (fontMapping[font.name]) {
-    return fontMapping[font.name];
+// Watch for changes to the primary color
+const primaryColor = ref(sittingsStore.primaryColor);
+const borderStyle = ref({ borderColor: `${primaryColor.value}99 !important` }); // Dynamic style
+watch(
+  () => sittingsStore.primaryColor,
+  (color) => {
+    primaryColor.value = color;
   }
-
-  // Fallback to the conditional checks
-  return font.name === "KOLemaza"
-    ? FONT_FAMILIES.KOLEMAZA
-    : font.name === "KOAynama Sharp"
-    ? FONT_FAMILIES.KOAYNAMA_SHARP
-    : font.name === "KOAynama Curved"
-    ? FONT_FAMILIES.KOAYNAMA_CURVED
-    : font.name === "KoShareb"
-    ? FONT_FAMILIES.KOSHAREB
-    : font.name === "Ko Banzeen"
-    ? FONT_FAMILIES.KOBANZEEN
-    : font.name === "KoDongol"
-    ? FONT_FAMILIES.KODONGOL
-    : font.name === "KoKhalaya"
-    ? FONT_FAMILIES.KOKHALAYA
-    : font.name === "KoKhalaya Variable"
-    ? FONT_FAMILIES.KOKHALAYA_VARIABLE
-    : font.name === "KORubbama"
-    ? FONT_FAMILIES.KORUBBAMA
-    : font.name === "KORubbama Expanded"
-    ? FONT_FAMILIES.KORUBBAMA_EXPANDED
-    : font.name === "KoGaliModern"
-    ? FONT_FAMILIES.KOGALIMODERN
-    : font.name === "Satoshi"
-    ? FONT_FAMILIES.SATOSHI
-    : font.name === "Satoshi Variable"
-    ? FONT_FAMILIES.SATOSHI_VARIABLE
-    : `'${font.name}'`;
-};
+);
 
 onMounted(() => {
+  checkMobile();
+  window.addEventListener("resize", checkMobile);
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", checkMobile);
 });
 </script>
 
@@ -526,19 +587,15 @@ onMounted(() => {
     <!-- Main Card with integrated options panel -->
     <v-card
       flat
-      class="font-card bg-black border border-gray-800 text-white hover:border-yellow-500 transition-all duration-300"
+      class="font-card bg-black border-2 text-white transition-all duration-300 border-color border-primary"
     >
       <div
-        class="px-6 py-4 flex justify-between items-center border-b border-gray-800"
-        @click="toggleOptions"
+        class="px-6 py-4 flex flex-wrap justify-between items-center border-b-2 border-primary"
       >
         <div>
           <h3 class="font-bold text-xl">{{ font.name }}</h3>
           <div class="flex items-center mt-1">
-            <span
-              class="text-gray-400 text-sm mr-2 cursor-pointer"
-              @click.stop="showStyleMenu = !showStyleMenu"
-            >
+            <span class="text-gray-400 text-sm mr-2 cursor-pointer">
               <span class="text-white">{{
                 selectedStyle?.title || "Regular"
               }}</span>
@@ -555,24 +612,120 @@ onMounted(() => {
             </span>
           </div>
         </div>
-        <div class="flex items-center bg-black">
-          <!-- Font Style Dropdown using v-menu -->
+
+        <!-- Font controls moved to header -->
+        <div class="font-controls flex items-center desktop-only">
+          <!-- Size Slider (replacing dropdown) - desktop only -->
+          <div class="size-selector mr-4">
+            <div class="flex items-center">
+              <div class="text-xs text-gray-400 mr-2">Size</div>
+              <div class="header-slider">
+                <v-slider
+                  v-model="fontSize"
+                  min="10"
+                  max="280"
+                  step="1"
+                  class="slider-thumb compact-slider"
+                  hide-details
+                  density="compact"
+                  :color="primaryColor"
+                  :thumb-color="primaryColor"
+                  :track-color="primaryColor"
+                  @click.stop
+                  thumb-label="hover"
+                >
+                  <template v-slot:thumb-label="{ modelValue }">
+                    {{ modelValue }}px
+                  </template>
+                </v-slider>
+              </div>
+              <div class="ml-1 text-white text-xs font-mono">
+                {{ fontSize }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Weight Slider (if not variable font with wght axis) -->
+          <div
+            v-if="!isVariableFont || !variableFontParams['wght']"
+            class="weight-selector mr-4"
+          >
+            <div class="flex items-center">
+              <div class="text-xs text-gray-400 mr-2">Weight</div>
+              <div class="header-slider">
+                <v-slider
+                  v-model="fontWeight"
+                  min="100"
+                  max="900"
+                  step="1"
+                  class="slider-thumb compact-slider"
+                  hide-details
+                  density="compact"
+                  :color="primaryColor"
+                  :thumb-color="primaryColor"
+                  :track-color="primaryColor"
+                  @click.stop
+                  thumb-label="hover"
+                >
+                  <template v-slot:thumb-label="{ modelValue }">
+                    {{ getWeightName(modelValue) }}
+                  </template>
+                </v-slider>
+              </div>
+              <div class="ml-1 text-white text-xs font-mono">
+                {{ fontWeight }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Variable Font Controls - desktop only -->
+          <div
+            v-for="axis in variableFontAxes"
+            :key="axis.axis"
+            class="var-control-selector mr-4 flex"
+          >
+            <div class="flex items-center">
+              <div class="text-xs text-gray-400 mr-2">{{ axis.axis }}</div>
+              <div class="header-slider">
+                <v-slider
+                  v-model="variableFontParams[axis.axis]"
+                  :min="axis.min"
+                  :max="axis.max"
+                  :step="axis.step"
+                  class="slider-thumb compact-slider"
+                  hide-details
+                  density="compact"
+                  :color="primaryColor"
+                  :thumb-color="primaryColor"
+                  :track-color="primaryColor"
+                  @click.stop
+                  thumb-label="hover"
+                >
+                </v-slider>
+              </div>
+              <div class="ml-2 text-white text-xs font-mono">
+                {{ variableFontParams[axis.axis] }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Style Menu Button -->
           <div class="style-menu-container mr-2">
             <v-menu
               v-model="showStyleMenu"
               :close-on-content-click="false"
               location="bottom"
               offset="5"
+              :class="{ 'mobile-menu': isMobile }"
             >
               <template v-slot:activator="{ props }">
                 <v-btn
                   icon
                   variant="text"
-                  color="grey"
+                  :color="primaryColor"
                   v-bind="props"
                   @click.stop
                   class="style-btn"
-                  :class="{ 'style-btn-active': showStyleMenu }"
                 >
                   <v-icon>mdi-format-font</v-icon>
                 </v-btn>
@@ -596,6 +749,9 @@ onMounted(() => {
                       selectedStyle && selectedStyle.title === style.title,
                     'style-list-item-variable': style.isVariable,
                   }"
+                  :style="{
+                    color: primaryColor,
+                  }"
                 >
                   <template v-slot:prepend>
                     <div class="radio-circle mr-2">
@@ -604,12 +760,20 @@ onMounted(() => {
                           selectedStyle && selectedStyle.title === style.title
                         "
                         class="radio-dot"
+                        :style="{ 'background-color': primaryColor }"
                       ></div>
                     </div>
                   </template>
                   <v-list-item-title class="text-sm">
                     {{ style.title }}
-                    <span v-if="style.isVariable" class="variable-badge"
+                    <span
+                      v-if="style.isVariable"
+                      class="variable-badge"
+                      :style="{
+                        color: primaryColor,
+                        'background-color': `${primaryColor}50`,
+                        'border-radius': '8px',
+                      }"
                       >Variable</span
                     >
                   </v-list-item-title>
@@ -617,18 +781,152 @@ onMounted(() => {
               </v-list>
             </v-menu>
           </div>
+
+          <!-- Mobile edit button to open options panel -->
           <v-btn
             icon
             variant="text"
-            :color="isFavorite ? 'yellow' : 'grey'"
+            :color="primaryColor"
+            class="mr-2"
+            @click.stop="toggleOptions"
+          >
+            <v-icon>{{ showOptions ? "mdi-arrow-up" : " mdi-tune" }}</v-icon>
+          </v-btn>
+
+          <!-- Favorite and Detail Buttons -->
+          <v-btn
+            icon
+            variant="text"
+            :color="isFavorite ? 'yellow' : primaryColor"
             class="mr-2"
             @click.stop="addToFavorites"
           >
             <v-icon>{{ isFavorite ? "mdi-star" : "mdi-star-outline" }}</v-icon>
           </v-btn>
-          <v-btn icon variant="text" color="grey" @click.stop="viewFontDetail">
+          <v-btn
+            icon
+            variant="text"
+            :color="primaryColor"
+            @click.stop="viewFontDetail"
+          >
             <v-icon>mdi-arrow-top-right</v-icon>
           </v-btn>
+        </div>
+
+        <!-- Mobile-only controls for the header -->
+        <div class="mobile-only font-controls-mobile">
+          <div class="flex items-center">
+            <!-- Style Menu Button -->
+            <div class="style-menu-container mr-2">
+              <v-menu
+                v-model="showStyleMenuMobile"
+                :close-on-content-click="false"
+                location="bottom"
+                offset="5"
+                id="style-menu-mobile"
+              >
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    icon
+                    variant="text"
+                    :color="primaryColor"
+                    v-bind="props"
+                    @click.stop
+                    class="style-btn"
+                  >
+                    <v-icon>mdi-format-font</v-icon>
+                  </v-btn>
+                </template>
+                <v-list
+                  id="style-list-mobile"
+                  class="style-list bg-black border border-gray-700 rounded pa-2"
+                  max-height="300"
+                >
+                  <!-- Same list items as desktop -->
+                  <v-list-item
+                    v-for="style in styleOptions"
+                    :key="style.title"
+                    :value="style"
+                    @click="
+                      handleStyleChange(style);
+                      showStyleMenuMobile = false;
+                    "
+                    :active="
+                      selectedStyle && selectedStyle.title === style.title
+                    "
+                    class="style-list-item rounded mb-1 px-3 py-1"
+                    :class="{
+                      'style-list-item-active':
+                        selectedStyle && selectedStyle.title === style.title,
+                      'style-list-item-variable': style.isVariable,
+                    }"
+                    :style="{
+                      color: primaryColor,
+                    }"
+                  >
+                    <template v-slot:prepend>
+                      <div class="radio-circle mr-2">
+                        <div
+                          v-if="
+                            selectedStyle && selectedStyle.title === style.title
+                          "
+                          class="radio-dot"
+                          :style="{ 'background-color': primaryColor }"
+                        ></div>
+                      </div>
+                    </template>
+                    <v-list-item-title class="text-sm">
+                      {{ style.title }}
+                      <span
+                        v-if="style.isVariable"
+                        class="variable-badge"
+                        :style="{
+                          color: primaryColor,
+                          'background-color': `${primaryColor}50`,
+                          'border-radius': '8px',
+                        }"
+                        >Variable</span
+                      >
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+
+            <!-- Mobile edit button to open options panel -->
+            <v-btn
+              icon
+              variant="text"
+              :color="primaryColor"
+              class="mr-2"
+              @click.stop="toggleOptions"
+            >
+              <v-icon>{{ showOptions ? "mdi-tune" : "mdi-arrow-down" }}</v-icon>
+            </v-btn>
+
+            <!-- Favorite Button -->
+            <v-btn
+              icon
+              variant="text"
+              :color="isFavorite ? 'yellow' : primaryColor"
+              class="mr-2"
+              @click.stop="addToFavorites"
+            >
+              <v-icon>{{
+                isFavorite ? "mdi-star" : "mdi-star-outline"
+              }}</v-icon>
+            </v-btn>
+
+            <!-- Detail Button -->
+            <v-btn
+              icon
+              variant="text"
+              :color="primaryColor"
+              @click.stop="viewFontDetail"
+            >
+              <v-icon>mdi-arrow-top-right</v-icon>
+            </v-btn>
+          </div>
         </div>
       </div>
 
@@ -664,7 +962,7 @@ onMounted(() => {
 
         <p
           contenteditable="true"
-          class="sample-text-editor m-0 text-wrap"
+          class="sample-text-editor m-0 text-wrap overflow-y-hidden"
           @input="updateSampleText"
           v-text="localSampleText"
           :class="[
@@ -684,69 +982,124 @@ onMounted(() => {
         @click.stop
       >
         <div class="grid grid-cols-1 gap-4">
-          <!-- Weight Slider -->
-          <div class="option-row flex items-center mt-7">
-            <div class="option-label text-white text-sm w-20">Size</div>
-            <div class="flex-grow">
-              <div class="flex items-center">
-                <v-slider
-                  v-model="fontSize"
-                  min="10"
-                  max="280"
-                  step="1"
-                  class="slider-thumb flex-grow"
-                  density="compact"
-                  track-color="white"
-                  thumb-color="white"
-                  hide-details
-                  @update:model-value="updateFontSize"
-                  thumb-label
-                >
-                  <template v-slot:thumb-label="{ modelValue }">
-                    {{ modelValue }}
-                  </template>
-                </v-slider>
-                <div
-                  class="weight-indicator ml-2 text-white text-xs min-w-[40px] text-right"
-                >
-                  {{ fontSize }}
+          <!-- Mobile version of all controls -->
+          <div class="mobile-only">
+            <!-- Size Slider -->
+            <div class="option-row flex items-center mb-4">
+              <div class="option-label text-white text-sm w-20">Size</div>
+              <div class="flex-grow">
+                <div class="flex items-center">
+                  <v-slider
+                    v-model="fontSize"
+                    min="10"
+                    max="280"
+                    step="1"
+                    class="slider-thumb flex-grow"
+                    density="compact"
+                    :color="primaryColor"
+                    :thumb-color="primaryColor"
+                    :track-color="primaryColor"
+                    hide-details
+                    @update:model-value="updateFontSize"
+                    thumb-label
+                  >
+                    <template v-slot:thumb-label="{ modelValue }">
+                      {{ modelValue }}
+                    </template>
+                  </v-slider>
+                  <div
+                    class="weight-indicator ml-2 text-white text-xs min-w-[40px] text-right"
+                  >
+                    {{ fontSize }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Weight Slider for mobile (if not variable font with wght axis) -->
+            <div
+              v-if="!isVariableFont || !variableFontParams['wght']"
+              class="option-row flex items-center mb-4"
+            >
+              <div class="option-label text-white text-sm w-20">Weight</div>
+              <div class="flex-grow">
+                <div class="flex items-center">
+                  <v-slider
+                    v-model="fontWeight"
+                    min="100"
+                    max="900"
+                    step="100"
+                    class="slider-thumb flex-grow"
+                    density="compact"
+                    :color="primaryColor"
+                    :thumb-color="primaryColor"
+                    :track-color="primaryColor"
+                    hide-details
+                    @update:model-value="updateFontWeight"
+                    thumb-label
+                  >
+                    <template v-slot:thumb-label="{ modelValue }">
+                      {{ getWeightName(modelValue) }}
+                    </template>
+                  </v-slider>
+                  <div
+                    class="weight-indicator ml-2 text-white text-xs min-w-[40px] text-right"
+                  >
+                    {{ fontWeight }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Variable Font Controls for mobile -->
+            <div
+              v-if="isVariableFont && hasVariableFontAxes"
+              class="variable-font-controls border-b border-primary border-gray-700 pb-4 mb-4 bg-black"
+            >
+              <div class="text-white text-sm font-medium mb-3">
+                Variable Font Controls
+              </div>
+
+              <!-- Dynamic sliders for all variable font axes -->
+              <div
+                v-for="axis in variableFontAxes"
+                :key="axis.axis"
+                class="option-row flex items-center mt-2 mb-4"
+              >
+                <div class="option-label text-white text-sm w-20">
+                  {{ axis.axis }}
+                </div>
+                <div class="flex-grow">
+                  <div class="flex items-center">
+                    <v-slider
+                      v-model="variableFontParams[axis.axis]"
+                      :min="axis.min"
+                      :max="axis.max"
+                      :step="axis.step"
+                      class="slider-thumb flex-grow"
+                      density="compact"
+                      :color="primaryColor"
+                      :thumb-color="primaryColor"
+                      :track-color="primaryColor"
+                      hide-details
+                      thumb-label
+                    >
+                      <template v-slot:thumb-label="{ modelValue }">
+                        {{ modelValue }}
+                      </template>
+                    </v-slider>
+                    <div
+                      class="weight-indicator ml-2 text-white text-xs min-w-[40px] text-right"
+                    >
+                      {{ variableFontParams[axis.axis] }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Weight Slider -->
-          <div class="option-row flex items-center mt-7">
-            <div class="option-label text-white text-sm w-20">Weight</div>
-            <div class="flex-grow">
-              <div class="flex items-center">
-                <v-slider
-                  v-model="fontWeight"
-                  min="100"
-                  max="900"
-                  step="1"
-                  class="slider-thumb flex-grow"
-                  density="compact"
-                  track-color="white"
-                  thumb-color="white"
-                  hide-details
-                  @update:model-value="updateFontWeight"
-                  thumb-label
-                >
-                  <template v-slot:thumb-label="{ modelValue }">
-                    {{ modelValue }}
-                  </template>
-                </v-slider>
-                <div
-                  class="weight-indicator ml-2 text-white text-xs min-w-[40px] text-right"
-                >
-                  {{ fontWeight }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Size/Leading Slider -->
+          <!-- Leading Slider (both mobile and desktop) -->
           <div class="option-row flex items-center">
             <div class="option-label text-white text-sm w-20">Leading</div>
             <v-slider
@@ -756,8 +1109,9 @@ onMounted(() => {
               step="0.05"
               class="slider-thumb flex-grow"
               density="compact"
-              track-color="white"
-              thumb-color="white"
+              :color="primaryColor"
+              :thumb-color="primaryColor"
+              :track-color="primaryColor"
               hide-details
               @update:model-value="updateLeading"
             >
@@ -772,18 +1126,19 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Tracking/Letter Spacing -->
+          <!-- Tracking/Letter Spacing (both mobile and desktop) -->
           <div class="option-row flex items-center">
             <div class="option-label text-white text-sm w-20">Tracking</div>
             <v-slider
               v-model="tracking"
-              min="-100"
+              min="-20"
               max="100"
-              step="1"
+              step="0.5"
               class="slider-thumb flex-grow"
               density="compact"
-              track-color="white"
-              thumb-color="white"
+              :color="primaryColor"
+              :thumb-color="primaryColor"
+              :track-color="primaryColor"
               hide-details
               @update:model-value="updateTracking"
             >
@@ -798,58 +1153,89 @@ onMounted(() => {
             </div>
           </div>
 
-          <div class="flex justify-between items-center">
-            <div>
+          <!-- Mobile-optimized controls for alignment, caps, italic -->
+          <div class="flex justify-between items-center flex-wrap">
+            <div class="mb-3 w-full md:w-auto">
               <!-- Text Alignment -->
               <div class="option-row flex items-center">
                 <div class="option-label text-white text-sm w-20">Align</div>
-                <v-btn-toggle
-                  v-model="textAlign"
-                  color="white"
-                  density="comfortable"
-                  mandatory
-                  class="border-0"
-                >
-                  <v-btn
-                    value="left"
-                    icon="mdi-format-align-left"
-                    size="small"
-                  ></v-btn>
-                  <v-btn
-                    value="center"
-                    icon="mdi-format-align-center"
-                    size="small"
-                  ></v-btn>
-                  <v-btn
-                    value="right"
-                    icon="mdi-format-align-right"
-                    size="small"
-                  ></v-btn>
-                </v-btn-toggle>
+
+                <v-btn
+                  variant="text"
+                  value="left"
+                  icon="mdi-format-align-left"
+                  size="small"
+                  class="touch-btn"
+                  :active="textAlign === 'left'"
+                  :active-color="primaryColor"
+                  @click="textAlign = 'left'"
+                ></v-btn>
+                <v-btn
+                  variant="text"
+                  value="center"
+                  icon="mdi-format-align-center"
+                  size="small"
+                  class="touch-btn"
+                  :active="textAlign === 'center'"
+                  :active-color="primaryColor"
+                  @click="textAlign = 'center'"
+                ></v-btn>
+                <v-btn
+                  variant="text"
+                  value="right"
+                  icon="mdi-format-align-right"
+                  size="small"
+                  class="touch-btn"
+                  :active="textAlign === 'right'"
+                  :active-color="primaryColor"
+                  @click="textAlign = 'right'"
+                ></v-btn>
               </div>
             </div>
-            <div>
-              <!-- Text Transform (All Caps) -->
+            <div class="w-full md:w-auto">
+              <!-- Text Transform (All Caps) and Italic - mobile-optimized -->
               <div
                 class="option-row text-transform flex items-center justify-start gap-4 mt-1"
               >
-                <div class="feature-option" @click="toggleAllCaps">
+                <div
+                  class="feature-option touch-feature"
+                  @click="toggleAllCaps"
+                >
                   <div
-                    class="feature-checkbox-square"
-                    :class="{ active: isAllCaps }"
+                    class="feature-checkbox-square touch-checkbox"
+                    :style="{
+                      borderColor: primaryColor,
+                      backgroundColor: isAllCaps
+                        ? `${primaryColor}50`
+                        : 'transparent',
+                    }"
                   >
-                    <span class="checkbox-text font-bold">A</span>
+                    <span
+                      class="checkbox-text font-bold"
+                      :style="{ color: primaryColor }"
+                      >A</span
+                    >
                   </div>
                   <span class="ml-2 text-xs">All Caps</span>
                 </div>
 
                 <!-- Italic Toggle -->
-                <div class="feature-option" @click="toggleItalic">
+                <div class="feature-option touch-feature" @click="toggleItalic">
                   <div
-                    class="feature-checkbox-square"
-                    :class="{ active: fontStyle === 'italic' }"
+                    class="feature-checkbox-square touch-checkbox"
+                    :style="{
+                      borderColor: primaryColor,
+                      backgroundColor:
+                        fontStyle === 'italic'
+                          ? `${primaryColor}50`
+                          : 'transparent',
+                    }"
                   >
-                    <span class="checkbox-text italic">I</span>
+                    <span
+                      class="checkbox-text italic"
+                      :style="{ color: primaryColor }"
+                      >I</span
+                    >
                   </div>
                   <span class="ml-2 text-xs">Italic</span>
                 </div>
@@ -857,17 +1243,19 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- OpenType Features Section -->
-          <div class="pt-2 mt-2 border-t border-gray-700">
+          <!-- OpenType Features Section - same for both mobile and desktop -->
+          <!-- <div class="pt-2 mt-2 border-t border-gray-700">
             <div class="text-white text-sm font-medium mb-3">
               OpenType Features
             </div>
 
             <div class="grid grid-cols-2 gap-x-4 gap-y-2">
-              <!-- Feature Controls -->
-              <div class="feature-option" @click="toggleFeature('ligatures')">
+              <div
+                class="feature-option touch-feature"
+                @click="toggleFeature('ligatures')"
+              >
                 <div
-                  class="feature-checkbox"
+                  class="feature-checkbox touch-checkbox"
                   :class="{ active: features.ligatures }"
                 >
                   <div v-if="features.ligatures" class="checkbox-dot"></div>
@@ -876,11 +1264,11 @@ onMounted(() => {
               </div>
 
               <div
-                class="feature-option"
+                class="feature-option touch-feature"
                 @click="toggleFeature('discretionaryLigatures')"
               >
                 <div
-                  class="feature-checkbox"
+                  class="feature-checkbox touch-checkbox"
                   :class="{ active: features.discretionaryLigatures }"
                 >
                   <div
@@ -891,9 +1279,12 @@ onMounted(() => {
                 <span class="ml-2 text-xs">Discretionary Ligatures</span>
               </div>
 
-              <div class="feature-option" @click="toggleFeature('fractions')">
+              <div
+                class="feature-option touch-feature"
+                @click="toggleFeature('fractions')"
+              >
                 <div
-                  class="feature-checkbox"
+                  class="feature-checkbox touch-checkbox"
                   :class="{ active: features.fractions }"
                 >
                   <div v-if="features.fractions" class="checkbox-dot"></div>
@@ -901,9 +1292,12 @@ onMounted(() => {
                 <span class="ml-2 text-xs">Fractions</span>
               </div>
 
-              <div class="feature-option" @click="toggleFeature('ordinals')">
+              <div
+                class="feature-option touch-feature"
+                @click="toggleFeature('ordinals')"
+              >
                 <div
-                  class="feature-checkbox"
+                  class="feature-checkbox touch-checkbox"
                   :class="{ active: features.ordinals }"
                 >
                   <div v-if="features.ordinals" class="checkbox-dot"></div>
@@ -911,71 +1305,20 @@ onMounted(() => {
                 <span class="ml-2 text-xs">Ordinals</span>
               </div>
             </div>
-          </div>
-
-          <!-- Actions Row -->
-          <div
-            class="actions-row flex items-center justify-between mt-2 pt-2 border-t border-gray-700"
-          >
-            <v-btn
-              size="small"
-              color="primary"
-              variant="flat"
-              density="comfortable"
-              @click="downloadFont"
-              prepend-icon="mdi-download"
-            >
-              {{ font.isPremium ? "Buy" : "Download" }}
-            </v-btn>
-
-            <v-btn
-              size="small"
-              color="yellow"
-              variant="outlined"
-              @click.stop="viewFontDetail"
-            >
-              View Family
-            </v-btn>
-
-            <v-btn
-              size="small"
-              :color="isFavorite ? 'yellow' : 'gray'"
-              icon
-              variant="text"
-              @click="addToFavorites"
-            >
-              <v-icon>{{
-                isFavorite ? "mdi-star" : "mdi-star-outline"
-              }}</v-icon>
-            </v-btn>
-          </div>
+          </div> -->
         </div>
-      </div>
-
-      <!-- Designer info -->
-      <div
-        class="px-6 py-4 border-t border-gray-800 text-gray-400 text-sm flex justify-between"
-      >
-        <span>By {{ font.designer }}</span>
-        <v-btn
-          size="small"
-          variant="text"
-          color="gray"
-          icon
-          @click="toggleOptions"
-          class="customize-btn"
-        >
-          <v-icon>{{ showOptions ? "mdi-chevron-up" : "mdi-tune" }}</v-icon>
-        </v-btn>
       </div>
     </v-card>
   </div>
 </template>
 
 <style scoped>
+.border-primary {
+  border-color: v-bind(primaryColor) !important;
+}
 
 .text-dark-btn {
-  color: rgb(255,255,227) !important;
+  color: rgb(255, 255, 227) !important;
 }
 
 .text-light-btn {
@@ -983,7 +1326,7 @@ onMounted(() => {
 }
 
 .bg-dark-btn {
-  background-color: rgb(255,255,227) !important;
+  background-color: rgb(255, 255, 227) !important;
 }
 
 .bg-light-btn {
@@ -1002,7 +1345,7 @@ onMounted(() => {
 
 .font-card:hover {
   transform: translateY(-2px);
-  border-color: #ffc107 !important;
+  border-color: v-bind(isDarkMode) !important;
 }
 
 .font-preview {
@@ -1057,7 +1400,7 @@ onMounted(() => {
 }
 
 .options-active .font-card {
-  border-color: #ffc107 !important;
+  border-color: v-bind(isDarkMode) !important;
 }
 
 /* Slider styles */
@@ -1455,5 +1798,111 @@ onMounted(() => {
 /* Enhanced animation for style changes */
 .sample-text-editor {
   transition: font-weight 0.3s ease, font-style 0.3s ease, font-size 0.3s ease;
+}
+
+/* Add new styles for the font controls in header */
+.font-controls {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  padding: 4px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.font-controls-mobile {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.variable-font-controls {
+  background-color: rgba(20, 20, 20, 0.5);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.variable-badge {
+  font-size: 10px;
+  background-color: rgba(255, 196, 0, 0.8);
+  color: black;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+/* Header slider styles */
+.header-slider {
+  width: 80px;
+  margin: 0 4px;
+}
+
+:deep(.compact-slider.v-slider) {
+  margin: 0;
+}
+
+:deep(.compact-slider .v-slider__track) {
+  height: 2px !important;
+}
+
+:deep(.compact-slider .v-slider__thumb) {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* Responsive design classes */
+@media (max-width: 767px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Make mobile font preview take up more space */
+  .font-preview {
+    min-height: 150px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+
+  /* Make checkboxes and buttons larger for touch */
+  .touch-checkbox {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .feature-checkbox-square.touch-checkbox {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .touch-btn {
+    min-width: 40px !important;
+    height: 40px !important;
+  }
+
+  .mobile-touch-friendly {
+    padding: 4px;
+  }
+
+  .touch-feature {
+    padding: 8px 4px;
+  }
+
+  /* More space in the options panel for mobile */
+  .font-options-panel {
+    padding: 16px 12px;
+  }
+
+  /* Better layout for mobile alignment toggles */
+  .option-row {
+    margin-bottom: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none !important;
+  }
 }
 </style>

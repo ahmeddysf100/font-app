@@ -1,17 +1,21 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from "vue";
 import { useThemeStore } from "../stores/theme.js";
 import logoImage from "../assets/kotype.svg";
-import { fonts } from "../utils/fontLoader";
+import fonts from "../../public/fonts.json";
+import { useSittingsStore } from "../stores/sittings.js";
 
 const themeStore = useThemeStore();
 const isMobile = ref(false);
+const sittingsStore = useSittingsStore();
+
+const primaryColor = computed(() => sittingsStore.primaryColor);
 
 // Form data
 const formData = ref({
-  name: '',
-  email: '',
-  message: ''
+  name: "",
+  email: "",
+  message: "",
 });
 
 const isSubmitting = ref(false);
@@ -20,8 +24,8 @@ const submitError = ref(false);
 
 // Get Arabic fonts for background decoration
 const arabicFonts = computed(() => {
-  return fonts.filter(font => 
-    font.name.startsWith('KO') || font.name.startsWith('Ko')
+  return fonts.filter(
+    (font) => font.name.startsWith("KO") || font.name.startsWith("Ko")
   );
 });
 
@@ -40,24 +44,39 @@ const checkScreenSize = () => {
 // Update theme variables
 const updateThemeVariables = () => {
   const isDark = themeStore.darkMode;
-  document.documentElement.style.setProperty('--bg-color', isDark ? '#0d0d0d' : 'white');
-  document.documentElement.style.setProperty('--accent-color', isDark ? '#ff1493' : '#ff69b4');
-  document.documentElement.style.setProperty('--accent-light-color', isDark ? 'rgba(255, 20, 147, 0.1)' : 'rgba(255, 105, 180, 0.1)');
-  document.documentElement.style.setProperty('--accent-medium-color', isDark ? 'rgba(255, 20, 147, 0.3)' : 'rgba(255, 105, 180, 0.3)');
-  document.documentElement.style.setProperty('--section-bg-color', isDark ? '#151515' : '#f8f8f8');
-  document.documentElement.style.setProperty('--text-color', isDark ? '#f5f5f5' : '#111');
+  document.documentElement.style.setProperty(
+    "--bg-color",
+    isDark ? primaryColor.value : "white"
+  );
+  document.documentElement.style.setProperty(
+    "--accent-color",
+    isDark ? primaryColor.value : "#ff69b4"
+  );
+  document.documentElement.style.setProperty(
+    "--accent-light-color",
+    isDark ? primaryColor.value : "rgba(255, 105, 180, 0.1)"
+  );
+  // document.documentElement.style.setProperty('--accent-medium-color', isDark ? primaryColor.value : 'rgba(255, 105, 180, 0.3)');
+  document.documentElement.style.setProperty(
+    "--section-bg-color",
+    isDark ? "#151515" : "#f8f8f8"
+  );
+  document.documentElement.style.setProperty(
+    "--text-color",
+    isDark ? "#f5f5f5" : "#111"
+  );
 };
 
 // Handle form submission
 const handleSubmit = async () => {
   isSubmitting.value = true;
   submitError.value = false;
-  
+
   try {
     // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     submitSuccess.value = true;
-    formData.value = { name: '', email: '', message: '' };
+    formData.value = { name: "", email: "", message: "" };
   } catch (error) {
     submitError.value = true;
   } finally {
@@ -67,7 +86,7 @@ const handleSubmit = async () => {
 
 onMounted(() => {
   checkScreenSize();
-  window.addEventListener('resize', checkScreenSize);
+  window.addEventListener("resize", checkScreenSize);
   updateThemeVariables();
 });
 </script>
@@ -82,37 +101,43 @@ onMounted(() => {
         </div>
       </v-container>
     </div>
-    
+
     <v-container class="main-content">
       <v-row>
         <v-col cols="12" md="6">
           <div class="contact-info">
             <div class="info-section">
               <h2 class="section-title">Let's Connect</h2>
-              
+
               <p class="mb-6">
-                We're always on the lookout for new free Arabic fonts and new talents. If you'd like to publish with us or join our journey, we also offer consultation and feedback sessions for both students and professionals.
+                We're always on the lookout for new free Arabic fonts and new
+                talents. If you'd like to publish with us or join our journey,
+                we also offer consultation and feedback sessions for both
+                students and professionals.
               </p>
-              
+
               <p class="mb-6">
-                We offer ad banner space in our main page, for ads that related to our community interests like workshops, submissions..etc.
+                We offer ad banner space in our main page, for ads that related
+                to our community interests like workshops, submissions..etc.
               </p>
-              
+
               <p class="contact-cta">
-                Feel free to reach out: 
+                Feel free to reach out:
                 <a :href="'contact.kotype@gmail.com'" class="email-link">
-                  <span class="email-text">Email</span>
+                  <span class="email-text">contact.kotype@gmail.com</span>
                 </a>
               </p>
-              
+
               <p class="mt-8 donation-text">
-                If you like our fonts and our activities, please consider donating. This will allow us to continue distributing new quality, free fonts and improving our existing catalogue.
-                <v-btn 
-                  color="pink" 
-                  variant="elevated" 
-                  size="large" 
-                  class="mt-3 donation-btn"
-                  href="https://ko-fi.com/kotype" 
+                If you like our fonts and our activities, please consider
+                donating. This will allow us to continue distributing new
+                quality, free fonts and improving our existing catalogue.
+                <v-btn
+                  color="pink"
+                  variant=" "
+                  size="large"
+                  class="mt-3 donation-btn d-flex align-center"
+                  href="https://ko-fi.com/kotype"
                   target="_blank"
                 >
                   Visit our donation page
@@ -121,56 +146,56 @@ onMounted(() => {
             </div>
           </div>
         </v-col>
-        
+
         <v-col cols="12" md="6">
           <div class="contact-form-wrapper">
             <form class="contact-form" @submit.prevent="handleSubmit">
               <div class="form-group">
-                <input 
-                  type="text" 
-                  v-model="formData.name" 
-                  placeholder="Name*" 
+                <input
+                  type="text"
+                  v-model="formData.name"
+                  placeholder="Name*"
                   required
                   class="form-input"
                 />
               </div>
-              
+
               <div class="form-group">
-                <input 
-                  type="email" 
-                  v-model="formData.email" 
-                  placeholder="Email*" 
+                <input
+                  type="email"
+                  v-model="formData.email"
+                  placeholder="Email*"
                   required
                   class="form-input"
                 />
               </div>
-              
+
               <div class="form-group">
-                <textarea 
-                  v-model="formData.message" 
-                  placeholder="Message / Message" 
+                <textarea
+                  v-model="formData.message"
+                  placeholder="Message / Message"
                   rows="5"
                   class="form-input"
                 ></textarea>
               </div>
-              
+
               <div class="form-group submit-group">
-                <button 
-                  type="submit" 
-                  class="submit-btn" 
+                <button
+                  type="submit"
+                  class="submit-btn"
                   :disabled="isSubmitting"
                 >
                   <span v-if="isSubmitting">Sending...</span>
                   <span v-else>Send</span>
                 </button>
               </div>
-              
+
               <div v-if="submitSuccess" class="success-message">
                 <v-alert type="success" variant="tonal">
                   Thank you for your message! We will get back to you soon.
                 </v-alert>
               </div>
-              
+
               <div v-if="submitError" class="error-message">
                 <v-alert type="error" variant="tonal">
                   There was an error sending your message. Please try again.
@@ -181,10 +206,42 @@ onMounted(() => {
         </v-col>
       </v-row>
     </v-container>
-    
+
     <div class="decorative-text-bg">
-      <div v-if="randomFont" class="decorative-font" :style="{ fontFamily: randomFont.fontFamily }">
-        تواصل معنا
+      <div
+        v-if="randomFont"
+        class="decorative-font decorative-line1"
+        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+      >
+        تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
+      </div>
+      <div
+        v-if="randomFont"
+        class="decorative-font decorative-line2"
+        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+      >
+        تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
+      </div>
+      <div
+        v-if="randomFont"
+        class="decorative-font decorative-line3"
+        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+      >
+        تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
+      </div>
+      <div
+        v-if="randomFont"
+        class="decorative-font decorative-line4"
+        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+      >
+        تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
+      </div>
+      <div
+        v-if="randomFont"
+        class="decorative-font decorative-line5"
+        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+      >
+        تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
       </div>
     </div>
   </div>
@@ -209,8 +266,9 @@ onMounted(() => {
   background-color: var(--section-bg-color, #f8f8f8);
   padding: 80px 0 40px;
   position: relative;
-  box-shadow: var(--section-shadow, 0 5px 15px rgba(0,0,0,0.03));
+  box-shadow: var(--section-shadow, 0 5px 15px rgba(0, 0, 0, 0.03));
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1;
 }
 
 .header-content {
@@ -243,7 +301,7 @@ onMounted(() => {
 .main-content {
   padding: 60px 0;
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
 
 .contact-info {
@@ -280,7 +338,7 @@ onMounted(() => {
 }
 
 .email-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -310,8 +368,8 @@ onMounted(() => {
   background-color: var(--accent-color, #ff69b4) !important;
   color: white !important;
   font-weight: 500;
+  border-radius: 30px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 10px var(--accent-light-color, rgba(255, 105, 180, 0.2));
 }
 
 .donation-btn:hover {
@@ -396,39 +454,81 @@ textarea.form-input {
   cursor: not-allowed;
 }
 
-.success-message, .error-message {
+.success-message,
+.error-message {
   margin-top: 20px;
 }
 
 /* Decorative Background */
 .decorative-text-bg {
-  position: absolute;
+  position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.03;
 }
 
 .decorative-font {
   position: absolute;
-  top: 10%;
-  right: -5%;
-  font-size: 30rem;
-  transform: rotate(-10deg);
-  color: var(--accent-color, #ff69b4);
+  right: 0;
   white-space: nowrap;
-  line-height: 1;
+  color: white;
+  opacity: 0.035;
+  animation: slideRightToLeft 60s linear infinite;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+.decorative-line1 {
+  top: 10%;
+  font-size: 30rem;
+  animation-duration: 80s;
+}
+
+.decorative-line2 {
+  top: 30%;
+  font-size: 30rem;
+  animation-duration: 60s;
+  animation-delay: -20s;
+}
+
+.decorative-line3 {
+  top: 50%;
+  font-size: 30rem;
+  animation-duration: 70s;
+  animation-delay: -40s;
+}
+
+.decorative-line4 {
+  top: 70%;
+  font-size: 30rem;
+  animation-duration: 75s;
+  animation-delay: -15s;
+}
+
+.decorative-line5 {
+  top: 90%;
+  font-size: 30rem;
+  animation-duration: 65s;
+  animation-delay: -30s;
+}
+
+@keyframes slideRightToLeft {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @media (max-width: 959px) {
   .contact-info {
     margin-bottom: 40px;
   }
-  
+
   .decorative-font {
     font-size: 20rem;
   }
@@ -438,33 +538,31 @@ textarea.form-input {
   .page-header {
     padding: 60px 0 30px;
   }
-  
+
   .page-title {
     font-size: 1.6rem;
     padding: 12px 25px;
   }
-  
+
   .main-content {
     padding: 40px 0;
   }
-  
+
   .contact-form-wrapper {
     padding: 20px;
   }
-  
+
   .form-input {
     padding: 12px 15px;
   }
-  
+
   .submit-btn {
     padding: 12px 40px;
     width: 100%;
   }
-  
+
   .decorative-font {
     font-size: 15rem;
-    top: 50%;
-    right: -20%;
   }
 }
 
@@ -472,13 +570,13 @@ textarea.form-input {
   .section-title {
     font-size: 1.5rem;
   }
-  
+
   .contact-info p {
     font-size: 1rem;
   }
-  
+
   .decorative-font {
     font-size: 10rem;
   }
 }
-</style> 
+</style>

@@ -1,16 +1,22 @@
 <script setup>
+import fonts  from "../../public/fonts.json";
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFontStore } from '../stores/fonts'
 import { useSittingsStore } from "../stores/sittings";
 import { generateFontStyle } from '../utils/fontUtils'
-// Import fonts from fontLoader
-import { fonts } from "../utils/fontLoader";
+// Remove import for isGoogleFontsUrl
 
 const route = useRoute()
 const router = useRouter()
 const fontStore = useFontStore()
 const settingsStore = useSittingsStore();
+
+// Store font family and style tracking variables
+const currentFontFamily = ref('');
+const isVariableFont = ref(false);
+
+const primaryColor = computed(() => settingsStore.primaryColor);
 
 // Mobile detection
 const isMobile = ref(false);
@@ -24,9 +30,14 @@ const checkScreenSize = () => {
 const fontId = parseInt(route.params.id)
 const font = computed(() => fontStore.currentFont || fontStore.getFontById(fontId) || {})
 
-// Get current font data from the new fonts array
+// Get current font data from the new fonts array with proper error handling
 const currentFontData = computed(() => {
-  return fonts.find((f) => f.name === font.value.name) || null;
+  const fontData = fonts.find((f) => f.name === font.value.name);
+  if (!fontData) {
+    console.warn(`Font data not found for: ${font.value.name}`);
+    return null;
+  }
+  return fontData;
 });
 
 // Set default sample text for Arabic fonts
@@ -59,8 +70,15 @@ const colorMode = ref("white");
 // Filter options
 const showVariableFonts = ref(true);
 const showStaticFonts = ref(true);
+// Remove showGoogleFonts ref
 const searchQuery = ref("");
 const sortBy = ref("default"); // default, weight-asc, weight-desc, name
+
+// New loading state for fonts
+const fontsLoading = ref(true);
+const loadingError = ref(null);
+
+// Remove Google Fonts related refs and tracking variables
 
 // Get available styles based on the new font structure
 const fontStyles = computed(() => {
@@ -71,8 +89,11 @@ const fontStyles = computed(() => {
   // Add all static styles from the current font
   if (showStaticFonts.value) {
     allStyles = currentFontData.value.styles.map(style => {
+      // Get the actual font family to use for this style
+      const actualFontFamily = style.fontFamily || currentFontData.value.fontFamily;
+      
       const baseStyle = generateFontStyle(
-        style.fontFamily || currentFontData.value.fontFamily,
+        actualFontFamily,
         style.weight || 400,
         style.style || "normal"
       );
@@ -82,8 +103,10 @@ const fontStyles = computed(() => {
         name: style.name,
         category: currentFontData.value.category,
         isVariable: false,
+        fontFamily: actualFontFamily, // Store font family directly in the style object
         value: {
           ...baseStyle,
+          fontFamily: actualFontFamily, // Properly quoted font family
           fontSize: `${fontSize.value}px`,
           lineHeight: 1.3,
           color: colorMode.value === "white" ? "white" : "black",
@@ -92,7 +115,7 @@ const fontStyles = computed(() => {
         details: {
           weight: style.weight || 400,
           style: style.style || "normal",
-          fontFamily: style.fontFamily || currentFontData.value.fontFamily
+          fontFamily: actualFontFamily
         }
       };
     });
@@ -101,31 +124,66 @@ const fontStyles = computed(() => {
   // Add variable styles if available and enabled
   if (showVariableFonts.value && currentFontData.value.variable) {
     const variableStyles = currentFontData.value.variable.map(varStyle => {
+      // Parse weight range from variationSettings if available
+      let weightRange = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+      
+      if (varStyle.variationSettings) {
+        // Check for weight range in format "'wght' 100 500" or similar
+        const wghtMatch = varStyle.variationSettings.match(/'wght'\s+(\d+)\s+(\d+)/);
+        
+        if (wghtMatch) {
+          const minWeight = parseInt(wghtMatch[1]);
+          const maxWeight = parseInt(wghtMatch[2]);
+          
+          console.log(`Found weight range in variationSettings: ${minWeight} to ${maxWeight}`);
+          
+          // Generate weights within the specified range
+          const step = (maxWeight - minWeight) <= 400 ? 100 : 200;
+          weightRange = [];
+          
+          for (let weight = minWeight; weight <= maxWeight; weight += step) {
+            weightRange.push(weight);
+          }
+          
+          // Always include the min and max values
+          if (!weightRange.includes(minWeight)) weightRange.unshift(minWeight);
+          if (!weightRange.includes(maxWeight)) weightRange.push(maxWeight);
+        }
+      }
+      
       // Create styles for different weights to showcase variable font capabilities
-      return [100, 300, 400, 500, 700, 900].map(weight => {
+      return weightRange.map(weight => {
         const baseStyle = generateFontStyle(
           varStyle.fontFamily,
           weight,
           varStyle.style || "normal"
         );
         
+        // Handle specific variation settings if available
+        const fontVariationSettings = varStyle.variationSettings 
+          ? varStyle.variationSettings.replace(/wght/g, `'wght' ${weight}`) 
+          : `'wght' ${weight}`;
+        
         return {
           id: `variable-${varStyle.style || "normal"}-${weight}`,
           name: `Variable ${varStyle.style === "italic" ? "Italic" : ""} ${weight}`,
           category: currentFontData.value.category,
           isVariable: true,
+          fontFamily: varStyle.fontFamily, // Store font family directly
           value: {
             ...baseStyle,
+            fontFamily: `"${varStyle.fontFamily}", sans-serif`, // Properly quoted font family
             fontSize: `${fontSize.value}px`,
             lineHeight: 1.3,
             color: colorMode.value === "white" ? "white" : "black",
-            fontVariationSettings: `'wght' ${weight}`,
+            fontVariationSettings: fontVariationSettings,
             direction: textDirection.value,
           },
           details: {
             weight: weight,
             style: varStyle.style || "normal",
-            fontFamily: varStyle.fontFamily
+            fontFamily: varStyle.fontFamily,
+            variationSettings: fontVariationSettings
           }
         };
       });
@@ -143,6 +201,8 @@ const fontStyles = computed(() => {
       style.details.style.toLowerCase().includes(query)
     );
   }
+  
+  // Remove Google Fonts filter
   
   // Sort styles
   switch (sortBy.value) {
@@ -172,6 +232,8 @@ const toggleStaticFonts = () => {
   showStaticFonts.value = !showStaticFonts.value;
 };
 
+// Remove toggleGoogleFonts function
+
 // Update font size
 const updateFontSize = (size) => {
   fontSize.value = size;
@@ -187,9 +249,46 @@ const backToFontDetail = () => {
   router.push(`/fonts/${fontId}`);
 };
 
+// Remove all Google Fonts related functions: checkGoogleFontsLoaded, reloadGoogleFonts, extractGoogleFontInfo, debugLoadedFonts
+
+// Initialize font family tracking
+const initFontFamilyTracking = () => {
+  if (!currentFontData.value) return;
+  
+  // Set the default font family from the first available style
+  if (currentFontData.value.styles && currentFontData.value.styles.length > 0) {
+    const firstStyle = currentFontData.value.styles[0];
+    currentFontFamily.value = firstStyle.fontFamily || currentFontData.value.fontFamily;
+    isVariableFont.value = false;
+  } else if (currentFontData.value.variable && currentFontData.value.variable.length > 0) {
+    const firstVariable = currentFontData.value.variable[0];
+    currentFontFamily.value = firstVariable.fontFamily;
+    isVariableFont.value = true;
+  }
+  
+  console.log(`Initialized font family tracking with: ${currentFontFamily.value}`);
+};
+
 onMounted(() => {
   // Ensure the font is loaded in the store
-  fontStore.setCurrentFont(fontId);
+  try {
+    fontStore.setCurrentFont(fontId);
+    
+    // Verify font data is available after a short delay
+    setTimeout(() => {
+      if (!currentFontData.value) {
+        loadingError.value = `Could not load font data for ID: ${fontId}`;
+      } else {
+        // Initialize font family tracking
+        initFontFamilyTracking();
+      }
+      fontsLoading.value = false;
+    }, 500);
+  } catch (error) {
+    console.error("Error loading font:", error);
+    loadingError.value = "Failed to load font data";
+    fontsLoading.value = false;
+  }
   
   // Initialize mobile detection
   checkScreenSize();
@@ -203,6 +302,11 @@ watch(() => route.params.id, (newId) => {
   
   // Update sample text with default for the new font
   sampleText.value = getDefaultSampleText();
+  
+  // Initialize font family tracking for the new font
+  setTimeout(() => {
+    initFontFamilyTracking();
+  }, 500);
 }, { immediate: true });
 
 // Clean up event listeners
@@ -217,16 +321,17 @@ onUnmounted(() => {
   >
     <!-- Header -->
     <div class="px-6 pt-4">
-      <v-btn 
+      <!-- <v-btn 
+        :color="primaryColor"
         variant="text" 
         @click="backToFontDetail" 
         class="mb-4"
       >
         <v-icon start>mdi-arrow-left</v-icon>
         Back to Font Detail
-      </v-btn>
+      </v-btn> -->
       
-      <div class="border-b border-opacity-20" >
+      <div class="border-b border-opacity-20 primary-border" >
         <div class="flex flex-wrap justify-between items-center pb-4">
           <div>
             <h1 class="text-2xl font-bold">{{ font.name }} Family</h1>
@@ -239,14 +344,7 @@ onUnmounted(() => {
           
           <!-- Controls -->
           <div class="controls mt-3 md:mt-0 flex flex-wrap items-center gap-3">
-            <!-- Color mode toggle -->
-            <v-btn 
-              icon 
-              variant="text" 
-              @click="toggleColorMode"
-            >
-              <v-icon>{{ colorMode === 'white' ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
-            </v-btn>
+            <!-- Remove Google Fonts reload and debug buttons -->
             
             <!-- Font size slider -->
             <div class="flex items-center">
@@ -259,8 +357,9 @@ onUnmounted(() => {
                 class="slider-thumb w-24 md:w-32"
                 density="compact"
                 hide-details
-                :track-color="colorMode === 'white' ? '' : ''"
-                :thumb-color="colorMode === 'white' ? '' : ''"
+                :color="primaryColor"
+                :track-color="primaryColor"
+                :thumb-color="primaryColor"
                 @update:model-value="updateFontSize"
               ></v-slider>
               <span class="text-xs ml-1">{{ fontSize }}px</span>
@@ -271,10 +370,10 @@ onUnmounted(() => {
     </div>
     
     <!-- Filters -->
-    <div class="px-6 py-4">
+    <div class="px-6 py-4 ">
       <div class="flex flex-wrap gap-4 items-center">
-        <div class="search-box flex-grow max-w-md">
-          <div class="relative">
+        <div class="search-box flex-grow max-w-md bg-black">
+          <div class="relative bg-black border-b-2 primary-border">
             <v-icon 
               class="absolute left-2 top-1/2 transform -translate-y-1/2 opacity-50" 
               size="small"
@@ -285,14 +384,14 @@ onUnmounted(() => {
               v-model="searchQuery"
               type="text"
               placeholder="Search styles"
-              class="w-full py-2 pl-9 pr-4 rounded bg-gray-900 text-white"
+              class="w-full py-2 pl-9 pr-4 rounded bg-black text-white  "
             >
           </div>
         </div>
         
         <div class="filter-options flex flex-wrap gap-3">
           <v-chip
-            :color="showVariableFonts ? 'yellow' : 'gray'"
+            :color="showVariableFonts ? primaryColor : 'gray'"
             variant="outlined"
             @click="toggleVariableFonts"
             :class="showVariableFonts ? 'border-opacity-100' : 'border-opacity-50 opacity-50'"
@@ -301,13 +400,15 @@ onUnmounted(() => {
           </v-chip>
           
           <v-chip
-            :color="showStaticFonts ? 'yellow' : 'gray'"
+            :color="showStaticFonts ? primaryColor : 'gray'"
             variant="outlined"
             @click="toggleStaticFonts"
             :class="showStaticFonts ? 'border-opacity-100' : 'border-opacity-50 opacity-50'"
           >
             Static
           </v-chip>
+          
+          <!-- Remove Google Fonts chip -->
           
           <v-menu>
             <template v-slot:activator="{ props }">
@@ -316,6 +417,7 @@ onUnmounted(() => {
                 variant="text"
                 size="small"
                 class="ml-1"
+                :color="primaryColor"
               >
                 <v-icon start>mdi-sort</v-icon>
                 Sort
@@ -326,6 +428,7 @@ onUnmounted(() => {
                 value="default"
                 @click="sortBy = 'default'"
                 :active="sortBy === 'default'"
+                :color="primaryColor"
               >
                 <v-list-item-title>Default</v-list-item-title>
               </v-list-item>
@@ -333,6 +436,7 @@ onUnmounted(() => {
                 value="weight-asc"
                 @click="sortBy = 'weight-asc'"
                 :active="sortBy === 'weight-asc'"
+                :color="primaryColor"
               >
                 <v-list-item-title>Weight (Lightest first)</v-list-item-title>
               </v-list-item>
@@ -340,6 +444,7 @@ onUnmounted(() => {
                 value="weight-desc"
                 @click="sortBy = 'weight-desc'"
                 :active="sortBy === 'weight-desc'"
+                :color="primaryColor"
               >
                 <v-list-item-title>Weight (Heaviest first)</v-list-item-title>
               </v-list-item>
@@ -347,6 +452,7 @@ onUnmounted(() => {
                 value="name"
                 @click="sortBy = 'name'"
                 :active="sortBy === 'name'"
+                :color="primaryColor"
               >
                 <v-list-item-title>Name</v-list-item-title>
               </v-list-item>
@@ -358,23 +464,48 @@ onUnmounted(() => {
     
     <!-- Font Family Styles -->
     <div class="px-6 pb-12">
-      <div v-if="fontStyles.length === 0" class="text-center py-12 opacity-60">
+      <!-- Loading state -->
+      <div v-if="fontsLoading" class="text-center py-12">
+        <v-progress-circular
+          indeterminate
+          :color="primaryColor"
+          size="64"
+          width="4"
+        ></v-progress-circular>
+        <p class="mt-4 text-gray-400">Loading font styles...</p>
+      </div>
+      
+      <!-- Remove Google Fonts loading state -->
+      
+      <!-- Error state -->
+      <div v-else-if="loadingError" class="text-center py-12 text-red-500">
+        <v-icon icon="mdi-alert-circle" size="64" color="error"></v-icon>
+        <p class="mt-4">{{ loadingError }}</p>
+        <v-btn 
+          @click="router.push('/fonts')" 
+          class="mt-4" 
+          :color="primaryColor"
+          variant="outlined"
+        >
+          Return to fonts list
+        </v-btn>
+      </div>
+      
+      <!-- No styles with current filters -->
+      <div v-else-if="fontStyles.length === 0" class="text-center py-12 opacity-60">
         No styles available with the current filters.
       </div>
       
+      <!-- Font styles display -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div 
           v-for="style in fontStyles" 
           :key="style.id"
-          class="font-style-card rounded-lg transition-all duration-300 overflow-hidden"
-          :class="[
-            colorMode === 'white' 
-              ? 'border border-gray-800 hover:border-yellow-500 ' 
-              : 'border border-gray-300 hover:border-yellow-600 hover:shadow-md'
-          ]"
+          class="font-style-card rounded-lg transition-all duration-300 overflow-hidden border-2 primary-border"
+          
         >
-          <div class="flex justify-between items-center p-4 border-b border-opacity-20"
-               :class="colorMode === 'white' ? 'border-gray-700' : 'border-gray-300'">
+          <div class="flex justify-between items-center p-4 border-b-[1px] primary-border border-opacity-10"
+              >
             <h3 class="font-medium truncate" :title="style.name">{{ style.name }}</h3>
             <div class="flex items-center gap-2">
               <v-chip 
@@ -386,6 +517,7 @@ onUnmounted(() => {
               >
                 Variable
               </v-chip>
+              <!-- Remove Google Fonts chip -->
               <v-chip 
                 size="x-small" 
                 :color="colorMode === 'white' ? 'gray' : 'gray-light'" 
@@ -398,14 +530,15 @@ onUnmounted(() => {
           </div>
           
           <div 
-            class="font-preview p-6 text-center"
+            contenteditable="true"
+            class="font-preview p-6 text-center border-none"
             :style="style.value"
             :dir="textDirection"
             :class="[
-            colorMode === 'white' 
-              ? ' bg-black text-white' 
-              : ' bg-white text-black'
-          ]"
+              colorMode === 'white' 
+                ? ' bg-black text-white' 
+                : ' bg-white text-black'
+            ]"
           >
             {{ sampleText }}
           </div>
@@ -423,12 +556,14 @@ onUnmounted(() => {
                 density="compact"
                 hide-details
                 disabled
+                :color="primaryColor"
                 :track-color="colorMode === 'white' ? 'white' : 'black'"
                 :thumb-color="colorMode === 'white' ? 'white' : 'black'"
               ></v-slider>
               <span class="text-xs ml-1">{{ style.details.weight }}</span>
             </div>
           </div>
+          <!-- Remove Google Fonts indicator -->
         </div>
       </div>
     </div>
@@ -436,11 +571,23 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.primary-border {
+  border-color: v-bind(primaryColor);
+}
+
 .font-preview {
   font-size: 32px;
   line-height: 1.3;
   min-height: 100px;
   transition: all 0.3s ease;
+  outline: none; /* Remove outline when focused */
+}
+
+/* Remove focus border for contenteditable elements */
+[contenteditable="true"]:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
 .variable-badge {
@@ -512,4 +659,6 @@ input:focus {
     width: 100%;
   }
 }
+
+/* Remove Google Fonts styles */
 </style> 

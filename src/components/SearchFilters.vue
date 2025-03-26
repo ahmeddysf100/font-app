@@ -23,7 +23,7 @@ const isFilterPanelOpen = ref(false);
 
 // Check screen size on mount and when window resizes
 const checkScreenSize = () => {
-  isMobile.value = window.innerWidth < 768;
+  isMobile.value = window.innerWidth < 868;
   if (!isMobile.value) {
     isFilterPanelOpen.value = false;
   }
@@ -47,6 +47,7 @@ const categories = ref([
   { text: "Serif", value: "serif" },
   { text: "Mono", value: "mono" },
   { text: "Script", value: "script" },
+  { text: "Handwriting", value: "handwriting" },
 ]);
 const selectedCategory = ref("Categories");
 
@@ -110,6 +111,20 @@ const themeMode = ref("light");
 // Sample text input
 const sampleText = ref("السلام عليكم");
 
+// Add color options
+const colorOptions = ref([
+  { text: "Pink", value: "#FA82D1" },
+  { text: "Blue", value: "blue" },
+  { text: "Green", value: "green" },
+  { text: "Purple", value: "purple" },
+  { text: "Red", value: "red" },
+  { text: "Orange", value: "orange" },
+  { text: "Pink", value: "pink" },
+  { text: "Teal", value: "teal" },
+]);
+
+const selectedColor = computed(() => settingsStore.primaryColor);
+const borderColor = computed(() => `${selectedColor.value}`);
 // Reset all filters
 const resetAll = () => {
   // Update settings in Pinia store
@@ -155,7 +170,9 @@ const updatePersonality = (personality) => {
   emit("filter-change", { type: "personality", value: personality });
 };
 
+const selectedTextType = ref("cities");
 const updateTextType = (type) => {
+  selectedTextType.value = type;
   cityNames.value = type === "cities";
   excerpts.value = type === "excerpts";
   namesSelected.value = type === "names";
@@ -188,40 +205,52 @@ const handleClickOutside = (event) => {
   }
 };
 
+// Add color update function
+const updateColor = (color) => {
+  selectedColor.value = color;
+  settingsStore.primaryColor = color;
+  settingsStore.storeColorInLocalStorage();
+  emit("filter-change", { type: "color", value: color });
+};
+
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
   checkScreenSize();
-  window.addEventListener('resize', checkScreenSize);
+  window.addEventListener("resize", checkScreenSize);
+  settingsStore.getColorFromLocalStorage();
 });
 
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
-  window.removeEventListener('resize', checkScreenSize);
+  window.removeEventListener("resize", checkScreenSize);
 });
 </script>
 
 <template>
   <div class="search-filters bg-black dark:bg-black text-white">
     <!-- Search Bar Row - Always visible -->
-    <div class="py-3 md:py-4 border-b border-gray-800 dark:border-gray-700">
+    <div class="py-3 md:py-4 border-b border-primary">
       <v-container>
         <div class="flex items-center">
           <div class="search-box flex items-center flex-grow">
-            <v-icon class="mr-2 text-gray-500">mdi-magnify</v-icon>
+            <v-icon class="mr-2 text-gray-500" :color="selectedColor"
+              >mdi-magnify</v-icon
+            >
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search"
               class="bg-transparent border-none outline-none text-white w-full"
+              :style="{ 'caret-color': selectedColor }"
             />
           </div>
 
           <!-- Mobile Filter Toggle -->
           <div v-if="isMobile" class="ml-2">
-            <v-btn 
-              icon 
-              variant="text" 
-              color="white" 
+            <v-btn
+              icon
+              variant="text"
+              :color="selectedColor"
               @click="toggleFilterPanel"
               class="filter-toggle-btn"
             >
@@ -232,93 +261,83 @@ onUnmounted(() => {
           <!-- Desktop Filters -->
           <div v-if="!isMobile" class="flex items-center ml-4">
             <!-- Categories Dropdown -->
-            <div class="ml-4 relative">
-              <v-menu>
-                <template v-slot:activator="{ props }">
-                  <div v-bind="props" class="flex items-center cursor-pointer">
-                    <span class="mr-1 text-gray-400">{{ selectedCategory }}</span>
-                    <v-icon size="small" class="text-gray-400">mdi-chevron-down</v-icon>
-                  </div>
+            <div class="mr-8 relative">
+              <v-select
+                v-model="selectedCategory"
+                @update:model-value="updateCategory"
+                :items="categories"
+                item-title="text"
+                item-value="text"
+                variant="outlined"
+                density="comfortable"
+                class="category-select"
+                bg-color="black"
+                hide-details
+                label="Category"
+                clearable
+                :color="selectedColor"
+              >
+                <template v-slot:selection="{ item }">
+                  <span :style="{ color: selectedColor }">{{
+                    item.raw.text
+                  }}</span>
                 </template>
-                <v-list class="bg-gray-900">
-                  <v-list-item
-                    v-for="(category, index) in categories"
-                    :key="index"
-                    :value="category.value"
-                    @click="updateCategory(category.text)"
-                    class="text-white"
-                  >
-                    {{ category.text }}
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+              </v-select>
             </div>
 
-            <!-- Properties Dropdown -->
-            <!-- <div class="ml-6 relative">
-              <v-menu>
-                <template v-slot:activator="{ props }">
-                  <div v-bind="props" class="flex items-center cursor-pointer">
-                    <span class="mr-1 text-gray-400">{{ selectedProperty }}</span>
-                    <v-icon size="small" class="text-gray-400">mdi-chevron-down</v-icon>
-                  </div>
+            <!-- Color Selector -->
+            <div class="ml-8 relative">
+              <v-select
+                v-model="selectedColor"
+                @update:model-value="updateColor"
+                :items="colorOptions"
+                item-title="text"
+                item-value="value"
+                variant="outlined"
+                density="comfortable"
+                class="color-select"
+                bg-color="black"
+                hide-details
+                label="Color"
+                :color="selectedColor"
+              >
+                <template v-slot:selection="{ item }">
+                  <span :style="{ color: selectedColor }">{{
+                    item.raw.text
+                  }}</span>
                 </template>
-                <v-list class="bg-gray-900">
-                  <v-list-item
-                    v-for="(property, index) in properties"
-                    :key="index"
-                    :value="property.value"
-                    @click="updateProperty(property.text)"
-                    class="text-white"
-                  >
-                    {{ property.text }}
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </div> -->
+              </v-select>
+            </div>
 
             <!-- Font Size (Desktop) -->
             <div class="ml-auto flex items-center">
-              <div class="relative" ref="fontSizeRef">
-                <div
-                  class="font-size-select flex items-center cursor-pointer px-2 py-1 border border-gray-700 rounded"
-                  @click.stop="toggleFontSizeMenu"
-                >
-                  <span class="text-white mr-1">{{ fontSizeText }}</span>
-                  <v-icon size="small" color="white">mdi-chevron-down</v-icon>
-                </div>
+              <!-- Replace the custom dropdown with v-select -->
 
-                <!-- Font Size Dropdown -->
-                <div
-                  v-if="showFontSizeMenu"
-                  class="font-size-dropdown absolute right-0 mt-1 w-40 bg-gray-900 border border-gray-700 rounded max-h-72 overflow-y-auto z-50"
-                  style="scrollbar-width: thin; scrollbar-color: #666 #333"
+              <div class="mr-4 ml-4 w-24">
+                <v-select
+                  v-model="fontSize"
+                  :items="fontSizeOptions"
+                  item-title="label"
+                  item-value="value"
+                  variant="outlined"
+                  density="compact"
+                  class="font-size-select"
+                  bg-color="black"
+                  hide-details
+                  :color="selectedColor"
+                  label="Font Size"
+                  @update:model-value="updateFontSize"
                 >
-                  <div class="py-1 bg-black">
-                    <div
-                      v-for="option in fontSizeOptions"
-                      :key="option.value"
-                      class="font-size-option px-4 py-2 hover:bg-gray-800 bg-black cursor-pointer flex items-center"
-                      :class="{ 'selected-size': fontSize === option.value }"
-                      @click="selectFontSize(option.value)"
-                    >
-                      <div
-                        class="size-indicator mr-2"
-                        :class="{ 'active-indicator': fontSize === option.value }"
-                      >
-                        <div
-                          v-if="fontSize === option.value"
-                          class="indicator-dot"
-                        ></div>
-                      </div>
-                      <span>{{ option.label }}</span>
-                    </div>
-                  </div>
-                </div>
+                  <template v-slot:selection="{ item }">
+                    <span :style="{ color: selectedColor }">{{
+                      item.raw.label
+                    }}</span>
+                  </template>
+                </v-select>
               </div>
 
-              <!-- Font Slider Button (Desktop) -->
-              <div class="ml-4">
+              <!-- Keep the slider -->
+              <div class="flex items-center justify-between ml-4">
                 <v-slider
                   v-model="fontSize"
                   min="8"
@@ -327,11 +346,15 @@ onUnmounted(() => {
                   class="slider-thumb mt-0 pt-0"
                   density="compact"
                   hide-details
-                  track-color="white"
-                  thumb-color="white"
+                  :color="selectedColor"
+                  :track-color="`${selectedColor}50`"
+                  :thumb-color="selectedColor"
                   thumb-label
                   @update:model-value="updateFontSize"
                 ></v-slider>
+                <span class="pl-4" :style="{ color: selectedColor }">{{
+                  fontSizeText
+                }}</span>
               </div>
             </div>
           </div>
@@ -340,76 +363,71 @@ onUnmounted(() => {
     </div>
 
     <!-- Mobile Filter Panel - Collapsible -->
-    <div 
-      v-if="isMobile" 
-      class="mobile-filter-panel"
+    <div
+      v-if="isMobile"
+      class="mobile-filter-panel bg-black"
       :class="{ 'panel-open': isFilterPanelOpen }"
     >
       <v-container>
         <!-- Categories and Properties in mobile view -->
-        <div class="py-3 border-b border-gray-800">
+        <div class="py-3 border-b border-primary">
           <div class="flex flex-wrap items-center justify-between">
             <!-- Categories Dropdown Mobile -->
-            <div class="mobile-dropdown mb-3 w-full sm:w-1/2 sm:pr-2">
-              <span class="text-gray-400 text-sm mb-1 block">Category</span>
-              <v-menu location="bottom" :close-on-content-click="true">
-                <template v-slot:activator="{ props }">
-                  <div 
-                    v-bind="props" 
-                    class="flex items-center justify-between cursor-pointer p-3 border border-gray-700 rounded"
-                  >
-                    <span>{{ selectedCategory }}</span>
-                    <v-icon size="small">mdi-chevron-down</v-icon>
-                  </div>
+            <div class="mobile-dropdown mb-3 w-full">
+              <v-select
+                v-model="selectedCategory"
+                @update:model-value="updateCategory"
+                :items="categories"
+                item-title="text"
+                item-value="text"
+                variant="outlined"
+                density="comfortable"
+                class=" "
+                bg-color="black"
+                hide-details
+                label="Category"
+                clearable
+                :color="selectedColor"
+              >
+                <template v-slot:selection="{ item }">
+                  <span :style="{ color: selectedColor }">{{
+                    item.raw.text
+                  }}</span>
                 </template>
-                <v-list class="bg-gray-900">
-                  <v-list-item
-                    v-for="(category, index) in categories"
-                    :key="index"
-                    :value="category.value"
-                    @click="updateCategory(category.text)"
-                    class="text-white"
-                  >
-                    {{ category.text }}
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+              </v-select>
             </div>
 
-            <!-- Properties Dropdown Mobile -->
-            <!-- <div class="mobile-dropdown mb-3 w-full sm:w-1/2 sm:pl-2">
-              <span class="text-gray-400 text-sm mb-1 block">Property</span>
-              <v-menu location="bottom" :close-on-content-click="true">
-                <template v-slot:activator="{ props }">
-                  <div 
-                    v-bind="props" 
-                    class="flex items-center justify-between cursor-pointer p-3 border border-gray-700 rounded"
-                  >
-                    <span>{{ selectedProperty }}</span>
-                    <v-icon size="small">mdi-chevron-down</v-icon>
-                  </div>
+            <!-- Color Selector Mobile -->
+            <div class="mobile-dropdown mb-3 mt-3 w-full">
+              <v-select
+                v-model="selectedColor"
+                @update:model-value="updateColor"
+                :items="colorOptions"
+                item-title="text"
+                item-value="value"
+                variant="outlined"
+                density="comfortable"
+                class=""
+                bg-color="black"
+                hide-details
+                label="Color"
+                :color="selectedColor"
+              >
+                <template v-slot:selection="{ item }">
+                  <span :style="{ color: selectedColor }">{{
+                    item.raw.text
+                  }}</span>
                 </template>
-                <v-list class="bg-gray-900">
-                  <v-list-item
-                    v-for="(property, index) in properties"
-                    :key="index"
-                    :value="property.value"
-                    @click="updateProperty(property.text)"
-                    class="text-white"
-                  >
-                    {{ property.text }}
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </div> -->
+              </v-select>
+            </div>
           </div>
         </div>
-        
+
         <!-- Font Size Mobile -->
-        <div class="py-3 border-b border-gray-800">
+        <div class="py-3 border-b border-primary">
           <div class="flex items-center justify-between mb-2">
             <span class="text-gray-400 text-sm">Font Size</span>
-            <span class="text-white">{{ fontSizeText }}</span>
+            <span :style="{ color: selectedColor }">{{ fontSizeText }}</span>
           </div>
           <v-slider
             v-model="fontSize"
@@ -418,36 +436,38 @@ onUnmounted(() => {
             step="1"
             class="mobile-slider mt-0 pt-0"
             density="compact"
-            color="white"
-            track-color="white"
-            thumb-color="white"
+            :color="selectedColor"
+            :track-color="`${selectedColor}50`"
+            :thumb-color="selectedColor"
             thumb-label
             @update:model-value="updateFontSize"
           ></v-slider>
         </div>
-        
+
         <!-- Sample Text Mobile -->
-        <div class="py-3 border-b border-gray-800">
+        <div class="py-3 border-b border-primary">
           <span class="text-gray-400 text-sm mb-1 block">Sample Text</span>
           <div class="flex items-center w-full">
-            <v-icon class="mr-2 text-gray-500">mdi-pencil</v-icon>
+            <v-icon class="mr-2" :color="selectedColor">mdi-pencil</v-icon>
             <input
               v-model="sampleText"
               type="text"
               placeholder="Type your sample text here"
               class="bg-transparent border-none outline-none text-white w-full p-2"
               @input="updateSampleText"
+              :style="{ 'caret-color': selectedColor }"
             />
           </div>
         </div>
-        
+
         <!-- Text Type Mobile -->
-        <div class="py-3 border-b border-gray-800">
+        <div class="py-3 border-b border-primary">
           <span class="text-gray-400 text-sm mb-2 block">Text Type</span>
-          <div class="flex flex-wrap">
+          <div class="flex flex-wrap justify-between w-full">
             <v-btn
               variant="text"
-              color="grey"
+              :active="cityNames"
+              :active-color="selectedColor"
               class="text-caption mr-3 mb-2 px-3 py-2"
               :class="{ 'mobile-active-btn': cityNames }"
               @click="updateTextType('cities')"
@@ -457,7 +477,8 @@ onUnmounted(() => {
 
             <v-btn
               variant="text"
-              color="grey"
+              :active="excerpts"
+              :active-color="selectedColor"
               class="text-caption mr-3 mb-2 px-3 py-2"
               :class="{ 'mobile-active-btn': excerpts }"
               @click="updateTextType('excerpts')"
@@ -467,7 +488,8 @@ onUnmounted(() => {
 
             <v-btn
               variant="text"
-              color="grey"
+              :active="namesSelected"
+              :active-color="selectedColor"
               class="text-caption mb-2 px-3 py-2"
               :class="{ 'mobile-active-btn': namesSelected }"
               @click="updateTextType('names')"
@@ -476,78 +498,53 @@ onUnmounted(() => {
             </v-btn>
           </div>
         </div>
-        
-        <!-- Personality and Alignment Mobile -->
-        <div class="py-3 border-b border-gray-800">
-          <div class="flex flex-wrap items-start justify-between">
-            <!-- Personality Dropdown Mobile -->
-            <div class="mobile-dropdown mb-3 w-full sm:w-1/2 sm:pr-2">
-              <span class="text-gray-400 text-sm mb-1 block">Personality</span>
-              <v-menu location="bottom" :close-on-content-click="true">
-                <template v-slot:activator="{ props }">
-                  <div 
-                    v-bind="props" 
-                    class="flex items-center justify-between cursor-pointer p-3 border border-gray-700 rounded"
-                  >
-                    <span>{{ selectedPersonality }}</span>
-                    <v-icon size="small">mdi-chevron-down</v-icon>
-                  </div>
-                </template>
-                <v-list class="bg-gray-900">
-                  <v-list-item
-                    v-for="(personality, index) in personalities"
-                    :key="index"
-                    :value="personality.value"
-                    @click="updatePersonality(personality.text)"
-                    class="text-white"
-                  >
-                    {{ personality.text }}
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </div>
 
+        <!--  Alignment Mobile -->
+        <div class="py-3 border-b border-primary">
+          <div class="flex flex-wrap items-start justify-between">
             <!-- Text Alignment Mobile -->
-            <div class="w-full sm:w-1/2 sm:pl-2">
+            <div class="w-full sm:pl-2">
               <span class="text-gray-400 text-sm mb-1 block">Alignment</span>
-              <v-btn-toggle
-                v-model="alignment"
-                color="white"
-                density="comfortable"
-                mandatory
-                class="border-0 w-full"
-              >
+              <div class="flex flex-wrap justify-between w-full">
                 <v-btn
-                  value="left"
-                  icon="mdi-format-align-left"
-                  size="small"
+                  variant="text"
+                  :active="alignment === 'left'"
+                  :active-color="selectedColor"
+                  class="text-caption mr-3 mb-2 px-3 py-2 flex-1"
                   @click="updateAlignment('left')"
-                  class="flex-1"
-                ></v-btn>
+                >
+                  <v-icon>mdi-format-align-left</v-icon>
+                </v-btn>
+
                 <v-btn
-                  value="center"
-                  icon="mdi-format-align-center"
-                  size="small"
+                  variant="text"
+                  :active="alignment === 'center'"
+                  :active-color="selectedColor"
+                  class="text-caption mr-3 mb-2 px-3 py-2 flex-1"
                   @click="updateAlignment('center')"
-                  class="flex-1"
-                ></v-btn>
+                >
+                  <v-icon>mdi-format-align-center</v-icon>
+                </v-btn>
+
                 <v-btn
-                  value="right"
-                  icon="mdi-format-align-right"
-                  size="small"
+                  variant="text"
+                  :active="alignment === 'right'"
+                  :active-color="selectedColor"
+                  class="text-caption mb-2 px-3 py-2 flex-1"
                   @click="updateAlignment('right')"
-                  class="flex-1"
-                ></v-btn>
-              </v-btn-toggle>
+                >
+                  <v-icon>mdi-format-align-right</v-icon>
+                </v-btn>
+              </div>
             </div>
           </div>
         </div>
-        
+
         <!-- Reset Button Mobile -->
         <div class="py-3 flex justify-center">
           <v-btn
             variant="outlined"
-            color="white"
+            :color="selectedColor"
             class="px-6"
             @click="resetAll"
           >
@@ -558,54 +555,28 @@ onUnmounted(() => {
     </div>
 
     <!-- Sample Text Entry Row (Desktop Only) -->
-    <div v-if="!isMobile" class="py-4 border-b border-gray-800 dark:border-gray-700">
+    <div v-if="!isMobile" class="py-4 border-b border-primary">
       <v-container>
         <div class="flex items-center">
           <div class="flex items-center flex-grow">
-            <v-icon class="mr-2 text-gray-500">mdi-pencil</v-icon>
+            <v-icon class="mr-2" :color="selectedColor">mdi-pencil</v-icon>
             <input
               v-model="sampleText"
               type="text"
               placeholder="Type your sample text here"
-              class=" border-none outline-none text-white w-full"
+              class="bg-transparent border-none outline-none text-white w-full"
               @input="updateSampleText"
+              :style="{ 'caret-color': selectedColor }"
             />
-          </div>
-
-          <!-- Personality Filter -->
-          <div class="ml-6 relative">
-            <v-menu>
-              <template v-slot:activator="{ props }">
-                <div v-bind="props" class="flex items-center cursor-pointer">
-                  <span class="mr-1 text-gray-400">{{
-                    selectedPersonality
-                  }}</span>
-                  <v-icon size="small" class="text-gray-400"
-                    >mdi-chevron-down</v-icon
-                  >
-                </div>
-              </template>
-              <v-list class="bg-gray-900">
-                <v-list-item
-                  v-for="(personality, index) in personalities"
-                  :key="index"
-                  :value="personality.value"
-                  @click="updatePersonality(personality.text)"
-                  class="text-white"
-                >
-                  {{ personality.text }}
-                </v-list-item>
-              </v-list>
-            </v-menu>
           </div>
 
           <!-- Text Type Selector -->
           <div class="ml-8 flex items-center">
             <v-btn
               variant="text"
-              color="grey"
               class="text-caption mr-2"
-              :class="{ 'font-weight-bold text-white': cityNames }"
+              :active="selectedTextType === 'cities'"
+              :active-color="selectedColor"
               @click="updateTextType('cities')"
             >
               Cities
@@ -613,9 +584,9 @@ onUnmounted(() => {
 
             <v-btn
               variant="text"
-              color="grey"
+              :active="selectedTextType === 'excerpts'"
+              :active-color="selectedColor"
               class="text-caption mr-2"
-              :class="{ 'font-weight-bold text-white': excerpts }"
               @click="updateTextType('excerpts')"
             >
               Excerpts
@@ -623,9 +594,9 @@ onUnmounted(() => {
 
             <v-btn
               variant="text"
-              color="grey"
+              :active="selectedTextType === 'names'"
+              :active-color="selectedColor"
               class="text-caption"
-              :class="{ 'font-weight-bold text-white': namesSelected }"
               @click="updateTextType('names')"
             >
               Names
@@ -633,59 +604,44 @@ onUnmounted(() => {
           </div>
 
           <!-- Text Alignment -->
-          <div class="ml-6 flex">
-            <v-btn-toggle
-              v-model="alignment"
-              color="white"
-              density="comfortable"
-              mandatory
-              class="border-0"
-            >
-              <v-btn
-                value="left"
-                icon="mdi-format-align-left"
-                size="small"
-                @click="updateAlignment('left')"
-              ></v-btn>
-              <v-btn
-                value="center"
-                icon="mdi-format-align-center"
-                size="small"
-                @click="updateAlignment('center')"
-              ></v-btn>
-              <v-btn
-                value="right"
-                icon="mdi-format-align-right"
-                size="small"
-                @click="updateAlignment('right')"
-              ></v-btn>
-            </v-btn-toggle>
-          </div>
-
-          <!-- Theme Toggle -->
-          <div class="ml-4 flex items-center">
-            <v-btn icon size="small" variant="text" color="white" @click="toggleTheme()">
-              <v-icon>{{
-                textDarkMode ? "mdi-weather-night" : "mdi-weather-sunny"
-              }}</v-icon>
-            </v-btn>
-            <!-- <v-btn
-              icon
-              size="small"
+          <div class="ml-6 flex flex-wrap">
+            <v-btn
+              value="left"
+              @click="updateAlignment('left')"
+              class="flex-1"
               variant="text"
-              color="grey-lighten-1"
-              class="ml-2"
-              @click="toggleTheme('dark')"
+              :active="alignment === 'left'"
+              :active-color="selectedColor"
             >
-              <v-icon>mdi-moon-waning-crescent</v-icon>
-            </v-btn> -->
+              <v-icon>mdi-format-align-left</v-icon></v-btn
+            >
+            <v-btn
+              value="center"
+              @click="updateAlignment('center')"
+              class="flex-1"
+              variant="text"
+              :active="alignment === 'center'"
+              :active-color="selectedColor"
+            >
+              <v-icon>mdi-format-align-center</v-icon></v-btn
+            >
+            <v-btn
+              value="right"
+              @click="updateAlignment('right')"
+              class="flex-1"
+              variant="text"
+              :active="alignment === 'right'"
+              :active-color="selectedColor"
+            >
+              <v-icon>mdi-format-align-right</v-icon></v-btn
+            >
           </div>
 
           <!-- Reset All -->
           <div class="ml-6">
             <v-btn
-              variant="text"
-              color="grey-lighten-1"
+              variant="outlined"
+              :color="selectedColor"
               class="text-caption"
               @click="resetAll"
             >
@@ -699,6 +655,10 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.border-primary {
+  border-color: v-bind(borderColor) !important;
+}
+
 .search-filters {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -728,7 +688,6 @@ input::placeholder {
 
 .selected-size {
   color: white;
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .size-indicator {
@@ -741,34 +700,15 @@ input::placeholder {
   justify-content: center;
 }
 
-.active-indicator {
-  border: 1px solid #fff;
-}
-
 .indicator-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: white;
 }
 
 /* Custom slider styles */
 .slider-thumb {
   width: 100px;
-}
-
-:deep(.v-slider .v-slider__track) {
-  height: 2px !important;
-  background-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-:deep(.v-slider .v-slider__thumb) {
-  width: 12px;
-  height: 12px;
-}
-
-:deep(.v-slider .v-slider__track-fill) {
-  background-color: white !important;
 }
 
 /* Mobile styles */
@@ -798,8 +738,6 @@ input::placeholder {
 }
 
 .mobile-active-btn {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
   font-weight: bold !important;
   border-radius: 4px;
 }
@@ -811,5 +749,26 @@ input::placeholder {
 .mobile-slider :deep(.v-slider__thumb) {
   width: 20px !important;
   height: 20px !important;
+}
+
+.category-select {
+  max-width: 180px; /* adjust as needed */
+  width: 180px;
+}
+
+.color-select {
+  max-width: 150px;
+  width: 150px;
+}
+
+/* Override Vuetify's default styles */
+:deep(.v-select .v-field__append-inner) {
+  padding: 0;
+}
+
+:deep(.v-select .v-field__input) {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 32px;
 }
 </style>

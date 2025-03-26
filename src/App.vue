@@ -1,9 +1,13 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useThemeStore } from './stores/theme.js'
+import { useSittingsStore } from './stores/sittings'
 import Navbar from './components/Navbar.vue'
 
 const themeStore = useThemeStore()
+const sittingsStore = useSittingsStore()
+
+const primaryColor = computed(() => sittingsStore.primaryColor)
 
 onMounted(() => {
   themeStore.initTheme()
@@ -11,7 +15,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app :theme="themeStore.darkMode ? 'dark' : 'light'">
+  <v-app :theme="themeStore.darkMode ? 'dark' : 'light'" :color="primaryColor">
     <Navbar />
     
     <v-main>

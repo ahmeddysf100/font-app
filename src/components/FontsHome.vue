@@ -3,11 +3,13 @@ import { ref, computed, reactive, onMounted, watch } from "vue";
 import { useFontStore } from "../stores/fonts";
 import FontCard from "./FontCard.vue";
 import SearchFilters from "./SearchFilters.vue";
-import { fonts } from "../utils/fontLoader"; // Import fonts directly from fontLoader
+import fonts from "../../public/fonts.json";
+import { useSittingsStore } from "../stores/sittings.js";
 
+const sittingsStore = useSittingsStore();
 /**
  * Dynamic Text Sample Collections
- * 
+ *
  * These text collections provide unique samples for each font based on the selected text type.
  * - Each font will display a consistent sample for each text type
  * - Arabic fonts automatically display Arabic text samples
@@ -17,17 +19,49 @@ import { fonts } from "../utils/fontLoader"; // Import fonts directly from fontL
 
 // Sample text collections by type
 const cityNames = [
-  "New York", "Tokyo", "London", "Paris", "Dubai",
-  "Singapore", "Barcelona", "Istanbul", "Sydney", "Cairo",
-  "Rio de Janeiro", "Amsterdam", "Prague", "San Francisco", "Cape Town",
-  "Seoul", "Moscow", "Venice", "Bangkok", "Vienna"
+  "New York",
+  "Tokyo",
+  "London",
+  "Paris",
+  "Dubai",
+  "Singapore",
+  "Barcelona",
+  "Istanbul",
+  "Sydney",
+  "Cairo",
+  "Rio de Janeiro",
+  "Amsterdam",
+  "Prague",
+  "San Francisco",
+  "Cape Town",
+  "Seoul",
+  "Moscow",
+  "Venice",
+  "Bangkok",
+  "Vienna",
 ];
 
 const nameExamples = [
-  "Emma Thompson", "Mohammed Al-Farsi", "Chen Wei", "Sofia Rodriguez", "James Wilson",
-  "Aisha Patel", "Hiroshi Tanaka", "Olga Petrov", "Juan Carlos", "Fatima Ahmed",
-  "Robert Kim", "Isabella Costa", "Raj Sharma", "Maria Lopez", "David Johnson",
-  "Amara Okafor", "Yuki Nakamura", "Sven Johansson", "Leila Morad", "Thomas Smith"
+  "Emma Thompson",
+  "Mohammed Al-Farsi",
+  "Chen Wei",
+  "Sofia Rodriguez",
+  "James Wilson",
+  "Aisha Patel",
+  "Hiroshi Tanaka",
+  "Olga Petrov",
+  "Juan Carlos",
+  "Fatima Ahmed",
+  "Robert Kim",
+  "Isabella Costa",
+  "Raj Sharma",
+  "Maria Lopez",
+  "David Johnson",
+  "Amara Okafor",
+  "Yuki Nakamura",
+  "Sven Johansson",
+  "Leila Morad",
+  "Thomas Smith",
 ];
 
 const textExcerpts = [
@@ -50,22 +84,54 @@ const textExcerpts = [
   "Every great design begins with an even better story.",
   "Make it simple, but significant.",
   "Design is where science and art break even.",
-  "Readers are leaders. Typography leads readers."
+  "Readers are leaders. Typography leads readers.",
 ];
 
 // Arabic sample text collections
 const arabicCityNames = [
-  "القاهرة", "دبي", "الرياض", "بيروت", "عمّان",
-  "مراكش", "الدوحة", "أبو ظبي", "بغداد", "الجزائر",
-  "مسقط", "صنعاء", "الخرطوم", "طرابلس", "تونس",
-  "الدار البيضاء", "المنامة", "دمشق", "الكويت", "جدة"
+  "القاهرة",
+  "دبي",
+  "الرياض",
+  "بيروت",
+  "عمّان",
+  "مراكش",
+  "الدوحة",
+  "أبو ظبي",
+  "بغداد",
+  "الجزائر",
+  "مسقط",
+  "صنعاء",
+  "الخرطوم",
+  "طرابلس",
+  "تونس",
+  "الدار البيضاء",
+  "المنامة",
+  "دمشق",
+  "الكويت",
+  "جدة",
 ];
 
 const arabicNameExamples = [
-  "محمد العلي", "فاطمة الزهراء", "أحمد المصري", "نور الهدى", "علي حسن",
-  "سارة المغربي", "عمر السعيد", "ليلى العبد الله", "خالد المنصور", "آية الرحمن",
-  "زياد الحسن", "هدى السالم", "يوسف القادري", "زينب المحمدي", "إبراهيم عبد الرحمن",
-  "سلمى الخطيب", "ياسر السليم", "رنا الحميد", "طارق الصديق", "منى العلوي"
+  "محمد العلي",
+  "فاطمة الزهراء",
+  "أحمد المصري",
+  "نور الهدى",
+  "علي حسن",
+  "سارة المغربي",
+  "عمر السعيد",
+  "ليلى العبد الله",
+  "خالد المنصور",
+  "آية الرحمن",
+  "زياد الحسن",
+  "هدى السالم",
+  "يوسف القادري",
+  "زينب المحمدي",
+  "إبراهيم عبد الرحمن",
+  "سلمى الخطيب",
+  "ياسر السليم",
+  "رنا الحميد",
+  "طارق الصديق",
+  "منى العلوي",
 ];
 
 const arabicTextExcerpts = [
@@ -88,7 +154,7 @@ const arabicTextExcerpts = [
   "حروفنا العربية تعانق بعضها لتشكل هوية وإبداع.",
   "الفراغ في التصميم العربي هو صمت يتحدث بلغة الجمال.",
   "الخط العربي هو الهندسة الروحانية التي تتجلى من خلال الأداة المادية.",
-  "الخط العربي سفير الثقافة والحضارة."
+  "الخط العربي سفير الثقافة والحضارة.",
 ];
 
 // Get fonts from store
@@ -105,8 +171,6 @@ const leading = ref(1.2);
 const tracking = ref(0);
 const isAllCaps = ref(false);
 
-
-
 // Reactive font CSS with computed properties for better reactivity
 const fontCss = computed(() => ({
   fontSize: `${fontSize.value}px`,
@@ -115,7 +179,7 @@ const fontCss = computed(() => ({
   lineHeight: leading.value,
   letterSpacing: `${tracking.value}px`,
   textAlign: textAlignment.value,
-  textTransform: isAllCaps.value ? 'uppercase' : 'none'
+  textTransform: isAllCaps.value ? "uppercase" : "none",
 }));
 
 const filterState = reactive({
@@ -135,7 +199,7 @@ const showVariableOnly = ref(false);
 // Initialize store
 onMounted(() => {
   fontStore.loadFavorites();
-  
+
   // Update fontCss when font parameters change
   updateFontCss();
 });
@@ -170,11 +234,11 @@ const handleFilterChange = (filter) => {
     case "textType":
       filterState.textType = filter.value;
       // Update sample text based on new text type
-      if (['cities', 'names', 'excerpts'].includes(filter.value)) {
+      if (["cities", "names", "excerpts"].includes(filter.value)) {
         // Don't set a specific sampleText here, we'll use the getSampleTextForFont function
         // to dynamically generate it for each font
       } else {
-        sampleText.value = filter.value === 'arabic' ? "السلام عليكم" : "Your Text";
+        sampleText.value = filter.value === "arabic" ? "" : "";
       }
       break;
     case "alignment":
@@ -185,6 +249,9 @@ const handleFilterChange = (filter) => {
       break;
     case "variable":
       filterState.variable = filter.value;
+      break;
+    case "color":
+      primaryColor.value = filter.value;
       break;
   }
 };
@@ -213,7 +280,7 @@ const handleReset = () => {
   tracking.value = 0;
   textAlignment.value = "center";
   isAllCaps.value = false;
-  
+
   // Reset filter state
   Object.assign(filterState, {
     category: "All",
@@ -223,7 +290,7 @@ const handleReset = () => {
     style: "All",
     variable: false,
   });
-  
+
   showVariableOnly.value = false;
 };
 
@@ -236,59 +303,61 @@ const filteredFonts = computed(() => {
     textType: filterState.textType,
     // Other filters can be added here
   });
-  
+
   // Additional filter for variable fonts
   if (filterState.variable) {
-    filtered = filtered.filter(font => {
+    filtered = filtered.filter((font) => {
       // Check if this font has variable options in the new font structure
-      const fontData = fonts.find(f => f.name === font.name);
+      const fontData = fonts.find((f) => f.name === font.name);
       return fontData && fontData.variable && fontData.variable.length > 0;
     });
   }
-  
+
   return filtered;
 });
 
 // Sort the filtered fonts based on the sort option
 const sortedFilteredFonts = computed(() => {
   const fontsList = [...filteredFonts.value];
-  
+
   switch (sortBy.value) {
-    case 'alphabetical':
+    case "alphabetical":
       return fontsList.sort((a, b) => a.name.localeCompare(b.name));
-    case 'new':
+    case "new":
       // In a real app, you might have a 'dateAdded' field
       return fontsList.sort((a, b) => b.id - a.id);
-    case 'favorite':
+    case "favorite":
       // Get favorites from localStorage
-      const fontFavorites = JSON.parse(localStorage.getItem('fontFavorites') || '[]');
-      
+      const fontFavorites = JSON.parse(
+        localStorage.getItem("fontFavorites") || "[]"
+      );
+
       // Get the favorites from the store for fallback
       const storeFavorites = fontStore.favorites || [];
-      
+
       // Combine both sources of favorites, prioritizing localStorage order
       const allFavorites = [...new Set([...fontFavorites, ...storeFavorites])];
-      
+
       if (allFavorites.length > 0) {
         // Create a map for quick lookup of favorite positions
         const favoritePositions = new Map(
           allFavorites.map((id, index) => [id, index])
         );
-        
+
         // Sort fonts: favorites first (in order), then non-favorites
         return fontsList.sort((a, b) => {
           const aIsFavorite = favoritePositions.has(a.id);
           const bIsFavorite = favoritePositions.has(b.id);
-          
+
           // If both are favorites, sort by position
           if (aIsFavorite && bIsFavorite) {
             return favoritePositions.get(a.id) - favoritePositions.get(b.id);
           }
-          
+
           // If only one is favorite, it comes first
           if (aIsFavorite) return -1;
           if (bIsFavorite) return 1;
-          
+
           // If neither is favorite, sort alphabetically
           return a.name.localeCompare(b.name);
         });
@@ -310,7 +379,17 @@ const setSortBy = (sort) => {
 };
 
 // Watch for changes to update fontCss
-watch([fontSize, fontWeight, fontStyle, leading, tracking, textAlignment, isAllCaps, sampleText], 
+watch(
+  [
+    fontSize,
+    fontWeight,
+    fontStyle,
+    leading,
+    tracking,
+    textAlignment,
+    isAllCaps,
+    sampleText,
+  ],
   () => {
     updateFontCss();
   }
@@ -320,27 +399,42 @@ watch([fontSize, fontWeight, fontStyle, leading, tracking, textAlignment, isAllC
 const getSampleTextForFontComputed = computed(() => {
   // Capture the dependency on filterState.textType
   const currentTextType = filterState.textType;
-  
+
   // Return a function that uses the captured textType
   return (font) => {
     // Check if font is Arabic
-    const isArabicFont = font.name && (font.name.startsWith("KO") || font.name.startsWith("Ko"));
-    
+    const isArabicFont =
+      font.name && (font.name.startsWith("KO") || font.name.startsWith("Ko"));
+
     // Get font index to select consistent sample for each font
     const fontIndex = font.id % 20;
-    
-    switch(currentTextType) {
-      case 'cities':
+
+    switch (currentTextType) {
+      case "cities":
         return isArabicFont ? arabicCityNames[fontIndex] : cityNames[fontIndex];
-      case 'names':
-        return isArabicFont ? arabicNameExamples[fontIndex] : nameExamples[fontIndex];
-      case 'excerpts':
-        return isArabicFont ? arabicTextExcerpts[fontIndex] : textExcerpts[fontIndex];
+      case "names":
+        return isArabicFont
+          ? arabicNameExamples[fontIndex]
+          : nameExamples[fontIndex];
+      case "excerpts":
+        return isArabicFont
+          ? arabicTextExcerpts[fontIndex]
+          : textExcerpts[fontIndex];
       default:
         return isArabicFont ? "السلام عليكم" : "Your Text";
     }
   };
 });
+
+// Watch for changes to the primary color
+const primaryColor = ref(sittingsStore.primaryColor);
+watch(
+  () => sittingsStore.primaryColor,
+  (color) => {
+    primaryColor.value = color;
+  }
+);
+const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); // Dynamic style
 </script>
 
 <template>
@@ -357,7 +451,7 @@ const getSampleTextForFontComputed = computed(() => {
 
     <!-- Font display options -->
     <div
-      class="font-options-bar bg-black text-white py-4 border-b border-gray-800"
+      class="font-options-bar bg-black text-white py-4 border-b border-primary"
     >
       <v-container>
         <div class="flex items-center flex-wrap">
@@ -368,18 +462,30 @@ const getSampleTextForFontComputed = computed(() => {
 
           <!-- View options -->
           <div class="view-options">
-            <v-btn-toggle v-model="viewMode" density="comfortable" color="grey">
-              <v-btn value="list" variant="text" class="text-caption px-2">
-                List view
-              </v-btn>
-              <v-btn value="grid" variant="text" class="text-caption px-2">
-                Grid view
-              </v-btn>
-            </v-btn-toggle>
+            <v-btn
+              value="list"
+              variant="text"
+              class="text-caption px-2"
+              :active="viewMode === 'list'"
+              :active-color="primaryColor"
+              @click="viewMode = 'list'"
+            >
+              List view
+            </v-btn>
+            <v-btn
+              value="grid"
+              variant="text"
+              class="text-caption px-2"
+              :active="viewMode === 'grid'"
+              :active-color="primaryColor"
+              @click="viewMode = 'grid'"
+            >
+              Grid view
+            </v-btn>
           </div>
 
           <!-- View filters -->
-          <div class="flex items-center ml-8 space-x-4">
+          <!-- <div class="flex items-center ml-8 space-x-4">
             <v-btn variant="text" color="grey" class="text-caption">
               Top 20
             </v-btn>
@@ -395,28 +501,44 @@ const getSampleTextForFontComputed = computed(() => {
             >
               Variable
             </v-btn>
-          </div>
+          </div> -->
 
           <v-spacer></v-spacer>
 
           <!-- Sort options -->
           <div class="sort-options flex items-center mt-2 md:mt-0">
             <span class="text-gray-400 mr-4">Sort by</span>
-            <v-btn-toggle v-model="sortBy" density="comfortable" color="grey">
-              <v-btn value="new" variant="text" class="text-caption px-2">
-                New
-              </v-btn>
-              <v-btn value="favorite" variant="text" class="text-caption px-2">
-                Favorite
-              </v-btn>
-              <v-btn
-                value="alphabetical"
-                variant="text"
-                class="text-caption px-2"
-              >
-                Alphabetical
-              </v-btn>
-            </v-btn-toggle>
+
+            <v-btn
+              value="new"
+              variant="text"
+              class="text-caption px-2"
+              :active="sortBy === 'new'"
+              :active-color="primaryColor"
+              @click="sortBy = 'new'"
+            >
+              New
+            </v-btn>
+            <v-btn
+              value="favorite"
+              variant="text"
+              class="text-caption px-2"
+              :active="sortBy === 'favorite'"
+              :active-color="primaryColor"
+              @click="sortBy = 'favorite'"
+            >
+              Favorite
+            </v-btn>
+            <v-btn
+              value="alphabetical"
+              variant="text"
+              class="text-caption px-2"
+              :active="sortBy === 'alphabetical'"
+              :active-color="primaryColor"
+              @click="sortBy = 'alphabetical'"
+            >
+              Alphabetical
+            </v-btn>
           </div>
         </div>
       </v-container>
@@ -426,17 +548,17 @@ const getSampleTextForFontComputed = computed(() => {
     <div class="font-grid bg-black text-white py-8">
       <div class="w-[90%] mx-auto">
         <v-row>
-          <v-col 
-            v-for="font in sortedFilteredFonts" 
+          <v-col
+            v-for="font in sortedFilteredFonts"
             :key="font.id"
-            cols="12" 
-            :sm="viewMode === 'list' ? 12 : 6" 
+            cols="12"
+            :sm="viewMode === 'list' ? 12 : 6"
             :md="viewMode === 'list' ? 12 : 4"
             :lg="viewMode === 'list' ? 12 : 3"
             class="mb-4"
           >
-            <FontCard 
-              :font="font" 
+            <FontCard
+              :font="font"
               :font-css="fontCss"
               :sample-text="getSampleTextForFontComputed(font)"
               :key="`${font.id}-${filterState.textType}-${textDarkMode}`"
@@ -444,11 +566,16 @@ const getSampleTextForFontComputed = computed(() => {
             />
           </v-col>
         </v-row>
-        
+
         <!-- No results message -->
-        <div v-if="sortedFilteredFonts.length === 0" class="no-results text-center py-12">
+        <div
+          v-if="sortedFilteredFonts.length === 0"
+          class="no-results text-center py-12"
+        >
           <p class="text-gray-400 text-lg">No fonts match your filters</p>
-          <v-btn color="primary" class="mt-4" @click="handleReset">Reset Filters</v-btn>
+          <v-btn color="primary" class="mt-4" @click="handleReset"
+            >Reset Filters</v-btn
+          >
         </div>
       </div>
     </div>
@@ -456,6 +583,11 @@ const getSampleTextForFontComputed = computed(() => {
 </template>
 
 <style scoped>
+
+.border-primary {
+  border-color: v-bind(primaryColor) !important;
+}
+
 .font-preview {
   height: 180px;
   display: flex;
@@ -493,11 +625,11 @@ const getSampleTextForFontComputed = computed(() => {
   .font-options-bar .flex {
     justify-content: center;
   }
-  
+
   .font-count {
     margin-right: 16px;
   }
-  
+
   .sort-options {
     margin-top: 12px;
   }

@@ -6,10 +6,28 @@ export const useSittingsStore = defineStore("sittings", () => {
   const fontSize = ref(60);
   const fontAlignment = ref("center");
   const textSample = ref("");
+  const primaryColor = ref("#FA82D1");
 
   function updateResetFlag() {
     resetFlag.value = !resetFlag.value;
   }
 
-  return { resetFlag, updateResetFlag, fontAlignment };
+  function storeColorInLocalStorage() {
+    localStorage.setItem("primaryColor", primaryColor.value);
+  }
+
+  function getColorFromLocalStorage() {
+    const color = localStorage.getItem("primaryColor");
+    if (color) {
+      primaryColor.value = color;
+    }
+  }
+  return {
+    resetFlag,
+    updateResetFlag,
+    fontAlignment,
+    primaryColor,
+    storeColorInLocalStorage,
+    getColorFromLocalStorage,
+  };
 });

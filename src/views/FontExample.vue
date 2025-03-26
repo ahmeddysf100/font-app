@@ -129,15 +129,49 @@
           </v-card>
         </v-col>
       </v-row>
+      
+      <!-- Add new section for testing dynamic font loading -->
+      <v-row class="mb-8">
+        <v-col cols="12">
+          <v-card class="pa-4">
+            <v-card-title>Dynamic Fonts from Public Directory</v-card-title>
+            <v-card-text>
+              <p class="mb-4">
+                This section demonstrates fonts loaded dynamically from the public directory.
+              </p>
+              
+              <div v-for="font in availableFonts" :key="font.id" class="mb-6">
+                <h3 class="text-subtitle-1 mb-2">{{ font.name }} ({{ font.category }})</h3>
+                
+                <div v-for="style in font.styles" :key="style.name" 
+                  class="pa-3 mb-2 border rounded"
+                  :style="{
+                    fontFamily: `'${style.fontFamily || font.fontFamily}'`,
+                    fontWeight: style.weight || 400,
+                    fontStyle: style.style || 'normal'
+                  }"
+                >
+                  <p class="mb-1 text-caption">{{ style.name }} ({{ style.weight }})</p>
+                  <p class="text-h5">The quick brown fox jumps over the lazy dog.</p>
+                  <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import { useAvailableFonts } from '../utils/fontUtils';
 import FontText from '../components/FontText.vue';
 import FontSelector from '../components/FontSelector.vue';
 import { FONT_FAMILIES, FONT_STYLES, FONT_WEIGHTS, generateFontStyle } from '../utils/fontUtils';
+
+const availableFonts = useAvailableFonts();
 
 // Method 3: Dynamic text update
 const updateDynamicText = (fontStyle) => {

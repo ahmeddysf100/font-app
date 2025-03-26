@@ -3,6 +3,7 @@ import FontsHome from '../components/FontsHome.vue'
 import FontDetailView from '../components/FontDetailView.vue'
 import ContactView from '../views/ContactView.vue'
 import TermsView from '../views/TermsView.vue'
+import AboutView from '../views/AboutView.vue'
 
 const routes = [
   {
@@ -43,7 +44,7 @@ const routes = [
     path: '/about',
     name: 'About',
     // Lazy-loading route
-    component: () => import('../views/AboutView.vue')
+    component: AboutView
   },
   {
     path: '/contact',
@@ -66,6 +67,18 @@ const routes = [
     name: 'FontExample',
     // Lazy-loading route
     component: () => import('../views/FontExample.vue')
+  },
+  {
+    path: '/dynamic-fonts',
+    name: 'DynamicFonts',
+    // Lazy-loading route
+    component: () => import('../components/DynamicFontTester.vue')
+  },
+  {
+    path: '/honk-font',
+    name: 'HonkFont',
+    // Lazy-loading route
+    component: () => import('../components/HonkFontTester.vue')
   }
 ]
 
