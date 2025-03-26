@@ -901,7 +901,7 @@ onUnmounted(() => {
               class="mr-2"
               @click.stop="toggleOptions"
             >
-              <v-icon>{{ showOptions ? "mdi-tune" : "mdi-arrow-down" }}</v-icon>
+              <v-icon>{{ showOptions ? "mdi-arrow-up" : " mdi-tune" }}</v-icon>
             </v-btn>
 
             <!-- Favorite Button -->
