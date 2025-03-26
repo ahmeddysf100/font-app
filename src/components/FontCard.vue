@@ -1197,48 +1197,36 @@ onUnmounted(() => {
               <div
                 class="option-row text-transform flex items-center justify-start gap-4 mt-1"
               >
-                <div
-                  class="feature-option touch-feature"
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  :color="primaryColor"
+                  class="text-transform-btn"
+                  :class="{ 'btn-active': isAllCaps }"
                   @click="toggleAllCaps"
+                  :style="{
+                    backgroundColor: isAllCaps ? `${primaryColor}50` : 'transparent',
+                  }"
                 >
-                  <div
-                    class="feature-checkbox-square touch-checkbox"
-                    :style="{
-                      borderColor: primaryColor,
-                      backgroundColor: isAllCaps
-                        ? `${primaryColor}50`
-                        : 'transparent',
-                    }"
-                  >
-                    <span
-                      class="checkbox-text font-bold"
-                      :style="{ color: primaryColor }"
-                      >A</span
-                    >
-                  </div>
-                  <span class="ml-2 text-xs">All Caps</span>
-                </div>
+                  <span class="font-bold mr-2" :style="{ color: primaryColor }">A</span>
+                  <span class="text-xs">All Caps</span>
+                </v-btn>
 
                 <!-- Italic Toggle -->
-                <div class="feature-option touch-feature" @click="toggleItalic">
-                  <div
-                    class="feature-checkbox-square touch-checkbox"
-                    :style="{
-                      borderColor: primaryColor,
-                      backgroundColor:
-                        fontStyle === 'italic'
-                          ? `${primaryColor}50`
-                          : 'transparent',
-                    }"
-                  >
-                    <span
-                      class="checkbox-text italic"
-                      :style="{ color: primaryColor }"
-                      >I</span
-                    >
-                  </div>
-                  <span class="ml-2 text-xs">Italic</span>
-                </div>
+                <v-btn
+                  variant="outlined"
+                  size="small"
+                  :color="primaryColor"
+                  class="text-transform-btn"
+                  :class="{ 'btn-active': fontStyle === 'italic' }"
+                  @click="toggleItalic"
+                  :style="{
+                    backgroundColor: fontStyle === 'italic' ? `${primaryColor}50` : 'transparent',
+                  }"
+                >
+                  <span class="italic mr-2" :style="{ color: primaryColor }">I</span>
+                  <span class="text-xs">Italic</span>
+                </v-btn>
               </div>
             </div>
           </div>
@@ -1904,5 +1892,33 @@ onUnmounted(() => {
   .mobile-only {
     display: none !important;
   }
+}
+
+.style-list-item-variable {
+  border-left: 2px solid #ffc107;
+}
+
+.text-transform-btn {
+  border-width: 1px !important;
+  min-width: 90px !important;
+  justify-content: flex-start !important;
+  padding-left: 12px !important;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.text-transform-btn.btn-active {
+  border-color: v-bind(primaryColor) !important;
+}
+
+.font-debug-info {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #888;
+  z-index: 1;
 }
 </style>
