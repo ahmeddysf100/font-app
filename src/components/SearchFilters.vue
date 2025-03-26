@@ -109,7 +109,7 @@ const alignment = ref("left");
 const themeMode = ref("light");
 
 // Sample text input
-const sampleText = ref("السلام عليكم");
+const sampleText = ref("");
 
 // Add color options
 const colorOptions = ref([
@@ -185,9 +185,13 @@ const updateAlignment = (align) => {
   emit("filter-change", { type: "alignment", value: align });
 };
 
-const updateSampleText = () => {
-  settingsStore.textSample = sampleText.value;
-  emit("filter-change", { type: "sampleText", value: sampleText.value });
+const updateSampleText = (text) => {
+  let sampleText = text.target.value;
+  if (sampleText.length <= 0) {
+    sampleText = "السلام عليكم";
+  }
+  settingsStore.textSample = sampleText;
+  emit("filter-change", { type: "sampleText", value: sampleText });
 };
 
 const textDarkMode = ref(false);

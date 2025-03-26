@@ -163,7 +163,7 @@ const fontStore = useFontStore();
 // Filter states
 const searchQuery = ref("");
 const fontSize = ref(60);
-const sampleText = ref("السلام عليكم");
+const sampleText = ref("");
 const textAlignment = ref("left");
 const fontWeight = ref(400);
 const fontStyle = ref("normal");
@@ -421,7 +421,7 @@ const getSampleTextForFontComputed = computed(() => {
           ? arabicTextExcerpts[fontIndex]
           : textExcerpts[fontIndex];
       default:
-        return isArabicFont ? "السلام عليكم" : "Your Text";
+        return isArabicFont ? "" : "";
     }
   };
 });
