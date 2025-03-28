@@ -760,7 +760,7 @@ onUnmounted(() => {
                 </v-btn>
               </template>
               <v-list
-                class="style-list bg-black border border-gray-700 rounded pa-2"
+                class="style-list   border border-gray-700 rounded pa-2"
                 max-height="300"
               >
                 <v-list-item
@@ -772,7 +772,7 @@ onUnmounted(() => {
                     showStyleMenu = false;
                   "
                   :active="selectedStyle && selectedStyle.title === style.title"
-                  class="style-list-item rounded mb-1 px-3 py-1"
+                  class="style-list-item rounded mb-1 px-3 py-1 "
                   :class="{
                     'style-list-item-active':
                       selectedStyle && selectedStyle.title === style.title,
@@ -783,7 +783,7 @@ onUnmounted(() => {
                   }"
                 >
                   <template v-slot:prepend>
-                    <div class="radio-circle mr-2">
+                    <div class="radio-circle  mr-2 border border-primary">
                       <div
                         v-if="
                           selectedStyle && selectedStyle.title === style.title
@@ -868,7 +868,7 @@ onUnmounted(() => {
                 </template>
                 <v-list
                   id="style-list-mobile"
-                  class="style-list bg-black border border-gray-700 rounded pa-2"
+                  class="style-list   border border-gray-700 rounded pa-2"
                   max-height="300"
                 >
                   <!-- Same list items as desktop -->
@@ -894,12 +894,12 @@ onUnmounted(() => {
                     }"
                   >
                     <template v-slot:prepend>
-                      <div class="radio-circle mr-2">
+                      <div class="radio-circle mr-2 border border-primary" >
                         <div
                           v-if="
                             selectedStyle && selectedStyle.title === style.title
                           "
-                          class="radio-dot"
+                          class="radio-dot "
                           :style="{ 'background-color': primaryColor }"
                         ></div>
                       </div>
@@ -1660,8 +1660,7 @@ onUnmounted(() => {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  display: flex;
+   display: flex;
   align-items: center;
   justify-content: center;
 }
