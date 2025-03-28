@@ -92,49 +92,117 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="contact-view" :class="{ 'dark-theme': themeStore.darkMode }">
-    <div class="page-header bg-black">
+  <div 
+    class="contact-view"
+    :style="{
+      backgroundColor: themeStore.darkMode ? 'black' : 'white',
+      color: themeStore.darkMode ? '#f5f5f5' : '#111',
+      transition: 'background-color 0.3s ease, color 0.3s ease'
+    }"
+  >
+    <div 
+      class="page-header"
+      :style="{
+        backgroundColor: themeStore.darkMode ? 'black' : 'white',
+        transition: 'background-color 0.3s ease'
+      }"
+    >
       <v-container>
         <div class="header-content">
-          <h1 class="page-title">Contact Us</h1>
-          <div class="title-underline"></div>
+          <h1 
+            class="page-title"
+            :style="{
+              backgroundColor: primaryColor,
+              color: '#fff',
+              transition: 'background-color 0.3s ease'
+            }"
+          >
+            Contact Us
+          </h1>
+          <div 
+            class="title-underline"
+            :style="{
+              backgroundColor: primaryColor,
+              transition: 'background-color 0.3s ease'
+            }"
+          ></div>
         </div>
       </v-container>
     </div>
 
-    <v-container class="main-content">
+    <v-container class="main-content " >
       <v-row>
         <v-col cols="12" md="6">
           <div class="contact-info">
             <div class="info-section">
-              <h2 class="section-title">Let's Connect</h2>
+              <h2 
+                class="section-title"
+                :style="{
+                  color: primaryColor,
+                  transition: 'color 0.3s ease'
+                }"
+              >
+                Let's Connect
+              </h2>
 
-              <p class="mb-6">
+              <p 
+                class="mb-6"
+                :style="{
+                  color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#111',
+                  transition: 'color 0.3s ease'
+                }"
+              >
                 We're always on the lookout for new free Arabic fonts and new
                 talents. If you'd like to publish with us or join our journey,
                 we also offer consultation and feedback sessions for both
                 students and professionals.
               </p>
 
-              <p class="mb-6">
+              <p 
+                class="mb-6"
+                :style="{
+                  color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#111',
+                  transition: 'color 0.3s ease'
+                }"
+              >
                 We offer ad banner space in our main page, for ads that related
                 to our community interests like workshops, submissions..etc.
               </p>
 
-              <p class="contact-cta">
+              <p 
+                class="contact-cta"
+                :style="{
+                  color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#111',
+                  transition: 'color 0.3s ease'
+                }"
+              >
                 Feel free to reach out:
-                <a :href="'contact.kotype@gmail.com'" class="email-link">
+                <a 
+                  :href="'contact.kotype@gmail.com'" 
+                  class="email-link"
+                  :style="{
+                    color: primaryColor,
+                    transition: 'color 0.3s ease'
+                  }"
+                >
                   <span class="email-text">contact.kotype@gmail.com</span>
                 </a>
               </p>
 
-              <p class="mt-8 donation-text">
+              <p 
+                class="mt-8 donation-text"
+                :style="{
+                  color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#111',
+                  borderColor: themeStore.darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                  transition: 'color 0.3s ease, border-color 0.3s ease'
+                }"
+              >
                 If you like our fonts and our activities, please consider
                 donating. This will allow us to continue distributing new
                 quality, free fonts and improving our existing catalogue.
                 <v-btn
-                  color="pink"
-                  variant=" "
+                  :color="primaryColor"
+                  variant="elevated"
                   size="large"
                   class="mt-3 donation-btn d-flex align-center"
                   href="https://ko-fi.com/kotype"
@@ -148,7 +216,14 @@ onMounted(() => {
         </v-col>
 
         <v-col cols="12" md="6">
-          <div class="contact-form-wrapper">
+          <div 
+            class="contact-form-wrapper"
+            :style="{
+              backgroundColor: themeStore.darkMode ? '#151515' : '#f8f8f8',
+              boxShadow: themeStore.darkMode ? '0 5px 20px rgba(0, 0, 0, 0.2)' : '0 5px 20px rgba(0, 0, 0, 0.05)',
+              transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
+            }"
+          >
             <form class="contact-form" @submit.prevent="handleSubmit">
               <div class="form-group">
                 <input
@@ -157,37 +232,61 @@ onMounted(() => {
                   placeholder="Name*"
                   required
                   class="form-input"
+                  :style="{
+                    backgroundColor: themeStore.darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                    color: themeStore.darkMode ? '#f5f5f5' : '#111',
+                    borderColor: primaryColor,
+                    transition: 'all 0.3s ease'
+                  }"
                 />
               </div>
 
-              <div class="form-group">
+              <div class="form-group mt-4">
                 <input
                   type="email"
                   v-model="formData.email"
                   placeholder="Email*"
                   required
                   class="form-input"
+                  :style="{
+                    backgroundColor: themeStore.darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                    color: themeStore.darkMode ? '#f5f5f5' : '#111',
+                    borderColor: primaryColor,
+                    transition: 'all 0.3s ease'
+                  }"
                 />
               </div>
 
-              <div class="form-group">
+              <div class="form-group mt-4">
                 <textarea
                   v-model="formData.message"
                   placeholder="Message / Message"
                   rows="5"
                   class="form-input"
+                  :style="{
+                    backgroundColor: themeStore.darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                    color: themeStore.darkMode ? '#f5f5f5' : '#111',
+                    borderColor: primaryColor,
+                    transition: 'all 0.3s ease'
+                  }"
                 ></textarea>
               </div>
 
-              <div class="form-group submit-group">
-                <button
+              <div class="form-group submit-group mt-4">
+                <v-btn
                   type="submit"
                   class="submit-btn"
                   :disabled="isSubmitting"
+                  :style="{
+                    backgroundColor: primaryColor,
+                    transition: 'all 0.3s ease'
+                  }"
+                  block
+                  variant="elevated"
                 >
                   <span v-if="isSubmitting">Sending...</span>
                   <span v-else>Send</span>
-                </button>
+                </v-btn>
               </div>
 
               <div v-if="submitSuccess" class="success-message">
@@ -211,35 +310,60 @@ onMounted(() => {
       <div
         v-if="randomFont"
         class="decorative-font decorative-line1"
-        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+        :style="{ 
+          fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily,
+          opacity: '0.5',
+          color: themeStore.darkMode ? '#fff' : '#000',
+          transition: 'color 0.3s ease, opacity 0.3s ease'
+        }"
       >
         تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
       </div>
       <div
         v-if="randomFont"
         class="decorative-font decorative-line2"
-        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+        :style="{ 
+          fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily,
+          opacity: '0.5',
+          color: themeStore.darkMode ? '#fff' : '#000',
+          transition: 'color 0.3s ease, opacity 0.3s ease'
+        }"
       >
         تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
       </div>
       <div
         v-if="randomFont"
         class="decorative-font decorative-line3"
-        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+        :style="{ 
+          fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily,
+          opacity: '0.5',
+          color: themeStore.darkMode ? '#fff' : '#000',
+          transition: 'color 0.3s ease, opacity 0.3s ease'
+        }"
       >
         تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
       </div>
       <div
         v-if="randomFont"
         class="decorative-font decorative-line4"
-        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+        :style="{ 
+          fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily,
+          opacity: '0.5',
+          color: themeStore.darkMode ? '#fff' : '#000',
+          transition: 'color 0.3s ease, opacity 0.3s ease'
+        }"
       >
         تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
       </div>
       <div
         v-if="randomFont"
         class="decorative-font decorative-line5"
-        :style="{ fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily }"
+        :style="{ 
+          fontFamily: randomFont.styles?.[0]?.fontFamily || randomFont.variable?.[0]?.fontFamily || randomFont.fontFamily,
+          opacity: '0.5',
+          color: themeStore.darkMode ? '#fff' : '#000',
+          transition: 'color 0.3s ease, opacity 0.3s ease'
+        }"
       >
         تواصل معنا تواصل معنا تواصل معنا تواصل معنا تواصل معنا
       </div>
@@ -249,25 +373,14 @@ onMounted(() => {
 
 <style scoped>
 .contact-view {
-  background-color: #fff;
-  color: #111;
   min-height: 100vh;
   position: relative;
   overflow: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.contact-view.dark-theme {
-  background-color: #0d0d0d;
-  color: #f5f5f5;
 }
 
 .page-header {
-  background-color: var(--section-bg-color, #f8f8f8);
   padding: 80px 0 40px;
   position: relative;
-  box-shadow: var(--section-shadow, 0 5px 15px rgba(0, 0, 0, 0.03));
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
   z-index: 1;
 }
 
@@ -277,25 +390,19 @@ onMounted(() => {
 
 .page-title {
   display: inline-block;
-  background-color: var(--accent-color, #ff69b4);
-  color: white;
   padding: 15px 30px;
   border-radius: 30px;
   font-size: 2rem;
   position: relative;
   z-index: 2;
-  box-shadow: 0 4px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.2));
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .title-underline {
   height: 4px;
-  background-color: var(--accent-color, #ff69b4);
   width: 120px;
   margin: 10px auto 0;
   border-radius: 2px;
   opacity: 0.6;
-  transition: background-color 0.3s ease;
 }
 
 .main-content {
@@ -310,17 +417,13 @@ onMounted(() => {
 
 .section-title {
   font-size: 1.8rem;
-  color: var(--accent-color, #ff69b4);
   margin-bottom: 20px;
   font-weight: 600;
-  transition: color 0.3s ease;
 }
 
 .contact-info p {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: var(--text-color, #111);
-  transition: color 0.3s ease;
 }
 
 .contact-cta {
@@ -330,11 +433,9 @@ onMounted(() => {
 
 .email-link {
   position: relative;
-  color: var(--accent-color, #ff69b4);
   text-decoration: none;
   font-weight: 700;
   margin-left: 5px;
-  transition: color 0.3s ease;
 }
 
 .email-link::after {
@@ -344,7 +445,6 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: var(--accent-color, #ff69b4);
   transform: scaleX(0);
   transform-origin: bottom right;
   transition: transform 0.3s ease;
@@ -358,63 +458,36 @@ onMounted(() => {
 .donation-text {
   font-size: 1.1rem;
   line-height: 1.6;
-  border-top: 1px solid var(--accent-light-color, rgba(255, 105, 180, 0.2));
+  border-top: 1px solid;
   padding-top: 20px;
 }
 
 .donation-btn {
   display: block;
   margin-top: 15px;
-  background-color: var(--accent-color, #ff69b4) !important;
-  color: white !important;
   font-weight: 500;
   border-radius: 30px;
-  transition: all 0.3s ease;
 }
 
 .donation-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.3));
 }
 
-/* Form Styles */
 .contact-form-wrapper {
-  background-color: var(--section-bg-color, #f8f8f8);
   border-radius: 16px;
   padding: 30px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.contact-form {
-  width: 100%;
-}
-
-.form-group {
-  margin-bottom: 20px;
 }
 
 .form-input {
   width: 100%;
   padding: 15px 20px;
-  border: 2px solid var(--accent-light-color, rgba(255, 105, 180, 0.2));
+  border: 2px solid;
   border-radius: 30px;
   font-size: 1rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #111;
-  transition: all 0.3s ease;
-}
-
-.dark-theme .form-input {
-  background-color: rgba(30, 30, 30, 0.9);
-  color: #f5f5f5;
-  border-color: var(--accent-light-color, rgba(255, 20, 147, 0.2));
 }
 
 .form-input:focus {
   outline: none;
-  border-color: var(--accent-color, #ff69b4);
-  box-shadow: 0 0 0 3px var(--accent-light-color, rgba(255, 105, 180, 0.2));
 }
 
 .form-input::placeholder {
@@ -427,26 +500,18 @@ textarea.form-input {
   resize: vertical;
 }
 
-.submit-group {
-  text-align: center;
-}
-
 .submit-btn {
-  background-color: var(--accent-color, #ff69b4);
   color: white;
   border: none;
-  padding: 15px 60px;
+  padding: 25px 60px;
   font-size: 1.1rem;
   border-radius: 30px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px var(--accent-light-color, rgba(255, 105, 180, 0.3));
 }
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.4));
 }
 
 .submit-btn:disabled {
@@ -459,7 +524,6 @@ textarea.form-input {
   margin-top: 20px;
 }
 
-/* Decorative Background */
 .decorative-text-bg {
   position: fixed;
   top: 0;
@@ -475,10 +539,8 @@ textarea.form-input {
   position: absolute;
   right: 0;
   white-space: nowrap;
-  color: white;
-  opacity: 0.035;
   animation: slideRightToLeft 60s linear infinite;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  text-shadow: none;
 }
 
 .decorative-line1 {

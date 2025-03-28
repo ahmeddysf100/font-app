@@ -5,7 +5,6 @@ import { useFontStore } from "../stores/fonts";
 import { useSittingsStore } from "../stores/sittings";
 import { useThemeStore } from "../stores/theme";
 
-
 // Import fonts from fontLoader
 import fonts from "../../public/fonts.json";
 // console.log("fonts", fonts);
@@ -581,29 +580,59 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="font-card-container relative transition-all"
-    :class="{ 'options-active': showOptions }"
+    class="font-card-container relative transition-all overflow-hidden"
+    :class="{
+      'options-active': showOptions,
+    }"
+    style="border-radius: 15px;"
   >
     <!-- Main Card with integrated options panel -->
-    <v-card
-      flat
-      class="font-card bg-black border-2 text-white transition-all duration-300 border-color border-primary"
+    <div
+      class="font-card relative overflow-hidden border-2 border-primary"
+      :class="{
+        'bg-black': themeStore.darkMode,
+        'bg-card': !themeStore.darkMode
+      }"
+      :style="{
+        color: themeStore.darkMode ? 'white' : 'black',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+        borderRadius: '15px'
+      }"
     >
       <div
         class="px-6 py-4 flex flex-wrap justify-between items-center border-b-2 border-primary"
       >
         <div>
-          <h3 class="font-bold text-xl">{{ font.name }}</h3>
+          <h3
+            class="font-bold text-xl"
+            :class="{
+              'text-white': themeStore.darkMode,
+              'text-black': !themeStore.darkMode,
+            }"
+          >
+            {{ font.name }}
+          </h3>
           <div class="flex items-center mt-1">
             <span class="text-gray-400 text-sm mr-2 cursor-pointer">
-              <span class="text-white">{{
-                selectedStyle?.title || "Regular"
-              }}</span>
+              <span
+                class=" "
+                :class="{
+                  'text-white': themeStore.darkMode,
+                  'text-black': !themeStore.darkMode,
+                }"
+                >{{ selectedStyle?.title || "Regular" }}</span
+              >
               <span v-if="styleOptions.length > 1" class="style-count ml-2">
                 +{{ styleOptions.length - 1 }}
               </span>
             </span>
-            <span class="text-gray-400 text-sm ml-2">
+            <span
+              class="text-gray-400 text-sm ml-2"
+              :class="{
+                'text-gray-400': themeStore.darkMode,
+                'text-gray-600': !themeStore.darkMode,
+              }"
+            >
               {{
                 isVariableFont
                   ? "Variable"
@@ -932,13 +961,13 @@ onUnmounted(() => {
 
       <!-- Font Preview -->
       <div
-        class="font-preview px-6"
+        class="font-preview px-6 py-10"
         :class="{
           'preview-collapsed': showOptions,
           'auto-height': fontSize > 80,
           'arabic-font': font.category === 'Arabic',
-          'bg-dark-btn': textDarkMode,
-          'bg-light-btn': !textDarkMode,
+          'bg-dark-btn': themeStore.darkMode,
+          'bg-light-btn': themeStore.darkMode,
         }"
         :style="previewContainerStyle"
         @click.stop
@@ -962,14 +991,14 @@ onUnmounted(() => {
 
         <p
           contenteditable="true"
-          class="sample-text-editor m-0 text-wrap overflow-y-hidden"
+          class="sample-text-editor m-0   text-wrap overflow-y-hidden"
           @input="updateSampleText"
           v-text="localSampleText"
           :class="[
             `weight-${fontWeight}`,
             { 'rtl-text': font.category === 'Arabic' },
-            { 'text-dark-btn': !textDarkMode },
-            { 'text-light-btn': textDarkMode },
+            { 'text-black !important': !themeStore.darkMode },
+            { 'text-white !important': !!themeStore.darkMode },
           ]"
           :style="sampleTextStyle"
         ></p>
@@ -986,7 +1015,7 @@ onUnmounted(() => {
           <div class="mobile-only">
             <!-- Size Slider -->
             <div class="option-row flex items-center mb-4">
-              <div class="option-label text-white text-sm w-20">Size</div>
+              <div class="option-label   text-sm w-20" :class="{'text-black': !themeStore.darkMode, 'text-white': themeStore.darkMode}">Size</div>
               <div class="flex-grow">
                 <div class="flex items-center">
                   <v-slider
@@ -1021,7 +1050,7 @@ onUnmounted(() => {
               v-if="!isVariableFont || !variableFontParams['wght']"
               class="option-row flex items-center mb-4"
             >
-              <div class="option-label text-white text-sm w-20">Weight</div>
+              <div class="option-label   text-sm w-20" :class="{'text-black': !themeStore.darkMode, 'text-white': themeStore.darkMode}">Weight</div>
               <div class="flex-grow">
                 <div class="flex items-center">
                   <v-slider
@@ -1054,7 +1083,11 @@ onUnmounted(() => {
             <!-- Variable Font Controls for mobile -->
             <div
               v-if="isVariableFont && hasVariableFontAxes"
-              class="variable-font-controls border-b border-primary border-gray-700 pb-4 mb-4 bg-black"
+              class="variable-font-controls border-b border-primary border-gray-700 pb-4 mb-4"
+              :class="{
+                'bg-card': themeStore.darkMode,
+                'bg-white': !themeStore.darkMode,
+              }"
             >
               <div class="text-white text-sm font-medium mb-3">
                 Variable Font Controls
@@ -1066,7 +1099,13 @@ onUnmounted(() => {
                 :key="axis.axis"
                 class="option-row flex items-center mt-2 mb-4"
               >
-                <div class="option-label text-white text-sm w-20">
+                <div
+                  class="option-label text-sm w-20"
+                  :class="{
+                    'text-black': themeStore.darkMode,
+                    'text-white': themeStore.darkMode,
+                  }"
+                >
                   {{ axis.axis }}
                 </div>
                 <div class="flex-grow">
@@ -1101,7 +1140,15 @@ onUnmounted(() => {
 
           <!-- Leading Slider (both mobile and desktop) -->
           <div class="option-row flex items-center">
-            <div class="option-label text-white text-sm w-20">Leading</div>
+            <div
+              class="option-label text-sm w-20"
+              :class="{
+                'text-black': themeStore.darkMode,
+                'text-white': themeStore.darkMode,
+              }"
+            >
+              Leading
+            </div>
             <v-slider
               v-model="leading"
               min="0.8"
@@ -1128,7 +1175,15 @@ onUnmounted(() => {
 
           <!-- Tracking/Letter Spacing (both mobile and desktop) -->
           <div class="option-row flex items-center">
-            <div class="option-label text-white text-sm w-20">Tracking</div>
+            <div
+              class="option-label text-sm w-20"
+              :class="{
+                'text-black': themeStore.darkMode,
+                'text-white': themeStore.darkMode,
+              }"
+            >
+              Tracking
+            </div>
             <v-slider
               v-model="tracking"
               min="-20"
@@ -1158,7 +1213,15 @@ onUnmounted(() => {
             <div class="mb-3 w-full md:w-auto">
               <!-- Text Alignment -->
               <div class="option-row flex items-center">
-                <div class="option-label text-white text-sm w-20">Align</div>
+                <div
+                  class="option-label text-sm w-20"
+                  :class="{
+                    'text-black': themeStore.darkMode,
+                    'text-white': themeStore.darkMode,
+                  }"
+                >
+                  Align
+                </div>
 
                 <v-btn
                   variant="text"
@@ -1198,33 +1261,42 @@ onUnmounted(() => {
                 class="option-row text-transform flex items-center justify-start gap-4 mt-1"
               >
                 <v-btn
-                  variant="outlined"
+                  :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
                   size="small"
                   :color="primaryColor"
                   class="text-transform-btn"
                   :class="{ 'btn-active': isAllCaps }"
                   @click="toggleAllCaps"
                   :style="{
-                    backgroundColor: isAllCaps ? `${primaryColor}50` : 'transparent',
+                    backgroundColor: isAllCaps
+                      ? `${primaryColor}50`
+                      : 'transparent',
                   }"
                 >
-                  <span class="font-bold mr-2" :style="{ color: primaryColor }">A</span>
+                  <span class="font-bold mr-2" :style="{ color: primaryColor }"
+                    >A</span
+                  >
                   <span class="text-xs">All Caps</span>
                 </v-btn>
 
                 <!-- Italic Toggle -->
                 <v-btn
-                  variant="outlined"
+                  :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
                   size="small"
                   :color="primaryColor"
                   class="text-transform-btn"
                   :class="{ 'btn-active': fontStyle === 'italic' }"
                   @click="toggleItalic"
                   :style="{
-                    backgroundColor: fontStyle === 'italic' ? `${primaryColor}50` : 'transparent',
+                    backgroundColor:
+                      fontStyle === 'italic'
+                        ? `${primaryColor}50`
+                        : 'transparent',
                   }"
                 >
-                  <span class="italic mr-2" :style="{ color: primaryColor }">I</span>
+                  <span class="italic mr-2" :style="{ color: primaryColor }"
+                    >I</span
+                  >
                   <span class="text-xs">Italic</span>
                 </v-btn>
               </div>
@@ -1296,11 +1368,55 @@ onUnmounted(() => {
           </div> -->
         </div>
       </div>
-    </v-card>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.font-card-container {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 20px;
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.font-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border-color: transparent;
+  border-width: 2px;
+  border-style: solid;
+  will-change: transform, border-color;
+}
+
+.font-card-container:hover {
+  transform: translateY(-5px);
+}
+
+.font-card-container:hover .font-card {
+  border-color: v-bind(primaryColor) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove the old hover style */
+.font-card:hover {
+  transform: none;
+  border-color: transparent;
+}
+
+.font-preview {
+  transition: all 0.3s ease;
+}
+
+.font-info {
+  transition: all 0.3s ease;
+}
+
+.font-options-panel {
+  transition: all 0.3s ease;
+}
+
 .border-primary {
   border-color: v-bind(primaryColor) !important;
 }
@@ -1319,51 +1435,6 @@ onUnmounted(() => {
 
 .bg-light-btn {
   background-color: black !important;
-}
-.font-card-container {
-  margin-bottom: 20px;
-}
-
-.font-card {
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  position: relative;
-  overflow: hidden;
-  border-color: transparent;
-}
-
-.font-card:hover {
-  transform: translateY(-2px);
-  border-color: v-bind(isDarkMode) !important;
-}
-
-.font-preview {
-  min-height: 180px;
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-  padding-top: 48px;
-  padding-bottom: 48px;
-  font-variation-settings: inherit; /* Inherit font variation settings */
-  width: 100%;
-}
-
-.preview-collapsed {
-  min-height: 120px;
-  height: auto;
-  padding-top: 24px;
-  padding-bottom: 24px;
-}
-
-.auto-height {
-  min-height: 250px;
-}
-
-.customize-btn {
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
 }
 
 .font-card:hover .customize-btn {
@@ -1734,7 +1805,7 @@ onUnmounted(() => {
 .style-count {
   display: inline-block;
   background-color: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
+  color: v-bind(primaryColor);
   font-size: 11px;
   padding: 1px 4px;
   border-radius: 10px;
@@ -1785,13 +1856,13 @@ onUnmounted(() => {
 
 /* Enhanced animation for style changes */
 .sample-text-editor {
-  transition: font-weight 0.3s ease, font-style 0.3s ease, font-size 0.3s ease;
+  transition: font-weight 0.3s ease, font-style 0.3s ease, font-size 0.3s ease, 
+    line-height 0.3s ease, text-align 0.3s ease, font-variation-settings 0.3s ease;
 }
 
 /* Add new styles for the font controls in header */
 .font-controls {
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
+   border-radius: 4px;
   padding: 4px 8px;
   display: flex;
   flex-wrap: wrap;
@@ -1806,8 +1877,7 @@ onUnmounted(() => {
 }
 
 .variable-font-controls {
-  background-color: rgba(20, 20, 20, 0.5);
-  border-radius: 4px;
+   border-radius: 4px;
   padding: 10px;
   margin-bottom: 15px;
 }
@@ -1920,5 +1990,9 @@ onUnmounted(() => {
   font-size: 11px;
   color: #888;
   z-index: 1;
+}
+
+.bg-card {
+  background-color: rgba(226, 252, 252, 0.478) !important;
 }
 </style>

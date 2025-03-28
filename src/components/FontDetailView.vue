@@ -3,6 +3,8 @@ import { ref, computed, onMounted, watch, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useFontStore } from "../stores/fonts";
 import { useSittingsStore } from "../stores/sittings";
+import { useThemeStore } from "../stores/theme";
+import { useSeo } from "../composables/useSeo";
 import {
   FONT_FAMILIES,
   FONT_WEIGHTS,
@@ -18,7 +20,7 @@ const router = useRouter();
 const fontStore = useFontStore();
 const sittingsStore = useSittingsStore();
 const primaryColor = ref(sittingsStore.primaryColor);
-
+const themeStore = useThemeStore();
 // Get the font from the store instead of hardcoding
 const fontId = parseInt(route.params.id);
 const font = computed(
@@ -365,8 +367,7 @@ const fontStyles = computed(() => {
       : `${fontSize.value * 0.8}px`,
     lineHeight: fontLeading.value,
     letterSpacing: `${fontTracking.value}px`,
-    color: colorMode.value === "white" ? "white" : "black",
-    textAlign: textAlign.value,
+     textAlign: textAlign.value,
     direction: textDirection.value,
   };
 
@@ -449,6 +450,27 @@ const toggleControls = () => {
   isControlsVisible.value = !isControlsVisible.value;
 };
 
+// Set up dynamic SEO for this font detail page
+useSeo((route) => {
+  const id = parseInt(route.params.id);
+  const fontData = fontStore.getFontById(id) || {};
+  const fontName = fontData.name || "Font";
+
+  return {
+    title: `${fontName} | Kotype Font Library`,
+    description: `Explore ${fontName} font details, styles, and usage examples. ${
+      fontData.description || "Beautiful typography for your design projects."
+    }`,
+    keywords: `${fontName}, font, typography, design, kotype, ${
+      fontData.tags?.join(", ") || ""
+    }`,
+    ogTitle: `${fontName} Font | Kotype`,
+    ogDescription: `Discover the beauty of ${fontName} typography`,
+    ogImage: fontData.previewImage || undefined,
+    canonicalUrl: `https://yourdomain.com/font-app/fonts/${id}`,
+  };
+});
+
 onMounted(() => {
   // Set current font in store
   fontStore.setCurrentFont(fontId);
@@ -513,7 +535,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="font-detail-view bg-black text-white min-h-screen">
+  <div 
+    class="font-detail-view min-h-screen"
+    :style="{
+      backgroundColor: themeStore.darkMode ? 'black' : 'white',
+      color: themeStore.darkMode ? '#f5f5f5' : '#111',
+      transition: 'background-color 0.3s ease, color 0.3s ease'
+    }"
+  >
     <!-- Back button -->
     <div class="px-6 pt-4">
       <v-btn
@@ -521,6 +550,10 @@ onUnmounted(() => {
         variant="text"
         @click="backToFonts"
         class="mb-4"
+        :style="{
+          color: themeStore.darkMode ? '#f5f5f5' : '#111',
+          transition: 'color 0.3s ease'
+        }"
       >
         <v-icon start>mdi-arrow-left</v-icon>
         Back to Fonts
@@ -530,7 +563,11 @@ onUnmounted(() => {
     <!-- Font Detail Header -->
     <div
       class="border border-primary p-6"
-      :style="{ backgroundColor: colorMode === 'black' ? '#ffffe3' : 'black' }"
+      :style="{
+        backgroundColor: themeStore.darkMode ? 'black' : 'white',
+        color: themeStore.darkMode ? '#f5f5f5' : '#111',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }"
     >
       <div class="flex justify-between items-center mb-4">
         <!-- Font Name and Info -->
@@ -538,7 +575,7 @@ onUnmounted(() => {
           <div class="flex items-center flex-wrap">
             <h1
               class="text-2xl font-bold mr-3"
-              :style="{ color: colorMode === 'black' ? 'black' : 'white' }"
+              :style="{ color: themeStore.darkMode ? '#f5f5f5' : '#111' }"
             >
               {{ font.name }}
             </h1>
@@ -557,7 +594,7 @@ onUnmounted(() => {
             <span
               v-if="selectedStyle"
               class="current-style ml-3"
-              :style="{ color: primaryColor }"
+              :style="{ color: themeStore.darkMode ? '#f5f5f5' : '#111' }"
             >
               {{ selectedStyle.title }}
             </span>
@@ -596,15 +633,16 @@ onUnmounted(() => {
                   v-bind="props"
                   class="style-btn"
                   :style="{
-                    color: primaryColor,
+                    color: themeStore.darkMode ? '#f5f5f5' : '#111',
                   }"
                 >
                   <v-icon>mdi-format-font</v-icon>
                 </v-btn>
               </template>
               <v-list
-                class="style-list bg-black border border-gray-700 rounded pa-2"
+                class="style-list   border border-gray-700 rounded pa-2"
                 max-height="300"
+                :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
               >
                 <v-list-item
                   v-for="style in styleOptions"
@@ -622,7 +660,7 @@ onUnmounted(() => {
                     'style-list-item-variable': style.isVariable,
                   }"
                   :style="{
-                    color: primaryColor,
+                    color: themeStore.darkMode ? 'white' : 'black',
                   }"
                 >
                   <template v-slot:prepend>
@@ -753,8 +791,9 @@ onUnmounted(() => {
                 </v-btn>
               </template>
               <v-list
-                class="style-list bg-black border border-gray-700 rounded pa-2"
+                class="style-list   border border-gray-700 rounded pa-2"
                 max-height="300"
+                :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
               >
                 <v-list-item
                   v-for="style in styleOptions"
@@ -772,7 +811,7 @@ onUnmounted(() => {
                     'style-list-item-variable': style.isVariable,
                   }"
                   :style="{
-                    color: primaryColor,
+                    color: themeStore.darkMode ? '#f5f5f5' : '#111',
                   }"
                 >
                   <template v-slot:prepend>
@@ -788,13 +827,13 @@ onUnmounted(() => {
                   </template>
                   <v-list-item-title
                     class="text-sm"
-                    :style="{ color: primaryColor, backgroundColor }"
+                    :style="{ color: themeStore.darkMode ? '#f5f5f5' : '#111', backgroundColor }"
                   >
                     {{ style.title }}
                     <span
                       v-if="style.isVariable"
                       class="variable-badge"
-                      :style="{ color: primaryColor }"
+                      :style="{ color: themeStore.darkMode ? '#f5f5f5' : '#111' }"
                       >Variable</span
                     >
                   </v-list-item-title>
@@ -816,7 +855,7 @@ onUnmounted(() => {
           <div class="mobile-control-group">
             <div class="flex items-center justify-between mb-1">
               <span class="text-gray-400 text-sm">Weight</span>
-              <span class="text-white text-sm">{{ fontWeight }}</span>
+              <span class="text-gray-400 text-sm">{{ fontWeight }}</span>
             </div>
             <v-slider
               v-model="fontWeight"
@@ -836,7 +875,7 @@ onUnmounted(() => {
           <div class="mobile-control-group">
             <div class="flex items-center justify-between mb-1">
               <span class="text-gray-400 text-sm">Size</span>
-              <span class="text-white text-sm">{{ fontSize }}px</span>
+              <span class="text-gray-400 text-sm">{{ fontSize }}px</span>
             </div>
             <v-slider
               v-model="fontSize"
@@ -855,7 +894,7 @@ onUnmounted(() => {
           <div class="mobile-control-group">
             <div class="flex items-center justify-between mb-1">
               <span class="text-gray-400 text-sm">Leading</span>
-              <span class="text-white text-sm">{{ fontLeading }}</span>
+              <span class="text-gray-400 text-sm">{{ fontLeading }}</span>
             </div>
             <v-slider
               v-model="fontLeading"
@@ -874,7 +913,7 @@ onUnmounted(() => {
           <div class="mobile-control-group">
             <div class="flex items-center justify-between mb-1">
               <span class="text-gray-400 text-sm">Tracking</span>
-              <span class="text-white text-sm">{{ fontTracking }}</span>
+              <span class="text-gray-400 text-sm">{{ fontTracking }}</span>
             </div>
             <v-slider
               v-model="fontTracking"
@@ -894,12 +933,12 @@ onUnmounted(() => {
       <!-- Font Preview Area -->
       <div
         class="font-preview-area py-24 text-center"
-        :style="{ color: colorMode === 'white' ? 'white' : 'black' }"
+        :style="{ color: themeStore.darkMode ? 'white' : 'black' }"
       >
         <p
           class="sample-text"
           contenteditable="true"
-          :style="{ ...fontStyles, ...columnStyles }"
+          :style="{ ...fontStyles, ...columnStyles, color: themeStore.darkMode ? 'white' : 'black' }"
           @input="(e) => (sampleText = e.target.innerText)"
           :dir="textDirection"
         >
@@ -926,7 +965,7 @@ onUnmounted(() => {
 
     <!-- Font Controls Section -->
     <!-- Font Controls Section -->
-    <div class="border-x border-b border-gray-800 p-6">
+    <div class="    p-6">
       <!-- Mobile Controls Header with Toggle -->
       <div v-if="isMobile" class="flex justify-between items-center mb-4">
         <h2 class="text-xl">Font Controls</h2>
@@ -1043,7 +1082,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Apply and Reset -->
-          <div class="action-buttons flex items-center space-x-4">
+          <div class="action-buttons flex items-center space-x-4" :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }">
             <!-- <v-btn :color="primaryColor" @click="applyToAll"
               >Apply to All</v-btn
             > -->
@@ -1160,7 +1199,8 @@ onUnmounted(() => {
 
             <!-- Action Buttons (Mobile) -->
             <div
-              class="mobile-control-group action-buttons-mobile mt-6 grid grid-cols-2 gap-4 bg-black"
+              class="mobile-control-group action-buttons-mobile mt-6 grid grid-cols-2 gap-4  "
+              :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
             >
               <!-- <v-btn :color="primaryColor" @click="applyToAll" class="py-3" block
                 >Apply to All</v-btn
@@ -1562,7 +1602,7 @@ onUnmounted(() => {
         >
           <!-- Left side: Character with measurements -->
           <div
-            class="character-measurements w-full md:w-1/2 items-center border-primary border-[1px]"
+            class="character-measurements w-full md:w-1/2 items-center border-primary border-[2px]"
           >
             <div class="char-container">
               <!-- Display character -->
@@ -1580,26 +1620,28 @@ onUnmounted(() => {
 
           <!-- Right side: Grid view of some letters -->
           <div
-            class="letter-showcase bg-black overflow-y-auto"
+            class="letter-showcase   overflow-y-auto"
             style="max-height: 580px"
+            :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
           >
             <p class="text-gray-400 text-sm mb-2">
               {{ isArabicFont ? "Arabic letters" : "alphabet capital" }}
             </p>
-            <div class="grid grid-cols-4 bg-black">
+            <div class="grid grid-cols-8 " :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }" >
               <div
                 v-for="char in displayChars"
                 :key="char"
-                class="character-cell bg-black border border-primary-hover hover:border-[1px] p-1"
+                class="character-cell border-2 border-primary-hover p-1   overflow-x-hidden overflow-y-hidden"
                 :class="{
-                  'border-primary border-[1px] m-1 ':
+                  'border-primary   ':
                     char === selectedCharacter,
-                }"
+                }" 
+                :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
                 @click="setSelectedCharacter(char)"
               >
                 <div
                   class="showcase-char cursor-pointer p-1"
-                  :style="fontStyles"
+                  :style="fontStyles, { color: themeStore.darkMode ? 'white' : 'black' }"
                   :dir="textDirection"
                 >
                   {{ char }}
@@ -1609,21 +1651,18 @@ onUnmounted(() => {
 
             <div v-if="displayLowerChars.length > 0" class="mt-4">
               <p class="text-gray-400 text-sm mb-2">alphabet small</p>
-              <div class="grid grid-cols-4 gap-4 bg-black">
+              <div class="grid grid-cols-8 " :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }" >
                 <div
                   v-for="char in displayLowerChars"
                   :key="char"
-                  class="character-cell border border-primary-hover hover:border-[1px] p-1 bg-black overflow-x-hidden overflow-y-hidden"
+                  class="character-cell border-2 border-primary-hover p-1   overflow-x-hidden overflow-y-hidden"
                   :class="{
-                    'border-primary border-[1px] m-1 ':
-                      char === selectedCharacter,
+                    'border-primary    ': char === selectedCharacter,
                   }"
+                  :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
                   @click="setSelectedCharacter(char)"
                 >
-                  <div
-                    class="showcase-char cursor-pointer hover:border-primary hover:border-[1px]"
-                    :style="fontStyles"
-                  >
+                  <div class="showcase-char cursor-pointer" :style="fontStyles, { color: themeStore.darkMode ? 'white' : 'black' }">
                     {{ char }}
                   </div>
                 </div>
@@ -1632,20 +1671,19 @@ onUnmounted(() => {
 
             <div class="mt-4">
               <p class="text-gray-400 text-sm mb-2 text">special characters</p>
-              <div class="grid grid-cols-4 gap-4 bg-black">
+              <div class="grid grid-cols-8 " :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }" >
                 <div
                   v-for="char in specialChars"
                   :key="char"
-                  class="character-cell border border-primary-hover hover:border-[1px] p-1 bg-black"
+                  class="character-cell border-2 border-primary-hover p-1 "
                   :class="{
-                    'border-primary border-[1px] m-1 ':
-                      char === selectedCharacter,
+                    'border-primary    ': char === selectedCharacter,
                   }"
                   @click="setSelectedCharacter(char)"
                 >
                   <div
-                    class="showcase-char cursor-pointer p-1"
-                    :style="fontStyles"
+                    class="showcase-char cursor-pointer  "
+                    :style="fontStyles, { color: themeStore.darkMode ? 'white' : 'black' }"
                   >
                     {{ char }}
                   </div>
@@ -1737,6 +1775,20 @@ onUnmounted(() => {
 
 .border-primary-hover:hover {
   border-color: v-bind(primaryColor) !important;
+}
+
+.trans {
+  transition: all 0.3s ease;
+}
+
+.char-stretch {
+  display: inline-block;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.char-stretch:hover {
+  transform: scaleX(1.2);
 }
 
 .variable-tag {
@@ -1918,13 +1970,6 @@ onUnmounted(() => {
   margin-bottom: 15px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
 .character-cell {
   aspect-ratio: 1/1;
 
@@ -1933,7 +1978,7 @@ onUnmounted(() => {
 }
 
 .character-cell.selected {
-  border: 1px solid rgba(255, 220, 0, 0.8);
+  border: 2px solid rgba(255, 220, 0, 0.8);
   background-color: rgba(40, 40, 20, 0.9);
 }
 
@@ -1967,10 +2012,6 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .showcase-char {
     font-size: 20px !important;
-  }
-
-  .grid-cols-4 {
-    grid-template-columns: repeat(8, 1fr);
   }
 }
 

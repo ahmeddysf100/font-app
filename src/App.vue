@@ -1,29 +1,64 @@
 <script setup>
-import { onMounted, computed } from 'vue'
-import { useThemeStore } from './stores/theme.js'
-import { useSittingsStore } from './stores/sittings'
-import Navbar from './components/Navbar.vue'
+import { onMounted, computed, watch } from "vue";
+import { useHead } from "@vueuse/head";
+import { useThemeStore } from "./stores/theme.js";
+import { useSittingsStore } from "./stores/sittings";
+import { defaultSeoMeta } from "./utils/seo";
+import { useRoute } from "vue-router";
+import Navbar from "./components/Navbar.vue";
 
-const themeStore = useThemeStore()
-const sittingsStore = useSittingsStore()
+const themeStore = useThemeStore();
+const sittingsStore = useSittingsStore();
 
-const primaryColor = computed(() => sittingsStore.primaryColor)
+const route = useRoute();
+const primaryColor = computed(() => sittingsStore.primaryColor);
+const drawer = computed(() => sittingsStore.drawer);
+const menuItems = computed(() => sittingsStore.menuItems);
+// Compute which menu item is active based on current route
+const isActive = (path) => {
+  return route.path.startsWith(path);
+};
+
+// Setup global SEO meta tags
+useHead({
+  title: defaultSeoMeta.title,
+  meta: [
+    { name: "description", content: defaultSeoMeta.description },
+    { name: "keywords", content: defaultSeoMeta.keywords },
+    { name: "author", content: defaultSeoMeta.author },
+
+    // Open Graph
+    { property: "og:title", content: defaultSeoMeta.ogTitle },
+    { property: "og:description", content: defaultSeoMeta.ogDescription },
+    { property: "og:type", content: defaultSeoMeta.ogType },
+    { property: "og:url", content: defaultSeoMeta.ogUrl },
+    { property: "og:image", content: defaultSeoMeta.image },
+
+    // Twitter
+    { name: "twitter:card", content: defaultSeoMeta.twitterCard },
+    { name: "twitter:title", content: defaultSeoMeta.title },
+    { name: "twitter:description", content: defaultSeoMeta.description },
+    { name: "twitter:image", content: defaultSeoMeta.image },
+  ],
+  link: [{ rel: "canonical", href: defaultSeoMeta.ogUrl }],
+});
 
 onMounted(() => {
-  themeStore.initTheme()
-})
+  themeStore.initTheme();
+  sittingsStore.getColorFromLocalStorage();
+});
 </script>
 
 <template>
   <v-app :theme="themeStore.darkMode ? 'dark' : 'light'" :color="primaryColor">
     <Navbar />
-    
+
     <v-main>
       <!-- Using router-view to display the current route component -->
       <router-view></router-view>
     </v-main>
-    
-    <v-footer  class="py-4 text-center bg-black">
+
+    <v-footer class="py-4 text-center " :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }">
       <div class="w-full">
         <p class="text-gray-600 dark:text-gray-400">
           © {{ new Date().getFullYear() }} Kotype. All rights reserved.
@@ -44,6 +79,45 @@ onMounted(() => {
         </div>
       </div>
     </v-footer>
+
+    <!-- Mobile Navigation Drawer -->
+    <v-navigation-drawer
+      v-model="drawer"
+      temporary
+      location="right"
+      width="280"
+      class="mobile-drawer"
+    >
+      <div class="pa-4 drawer-header">
+        <div class="d-flex justify-space-between align-center">
+          <h3 class="text-h5 font-weight-bold">Menu</h3>
+          <v-btn icon @click="sittingsStore.drawer = false" class="close-btn">
+            <v-icon :color="primaryColor">mdi-close</v-icon>
+          </v-btn>
+        </div>
+      </div>
+
+      <v-divider class="my-2"></v-divider>
+
+      <v-list>
+        <v-list-item
+          v-for="item in menuItems"
+          :key="item.title"
+          :to="item.path"
+          :active="isActive(item.path)"
+          :color="primaryColor"
+          class="drawer-list-item"
+          link
+        >
+          <template v-slot:title>
+            <span class="text-h6">{{ item.title }}</span>
+          </template>
+          <template v-slot:append v-if="item.count">
+            <span class="count-badge">{{ item.count }}</span>
+          </template>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
   </v-app>
 </template>
 
@@ -71,44 +145,44 @@ html {
 
 /* Font families */
 .font-koaynama-sharp {
-  font-family: 'KOAynama-Sharp', sans-serif;
+  font-family: "KOAynama-Sharp", sans-serif;
 }
 
 .font-koaynama-curved {
-  font-family: 'KOAynama-Curved', sans-serif;
+  font-family: "KOAynama-Curved", sans-serif;
 }
 
 .font-koshareb {
-  font-family: 'KoShareb', serif;
+  font-family: "KoShareb", serif;
 }
 
 .font-kobanzeen {
-  font-family: 'Ko_Banzeen', sans-serif;
+  font-family: "Ko_Banzeen", sans-serif;
 }
 
 .font-kodongol {
-  font-family: 'KoDongol', serif;
+  font-family: "KoDongol", serif;
 }
 
 .font-kolemaza {
-  font-family: 'KOLemaza', sans-serif;
+  font-family: "KOLemaza", sans-serif;
 }
 
 .font-kokhalaya {
-  font-family: 'KoKhalaya', sans-serif;
+  font-family: "KoKhalaya", sans-serif;
 }
 
 .font-kokhalaya-variable {
-  font-family: 'KoKhalaya-Variable', sans-serif;
+  font-family: "KoKhalaya-Variable", sans-serif;
 }
 
 .font-korubbama {
-  font-family: 'KORubbama', cursive;
+  font-family: "KORubbama", cursive;
   font-weight: 900;
 }
 
 .font-kogalimodern {
-  font-family: 'KoGaliModern', monospace;
+  font-family: "KoGaliModern", monospace;
 }
 
 /* @font-face {
@@ -237,6 +311,4 @@ html {
   font-weight: normal;
   font-style: normal;
 } */
-
-
 </style>

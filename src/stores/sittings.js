@@ -7,7 +7,8 @@ export const useSittingsStore = defineStore("sittings", () => {
   const fontAlignment = ref("center");
   const textSample = ref("");
   const primaryColor = ref("#FA82D1");
-
+  const drawer = ref(false); 
+  const menuItems = ref([]);
   function updateResetFlag() {
     resetFlag.value = !resetFlag.value;
   }

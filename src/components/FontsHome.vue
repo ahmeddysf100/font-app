@@ -1,12 +1,30 @@
 <script setup>
 import { ref, computed, reactive, onMounted, watch } from "vue";
+import { useHead } from "@vueuse/head";
 import { useFontStore } from "../stores/fonts";
+import { generateSeoMeta } from "../utils/seo";
 import FontCard from "./FontCard.vue";
 import SearchFilters from "./SearchFilters.vue";
 import fonts from "../../public/fonts.json";
 import { useSittingsStore } from "../stores/sittings.js";
+import { useThemeStore } from '../stores/theme.js';
+
+// Set page-specific SEO meta tags
+useHead(
+  generateSeoMeta({
+    title: "Explore Fonts | Kotype Font Library",
+    description:
+      "Browse our collection of beautiful and functional fonts for your next design project.",
+    keywords:
+      "font collection, typography, design fonts, arabic fonts, latin fonts, kotype library",
+    ogTitle: "Explore Our Font Collection | Kotype",
+    ogDescription: "Discover beautiful typography for your design projects",
+    canonicalUrl: "https://yourdomain.com/font-app/fonts",
+  })
+);
 
 const sittingsStore = useSittingsStore();
+const themeStore = useThemeStore();
 /**
  * Dynamic Text Sample Collections
  *
@@ -451,7 +469,15 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
 
     <!-- Font display options -->
     <div
-      class="font-options-bar bg-black text-white py-4 border-b border-primary"
+      class="font-options-bar py-4 border-b border-primary"
+      :class="{ 
+        'bg-black': themeStore.darkMode, 
+        'bg-white': !themeStore.darkMode 
+      }"
+      :style="{ 
+        color: themeStore.darkMode ? 'white' : 'black',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }"
     >
       <v-container>
         <div class="flex items-center flex-wrap">
@@ -545,7 +571,17 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
     </div>
 
     <!-- Font Grid with Preview -->
-    <div class="font-grid bg-black text-white py-8">
+    <div 
+      class="font-grid py-8"
+      :class="{ 
+        'bg-black': themeStore.darkMode, 
+        'bg-white': !themeStore.darkMode 
+      }"
+      :style="{ 
+        color: themeStore.darkMode ? 'white' : 'black',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }"
+    >
       <div class="w-[90%] mx-auto">
         <v-row>
           <v-col
@@ -573,9 +609,14 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
           class="no-results text-center py-12"
         >
           <p class="text-gray-400 text-lg">No fonts match your filters</p>
-          <v-btn color="primary" class="mt-4" @click="handleReset"
-            >Reset Filters</v-btn
+          <v-btn 
+            :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
+            :color="primaryColor" 
+            class="mt-4" 
+            @click="handleReset"
           >
+            Reset Filters
+          </v-btn>
         </div>
       </div>
     </div>
@@ -583,6 +624,13 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
 </template>
 
 <style scoped>
+.font-options-bar {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.font-grid {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
 .border-primary {
   border-color: v-bind(primaryColor) !important;

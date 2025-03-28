@@ -68,14 +68,41 @@ onMounted(() => {
 
 <template>
   <div
-    class="terms-view bg-black"
-    :class="{ 'dark-theme': themeStore.darkMode }"
+    class="terms-view"
+    :style="{
+      backgroundColor: themeStore.darkMode ? '#0d0d0d' : '#fff',
+      color: themeStore.darkMode ? '#f5f5f5' : '#111',
+      transition: 'background-color 0.3s ease, color 0.3s ease'
+    }"
   >
-    <div class="page-header bg-black">
+    <div 
+      class="page-header"
+      :style="{
+        backgroundColor: themeStore.darkMode ? '#151515' : '#f8f8f8',
+        boxShadow: themeStore.darkMode ? '0 5px 15px rgba(0, 0, 0, 0.2)' : '0 5px 15px rgba(0, 0, 0, 0.03)',
+        transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
+      }"
+    >
       <v-container>
-        <div class="header-content bg-black">
-          <h1 class="page-title">Terms & Conditions</h1>
-          <div class="title-underline"></div>
+        <div class="header-content">
+          <h1 
+            class="page-title"
+            :style="{
+              backgroundColor: primaryColor,
+              color: '#fff',
+              boxShadow: `0 4px 15px ${themeStore.darkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 105, 180, 0.2)'}`,
+              transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
+            }"
+          >
+            Terms & Conditions
+          </h1>
+          <div 
+            class="title-underline"
+            :style="{
+              backgroundColor: primaryColor,
+              transition: 'background-color 0.3s ease'
+            }"
+          ></div>
         </div>
       </v-container>
     </div>
@@ -83,66 +110,77 @@ onMounted(() => {
     <v-container class="main-content">
       <v-row justify="center">
         <v-col cols="12" md="10" lg="8">
-          <div class="terms-container">
-            <div class="terms-header-pill">
+          <div 
+            class="terms-container"
+            :style="{
+              backgroundColor: themeStore.darkMode ? '#151515' : '',
+              boxShadow: themeStore.darkMode ? '0 5px 20px rgba(0, 0, 0, 0.2)' : '0 5px 20px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.05)',
+              transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
+            }"
+          >
+            <div 
+              class="terms-header-pill"
+              :style="{
+                backgroundColor: primaryColor,
+                color: '#fff',
+                boxShadow: `0 4px 10px ${themeStore.darkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 105, 180, 0.2)'}`,
+                transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
+              }"
+            >
               <h2>Basic Terms & Conditions</h2>
             </div>
 
             <div class="terms-content">
-              <div class="term-item">
-                <span class="term-number">1-</span>
-                <p>
-                  Kotype Arabic fonts are free to use in personal and commercial
-                  works.
-                </p>
-              </div>
-
-              <div class="term-item">
-                <span class="term-number">2-</span>
-                <p>
-                  Kotype fonts can be used on any medium: poster, logo,
-                  magazine, website, app, t-shirt, music video, bike trailer…
-                  Remember to credit the name of the type designer or the
-                  foundry whenever you use the fonts.
-                </p>
-              </div>
-
-              <div class="term-item">
-                <span class="term-number">3-</span>
-                <p>
-                  Redistribution of the fonts without written permission is not
-                  allowed.
-                </p>
-              </div>
-
-              <div class="term-item">
-                <span class="term-number">4-</span>
-                <p>
-                  Modification of the font file without written permission is
-                  not allowed.
-                </p>
-              </div>
-
-              <div class="term-item">
-                <span class="term-number">5-</span>
-                <p>
-                  Kotype Free Arabic fonts may not be added to or used within
-                  any online or offline design tools or apps (e.g., Canva,
-                  photoshop) that allow users to create, edit, or distribute
-                  images using the fonts without proper licensing from Kotype or
-                  the designer of the typeface.
+              <div 
+                v-for="(item, index) in [
+                  'Kotype Arabic fonts are free to use in personal and commercial works.',
+                  'Kotype fonts can be used on any medium: poster, logo, magazine, website, app, t-shirt, music video, bike trailer… Remember to credit the name of the type designer or the foundry whenever you use the fonts.',
+                  'Redistribution of the fonts without written permission is not allowed.',
+                  'Modification of the font file without written permission is not allowed.',
+                  'Kotype Free Arabic fonts may not be added to or used within any online or offline design tools or apps (e.g., Canva, photoshop) that allow users to create, edit, or distribute images using the fonts without proper licensing from Kotype or the designer of the typeface.'
+                ]"
+                :key="index"
+                class="term-item"
+              >
+                <span 
+                  class="term-number"
+                  :style="{
+                    color: primaryColor,
+                    transition: 'color 0.3s ease'
+                  }"
+                >
+                  {{ index + 1 }}-
+                </span>
+                <p
+                  :style="{
+                    color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#111',
+                    transition: 'color 0.3s ease'
+                  }"
+                >
+                  {{ item }}
                 </p>
               </div>
             </div>
 
-            <div class="donation-section">
-              <p>
+            <div 
+              class="donation-section"
+              :style="{
+                borderColor: themeStore.darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                transition: 'border-color 0.3s ease'
+              }"
+            >
+              <p
+                :style="{
+                  color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#111',
+                  transition: 'color 0.3s ease'
+                }"
+              >
                 If you like our Free fonts and our activities, please consider
                 donating. This will allow us to continue distributing new
                 quality, free fonts and improving our existing catalogue.
               </p>
               <v-btn
-                color="pink"
+                :color="primaryColor"
                 variant="elevated"
                 size="large"
                 class="mt-3 donation-btn"
@@ -161,7 +199,12 @@ onMounted(() => {
       <div
         v-if="randomFont"
         class="decorative-font"
-        :style="{ fontFamily: randomFont.fontFamily }"
+        :style="{ 
+          fontFamily: randomFont.fontFamily,
+          color: themeStore.darkMode ? '#fff' : '#000',
+          opacity: themeStore.darkMode ? '0.05' : '0.03',
+          transition: 'color 0.3s ease, opacity 0.3s ease'
+        }"
       >
         شروط
       </div>
@@ -171,25 +214,15 @@ onMounted(() => {
 
 <style scoped>
 .terms-view {
-  background-color: #fff;
-  color: #111;
   min-height: 100vh;
   position: relative;
   overflow: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.terms-view.dark-theme {
-  background-color: #0d0d0d;
-  color: #f5f5f5;
 }
 
 .page-header {
-  background-color: var(--section-bg-color, #f8f8f8);
   padding: 80px 0 40px;
   position: relative;
-  box-shadow: var(--section-shadow, 0 5px 15px rgba(0, 0, 0, 0.03));
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1;
 }
 
 .header-content {
@@ -198,25 +231,19 @@ onMounted(() => {
 
 .page-title {
   display: inline-block;
-  background-color: var(--accent-color, #ff69b4);
-  color: white;
   padding: 15px 30px;
   border-radius: 30px;
   font-size: 2rem;
   position: relative;
   z-index: 2;
-  box-shadow: 0 4px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.2));
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .title-underline {
   height: 4px;
-  background-color: var(--accent-color, #ff69b4);
   width: 120px;
   margin: 10px auto 0;
   border-radius: 2px;
   opacity: 0.6;
-  transition: background-color 0.3s ease;
 }
 
 .main-content {
@@ -226,17 +253,12 @@ onMounted(() => {
 }
 
 .terms-container {
-  background-color: var(--bg-color, white);
   border-radius: 16px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
   padding: 40px;
   position: relative;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .terms-header-pill {
-  background-color: var(--accent-color, #ff69b4);
-  color: white;
   padding: 12px 25px;
   border-radius: 100px;
   display: inline-block;
@@ -244,7 +266,6 @@ onMounted(() => {
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  box-shadow: 0 4px 10px var(--accent-light-color, rgba(255, 105, 180, 0.2));
 }
 
 .terms-header-pill h2 {
@@ -270,42 +291,33 @@ onMounted(() => {
   font-size: 1.2rem;
   margin-right: 8px;
   flex-shrink: 0;
-  color: var(--accent-color, #ff69b4);
 }
 
 .term-item p {
   margin: 0;
-  color: var(--text-color, #111);
-  transition: color 0.3s ease;
 }
 
 .donation-section {
   margin-top: 60px;
   padding-top: 30px;
-  border-top: 1px solid var(--accent-light-color, rgba(255, 105, 180, 0.2));
+  border-top: 1px solid;
   text-align: center;
 }
 
 .donation-section p {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: var(--text-color, #111);
   max-width: 700px;
   margin: 0 auto;
-  transition: color 0.3s ease;
 }
 
 .donation-btn {
-  background-color: var(--accent-color, #ff69b4) !important;
-  color: white !important;
   font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px var(--accent-light-color, rgba(255, 105, 180, 0.2));
+  transition: transform 0.3s ease;
 }
 
 .donation-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.3));
 }
 
 /* Decorative Background */

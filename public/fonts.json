@@ -503,23 +503,5 @@
             }
         ],
         "designer": "Monsieur La Doulaise"
-    },
-    {
-        "id": 11,
-        "name": "Honk",
-        "fontFamily": "Honk",
-        "category": "Display",
-        "styles": [],
-        "variable": [
-            {
-                "file": "https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@0..45,0..100&display=swap",
-                "name": "Variable",
-                "weight": "400",
-                "variationSettings": "'MORF' 15, 'SHLN' 50",
-                "fontFamily": "Honk"
-            }
-        ],
-        "designer": "Google Fonts",
-        "description": "A variable font with MORF (0-45) and SHLN (0-100) axes"
     }
 ]

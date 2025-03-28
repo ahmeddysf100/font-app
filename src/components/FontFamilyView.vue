@@ -5,12 +5,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useFontStore } from '../stores/fonts'
 import { useSittingsStore } from "../stores/sittings";
 import { generateFontStyle } from '../utils/fontUtils'
+import { useThemeStore } from '../stores/theme'
 // Remove import for isGoogleFontsUrl
 
 const route = useRoute()
 const router = useRouter()
 const fontStore = useFontStore()
 const settingsStore = useSittingsStore();
+const themeStore = useThemeStore();
 
 // Store font family and style tracking variables
 const currentFontFamily = ref('');
@@ -109,8 +111,7 @@ const fontStyles = computed(() => {
           fontFamily: actualFontFamily, // Properly quoted font family
           fontSize: `${fontSize.value}px`,
           lineHeight: 1.3,
-          color: colorMode.value === "white" ? "white" : "black",
-          direction: textDirection.value,
+           direction: textDirection.value,
         },
         details: {
           weight: style.weight || 400,
@@ -317,54 +318,68 @@ onUnmounted(() => {
 
 <template>
   <div 
-    class="font-family-view min-h-screen bg-black text-white"
+    class="font-family-view"
+    :style="{
+      backgroundColor: themeStore.darkMode ? 'black' : 'white',
+      color: themeStore.darkMode ? 'white' : 'black',
+      transition: 'background-color 0.3s ease, color 0.3s ease'
+    }"
   >
-    <!-- Header -->
-    <div class="px-6 pt-4">
-      <!-- <v-btn 
+    <!-- Back button -->
+    <!-- <div class="px-6 pt-4">
+      <v-btn
         :color="primaryColor"
-        variant="text" 
-        @click="backToFontDetail" 
+        variant="text"
+        @click="backToFontDetail"
         class="mb-4"
+        :style="{
+          color: themeStore.darkMode ? 'white' : 'black',
+          transition: 'color 0.3s ease'
+        }"
       >
         <v-icon start>mdi-arrow-left</v-icon>
-        Back to Font Detail
-      </v-btn> -->
+        Back to Font
+      </v-btn>
+    </div> -->
+
+    <!-- Font Family Header -->
+    <div 
+      class="font-family-header p-6  flex justify-between"
+      :style="{
+        backgroundColor: themeStore.darkMode ? 'black' : 'white',
+        color: themeStore.darkMode ? 'white' : 'black',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }"
+    >
+      <h1 
+        class="text-2xl font-bold  inline-block"
+        :style="{
+          color: themeStore.darkMode ? 'white' : 'black',
+          transition: 'color 0.3s ease'
+        }"
+      >
+        {{ font.name }} Family
+      </h1>
       
-      <div class="border-b border-opacity-20 primary-border" >
-        <div class="flex flex-wrap justify-between items-center pb-4">
-          <div>
-            <h1 class="text-2xl font-bold">{{ font.name }} Family</h1>
-            <p class="text-opacity-70 mt-1 text-gray-400" >
-              Designed by {{ font.designer }}
-              <span v-if="font.styleCount"> • {{ font.styleCount }} styles</span>
-              <span v-if="font.isPremium"> • Premium</span>
-            </p>
-          </div>
-          
-          <!-- Controls -->
-          <div class="controls mt-3 md:mt-0 flex flex-wrap items-center gap-3">
-            <!-- Remove Google Fonts reload and debug buttons -->
-            
-            <!-- Font size slider -->
-            <div class="flex items-center">
-              <span class="text-sm mr-2 opacity-70">Size</span>
-              <v-slider
-                v-model="fontSize"
-                min="12"
-                max="120"
-                step="1"
-                class="slider-thumb w-24 md:w-32"
-                density="compact"
-                hide-details
-                :color="primaryColor"
-                :track-color="primaryColor"
-                :thumb-color="primaryColor"
-                @update:model-value="updateFontSize"
-              ></v-slider>
-              <span class="text-xs ml-1">{{ fontSize }}px</span>
-            </div>
-          </div>
+      <!-- Controls -->
+      <div class="controls   gap-4  inline-block">
+        <!-- Font size slider -->
+        <div class="flex items-center">
+          <span class="text-sm mr-2 opacity-70">Size</span>
+          <v-slider
+            v-model="fontSize"
+            min="12"
+            max="120"
+            step="1"
+            class="slider-thumb w-24 md:w-32"
+            density="compact"
+            hide-details
+            :color="primaryColor"
+            :track-color="primaryColor"
+            :thumb-color="primaryColor"
+            @update:model-value="updateFontSize"
+          ></v-slider>
+          <span class="text-xs ml-1">{{ fontSize }}px</span>
         </div>
       </div>
     </div>
@@ -372,8 +387,8 @@ onUnmounted(() => {
     <!-- Filters -->
     <div class="px-6 py-4 ">
       <div class="flex flex-wrap gap-4 items-center">
-        <div class="search-box flex-grow max-w-md bg-black">
-          <div class="relative bg-black border-b-2 primary-border">
+        <div class="search-box flex-grow max-w-md ">
+          <div class="relative  border-b-2 primary-border">
             <v-icon 
               class="absolute left-2 top-1/2 transform -translate-y-1/2 opacity-50" 
               size="small"
@@ -384,7 +399,7 @@ onUnmounted(() => {
               v-model="searchQuery"
               type="text"
               placeholder="Search styles"
-              class="w-full py-2 pl-9 pr-4 rounded bg-black text-white  "
+              class="w-full py-2 pl-9 pr-4 rounded  text-white  "
             >
           </div>
         </div>
@@ -423,7 +438,7 @@ onUnmounted(() => {
                 Sort
               </v-btn>
             </template>
-            <v-list :bg-color="colorMode === 'white' ? 'rgb(30, 30, 30)' : 'white'">
+            <v-list :bg-color="themeStore.darkMode   ? 'rgb(30, 30, 30)' : 'white'">
               <v-list-item
                 value="default"
                 @click="sortBy = 'default'"
@@ -502,7 +517,12 @@ onUnmounted(() => {
           v-for="style in fontStyles" 
           :key="style.id"
           class="font-style-card rounded-lg transition-all duration-300 overflow-hidden border-2 primary-border"
-          
+          :style="{
+            backgroundColor: themeStore.darkMode ? 'black' : 'white',
+            color: themeStore.darkMode ? 'white' : 'black',
+            borderColor: primaryColor,
+            transition: 'all 0.3s ease'
+          }"
         >
           <div class="flex justify-between items-center p-4 border-b-[1px] primary-border border-opacity-10"
               >
@@ -511,8 +531,8 @@ onUnmounted(() => {
               <v-chip 
                 v-if="style.isVariable"
                 size="x-small" 
-                color="yellow" 
-                variant="outlined"
+                :color="themeStore.darkMode  ? 'amber-darken-2' : 'amber-darken-3'" 
+                :variant="themeStore.darkMode ? 'tonal' : 'tonal'"
                 class="text-xs variable-badge"
               >
                 Variable
@@ -520,7 +540,7 @@ onUnmounted(() => {
               <!-- Remove Google Fonts chip -->
               <v-chip 
                 size="x-small" 
-                :color="colorMode === 'white' ? 'gray' : 'gray-light'" 
+                :color="themeStore.darkMode ? 'gray' : 'gray-light'" 
                 variant="outlined"
                 class="text-xs"
               >
@@ -532,10 +552,10 @@ onUnmounted(() => {
           <div 
             contenteditable="true"
             class="font-preview p-6 text-center border-none"
-            :style="style.value"
+            :style="style.value, { color: themeStore.darkMode ? 'white' : 'black' }"
             :dir="textDirection"
             :class="[
-              colorMode === 'white' 
+              themeStore.darkMode 
                 ? ' bg-black text-white' 
                 : ' bg-white text-black'
             ]"
@@ -543,8 +563,8 @@ onUnmounted(() => {
             {{ sampleText }}
           </div>
           
-          <div v-if="style.isVariable" class="variable-controls p-3 border-t border-opacity-20"
-               :class="colorMode === 'white' ? 'border-gray-700 bg-gray-900' : 'border-gray-300 bg-gray-100'">
+          <div v-if="style.isVariable" class="variable-controls p-3 border-t-2  "
+               :style="{ borderColor: primaryColor }">
             <div class="flex items-center">
               <span class="text-xs opacity-70 mr-2">Weight</span>
               <v-slider
@@ -557,8 +577,8 @@ onUnmounted(() => {
                 hide-details
                 disabled
                 :color="primaryColor"
-                :track-color="colorMode === 'white' ? 'white' : 'black'"
-                :thumb-color="colorMode === 'white' ? 'white' : 'black'"
+                :track-color="primaryColor"
+                :thumb-color="primaryColor"
               ></v-slider>
               <span class="text-xs ml-1">{{ style.details.weight }}</span>
             </div>
@@ -625,8 +645,7 @@ input {
 
 input:focus {
   outline: none;
-  ring: 2px;
-  ring-color: rgba(255, 193, 7, 0.5);
+  
 }
 
 /* Make the style cards responsive */
@@ -661,4 +680,30 @@ input:focus {
 }
 
 /* Remove Google Fonts styles */
+
+.font-family-view {
+  min-height: 100vh;
+}
+
+.font-family-header {
+  border-bottom: 1px solid v-bind(primaryColor);
+}
+
+.font-styles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.style-card {
+  border: 1px solid v-bind(primaryColor);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.style-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 </style> 

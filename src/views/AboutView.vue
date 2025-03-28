@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useThemeStore } from "../stores/theme.js";
 import logoImage from "../assets/kotype.svg"; // Import the SVG logo
 import fonts from "../../public/fonts.json";
-import { useSittingsStore } from "../stores/sittings.js"; 
+import { useSittingsStore } from "../stores/sittings.js";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const themeStore = useThemeStore();
@@ -166,15 +166,7 @@ const changeDisplayedFont = () => {
 
 let fontInterval;
 
-// Background colors - separate sets for light and dark mode
-// const lightModeColors = [
-//   "#ff69b4",
-//   "#8a2be2",
-//   "#1e90ff",
-//   "#ff6347",
-//   "#00ced1",
-//   "#9932cc",
-// ];
+// Background colors -
 const darkModeColors = [
   "#ff1493",
   "#9370db",
@@ -212,9 +204,7 @@ const currentBgIndex = ref(0);
 
 // Select color based on theme
 const currentBgColor = computed(() => {
-  return themeStore.darkMode
-    ? darkModeColors[currentBgIndex.value]
-    : lightModeColors[currentBgIndex.value];
+  return darkModeColors[currentBgIndex.value];
 });
 
 // Check screen size on mount and when window resizes
@@ -247,17 +237,14 @@ let scrollObserver;
 // Update divider color based on theme
 const updateDividerColor = () => {
   const isDark = themeStore.darkMode;
-  document.documentElement.style.setProperty(
-    "--bg-color",
-    isDark ? primaryColor.value : "white"
-  );
+  document.documentElement.style.setProperty("--bg-color", primaryColor.value);
   document.documentElement.style.setProperty(
     "--accent-color",
-    isDark ? primaryColor.value : "#ff69b4"
+    primaryColor.value
   );
   document.documentElement.style.setProperty(
     "--accent-light-color",
-    isDark ? primaryColor.value : "rgba(255, 105, 180, 0.1)"
+    primaryColor.value
   );
   document.documentElement.style.setProperty(
     "--accent-medium-color",
@@ -386,11 +373,32 @@ watch(
 </script>
 
 <template>
-  <div class="about-view" :class="{ 'dark-theme': themeStore.darkMode }">
+  <div
+    class="about-view"
+    :style="{
+      color: themeStore.darkMode ? '#fff' : '#000',
+      transition: 'color 0.3s ease',
+    }"
+  >
     <!-- Banner Image -->
-    <div class="banner-image-container bg-black">
+    <div
+      class="banner-image-container"
+      :class="{
+        'bg-black': themeStore.darkMode,
+        'bg-card': !themeStore.darkMode,
+      }"
+      :style="{
+        transition: 'background-color 0.3s ease',
+      }"
+    >
       <div class="overlay"></div>
-      <div class="font-info">
+      <div
+        class="font-info"
+        :style="{
+          color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#000',
+          transition: 'color 0.3s ease',
+        }"
+      >
         <v-chip
           :style="{ backgroundColor: primaryColor }"
           :class="['current-font-chip', { pulse: isFontChanging }]"
@@ -418,15 +426,26 @@ watch(
         <div
           v-for="(font, index) in arabicFonts"
           :key="font.id"
-          class="font-indicator"
-          :class="{ active: index === currentFontIndex }"
+          class="font-indicator "
+          :class="{ active: index === currentFontIndex, 'bg-black': themeStore.darkMode, 'bg-white': themeStore.darkMode }"
+          
           @click="currentFontIndex = index"
         ></div>
       </div>
     </div>
 
-    <!-- Header Section with improved layout -->
-    <section class="header-section bg-black">
+    <!-- Header Section -->
+    <section
+      class="header-section"
+      :class="{
+        'bg-black': themeStore.darkMode,
+        'bg-card': !themeStore.darkMode,
+      }"
+      :style="{
+        color: themeStore.darkMode ? 'white' : 'black',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+      }"
+    >
       <v-container>
         <v-row align="center" class="header-row">
           <v-col
@@ -441,17 +460,37 @@ watch(
                 class="kotype-logo"
                 width="300px"
               />
-              <!-- <div class="logo-flare"></div> -->
             </div>
           </v-col>
           <v-col cols="12" md="6" class="d-flex flex-column justify-center">
             <div class="section-heading">
               <div class="section-title-container">
-                <h2 class="section-title">What Is Kotype!</h2>
+                <h2
+                  class="section-title"
+                  :style="{
+                    color: themeStore.darkMode ? '#fff' : '#000',
+                    transition: 'color 0.3s ease',
+                  }"
+                >
+                  What Is Kotype!
+                </h2>
                 <div class="title-underline"></div>
               </div>
-              <div class="section-text">
-                <p>
+              <div
+                class="section-text"
+                :style="{
+                  color: themeStore.darkMode
+                    ? 'rgba(255, 255, 255, 0.9)'
+                    : '#000',
+                  transition: 'color 0.3s ease',
+                }"
+              >
+                <p
+                  :class="{
+                    'text-white !important': themeStore.darkMode,
+                    'text-black !important': !themeStore.darkMode,
+                  }"
+                >
                   This is KO-type. The move you probably anticipated, that will
                   knock all free font-haters out of their chairs. That was a
                   joke. Kotype is a community dedicated to the love of Arabic
@@ -466,29 +505,58 @@ watch(
       </v-container>
     </section>
 
-    <!-- Content Section with auto-revealing sections -->
-    <section class="content-section bg-black">
+    <div class="my-8 divider-fancy" style="visibility: visible; display: block;"></div>
+
+
+    <!-- Content Section -->
+    <section
+      class="content-section"
+      :class="{
+        'bg-black': themeStore.darkMode,
+        'bg-card': !themeStore.darkMode,
+      }"
+      :style="{
+        color: themeStore.darkMode ? 'white' : 'black',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+      }"
+    >
       <v-container>
         <v-row>
           <v-col cols="12">
             <div class="section mb-5 scroll-reveal">
               <div class="section-heading">
                 <div class="section-title-container">
-                  <h2 class="section-title">Our Mission</h2>
+                  <h2
+                    class="section-title"
+                    :style="{
+                      color: themeStore.darkMode ? '#fff' : '#000',
+                      transition: 'color 0.3s ease',
+                    }"
+                  >
+                    Our Mission
+                  </h2>
                   <div class="title-underline"></div>
                 </div>
-                <div class="section-text">
+                <div
+                  class="section-text"
+                  :style="{
+                    color: themeStore.darkMode
+                      ? 'rgba(255, 255, 255, 0.9)'
+                      : '#000',
+                    transition: 'color 0.3s ease',
+                  }"
+                >
                   <div class="quote-block">
-                    <v-icon color="pink" class="quote-icon"
+                    <v-icon color="white" class="quote-icon"
                       >mdi-format-quote-open</v-icon
                     >
-                    <p class="mission-quote">
+                    <p class="mission-quote ">
                       <em
                         >Give a man a fish, and you feed him for a day; teach a
                         man to fish, and you feed him for a lifetime.</em
                       >
                     </p>
-                    <v-icon color="pink" class="quote-icon quote-close"
+                    <v-icon color="white" class="quote-icon quote-close"
                       >mdi-format-quote-close</v-icon
                     >
                   </div>
@@ -504,10 +572,26 @@ watch(
             <div class="section mb-5 scroll-reveal">
               <div class="section-heading">
                 <div class="section-title-container">
-                  <h2 class="section-title">Our Vision</h2>
+                  <h2
+                    class="section-title"
+                    :style="{
+                      color: themeStore.darkMode ? '#fff' : '#000',
+                      transition: 'color 0.3s ease',
+                    }"
+                  >
+                    Our Vision
+                  </h2>
                   <div class="title-underline"></div>
                 </div>
-                <div class="section-text">
+                <div
+                  class="section-text"
+                  :style="{
+                    color: themeStore.darkMode
+                      ? 'rgba(255, 255, 255, 0.9)'
+                      : '#000',
+                    transition: 'color 0.3s ease',
+                  }"
+                >
                   <p>
                     The limited resources and repeated Arabic font designs are
                     killing this saturated market. We need more hands to work,
@@ -521,10 +605,26 @@ watch(
             <div class="section mb-5 scroll-reveal">
               <div class="section-heading">
                 <div class="section-title-container">
-                  <h2 class="section-title">Honestly</h2>
+                  <h2
+                    class="section-title"
+                    :style="{
+                      color: themeStore.darkMode ? '#fff' : '#000',
+                      transition: 'color 0.3s ease',
+                    }"
+                  >
+                    Honestly
+                  </h2>
                   <div class="title-underline"></div>
                 </div>
-                <div class="section-text">
+                <div
+                  class="section-text"
+                  :style="{
+                    color: themeStore.darkMode
+                      ? 'rgba(255, 255, 255, 0.9)'
+                      : '#000',
+                    transition: 'color 0.3s ease',
+                  }"
+                >
                   <p>
                     We are done with pirated libraries continue to steal the
                     efforts of designers, exploiting creations that may have
@@ -542,15 +642,31 @@ watch(
               </div>
             </div>
 
-            <v-divider class="my-8 divider-fancy"></v-divider>
+            <div class="my-8 divider-fancy" style="visibility: visible; display: block;"></div>
 
             <div class="section mb-5 scroll-reveal">
               <div class="section-heading">
                 <div class="section-title-container">
-                  <h2 class="section-title">Font License</h2>
+                  <h2
+                    class="section-title"
+                    :style="{
+                      color: themeStore.darkMode ? '#fff' : '#000',
+                      transition: 'color 0.3s ease',
+                    }"
+                  >
+                    Font License
+                  </h2>
                   <div class="title-underline"></div>
                 </div>
-                <div class="section-text">
+                <div
+                  class="section-text"
+                  :style="{
+                    color: themeStore.darkMode
+                      ? 'rgba(255, 255, 255, 0.9)'
+                      : '#000',
+                    transition: 'color 0.3s ease',
+                  }"
+                >
                   <p>
                     All fonts available on our platform are copyrighted and
                     owned by the respective designers who have submitted them.
@@ -619,26 +735,57 @@ watch(
             <div class="section mb-5 scroll-reveal">
               <div class="section-heading">
                 <div class="section-title-container">
-                  <h2 class="section-title">Support Us</h2>
+                  <h2
+                    class="section-title"
+                    :style="{
+                      color: themeStore.darkMode ? '#fff' : '#000',
+                      transition: 'color 0.3s ease',
+                    }"
+                  >
+                    Support Us
+                  </h2>
                   <div class="title-underline"></div>
                 </div>
-                <div class="section-text">
+                <div
+                  class="section-text"
+                  :style="{
+                    color: themeStore.darkMode
+                      ? 'rgba(255, 255, 255, 0.9)'
+                      : '#000',
+                    transition: 'color 0.3s ease',
+                  }"
+                >
                   <p>
                     If you like our Free fonts and our activities, please
                     consider donating. This will allow us to continue
                     distributing new quality, free fonts and improving our
                     existing catalogue. Visit our donation page.
                   </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- New Dedicated Donate Section -->
+            <div class="donate-section scroll-reveal">
+              <div class="donate-container">
+                <div class="donate-content">
+                  <v-icon size="48" color="pink" class="donate-icon"
+                    >mdi-heart</v-icon
+                  >
+                  <h3 class="donate-title">Support Kotype</h3>
+                  <p class="donate-text">
+                    Help us continue creating and sharing beautiful Arabic fonts
+                  </p>
                   <v-btn
                     color="pink"
                     variant="elevated"
-                    size="large"
-                    class="mt-5 support-btn"
+                    size="x-large"
+                    class="donate-btn"
                     href="https://ko-fi.com/kotype"
                     target="_blank"
                   >
-                    <v-icon start class="support-icon">mdi-heart</v-icon>
-                    Donate
+                    <v-icon start class="support-icon">mdi-coffee</v-icon>
+                    Buy us a coffee
                   </v-btn>
                 </div>
               </div>
@@ -647,10 +794,26 @@ watch(
             <div class="section mb-5 scroll-reveal">
               <div class="section-heading">
                 <div class="section-title-container">
-                  <h2 class="section-title">About the Team</h2>
+                  <h2
+                    class="section-title"
+                    :style="{
+                      color: themeStore.darkMode ? '#fff' : '#000',
+                      transition: 'color 0.3s ease',
+                    }"
+                  >
+                    About the Team
+                  </h2>
                   <div class="title-underline"></div>
                 </div>
-                <div class="section-text">
+                <div
+                  class="section-text"
+                  :style="{
+                    color: themeStore.darkMode
+                      ? 'rgba(255, 255, 255, 0.9)'
+                      : '#000',
+                    transition: 'color 0.3s ease',
+                  }"
+                >
                   <p>
                     We are a collective from different countries, united by a
                     common goal: to share our knowledge of type design and
@@ -668,23 +831,37 @@ watch(
                     </p>
                     <ul class="team-members">
                       <li>
-                        <a
+                        <v-btn
                           href="https://www.heyporterposter.com/"
                           target="_blank"
-                          >Hey Porter! (Tawfiq Dawi)</a
+                          variant="text"
+                          class="pa-0 text-decoration-underline"
+                          color="inherit"
                         >
+                          Hey Porter! (Tawfiq Dawi)
+                        </v-btn>
                       </li>
                       <li>
-                        <a href="http://abdomohamed.com/" target="_blank"
-                          >Abdo Mohamed</a
+                        <v-btn
+                          href="http://abdomohamed.com/"
+                          target="_blank"
+                          variant="text"
+                          class="pa-0 text-decoration-underline"
+                          color="inherit"
                         >
+                          Abdo Mohamed
+                        </v-btn>
                       </li>
                       <li>
-                        <a
+                        <v-btn
                           href="https://www.instagram.com/ibrohamdi/"
                           target="_blank"
-                          >Ibrahim Hamdi</a
+                          variant="text"
+                          class="pa-0 text-decoration-underline"
+                          color="inherit"
                         >
+                          Ibrahim Hamdi
+                        </v-btn>
                       </li>
                     </ul>
                   </div>
@@ -698,8 +875,12 @@ watch(
 
     <!-- Footer with font credits -->
     <div
-      class="footer-section bg-black"
-      :class="{ 'dark-footer': themeStore.darkMode }"
+      class="footer-section"
+      :class="{
+        'dark-footer': themeStore.darkMode,
+        'bg-black': themeStore.darkMode,
+        'bg-card': !themeStore.darkMode,
+      }"
     >
       <v-container>
         <div class="font-credits">
@@ -711,7 +892,7 @@ watch(
               variant="outlined"
               class="font-tag"
               color="pink"
-              @click=" router.push(`/fonts/${font.id}`)"
+              @click="router.push(`/fonts/${font.id}`)"
             >
               {{ font.name }}
             </v-chip>
@@ -724,16 +905,85 @@ watch(
 
 <style scoped>
 .about-view {
-  background-color: #fff;
-  color: #111;
-  padding-bottom: 0;
-  overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.about-view.dark-theme {
-  background-color: #0d0d0d;
-  color: #f5f5f5;
+.banner-image-container,
+.header-section,
+.content-section {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.section-title,
+.section-text {
+  transition: color 0.3s ease;
+}
+
+.bg-card {
+  background-color: white !important;
+}
+
+.dark-theme {
+  background-color: #000;
+  color: #fff;
+}
+
+.dark-theme .section-title {
+  color: #fff;
+}
+
+.dark-theme .section-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dark-theme .quote-translation {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dark-theme .mission-quote {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.dark-theme .license-list :deep(.v-list-item-title) {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dark-theme .team-members li {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+ 
+
+.dark-theme .font-credits {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dark-theme .quote-block {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-theme .team-highlight {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-theme .donate-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.section-text,
+.quote-translation,
+.mission-quote,
+.license-list :deep(.v-list-item-title),
+.team-members li a,
+.font-credits,
+.donate-text {
+  transition: color 0.3s ease;
+}
+
+.quote-block,
+.team-highlight,
+.team-members li {
+  transition: background-color 0.3s ease;
 }
 
 /* Banner Image */
@@ -754,7 +1004,6 @@ watch(
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -836,13 +1085,13 @@ watch(
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(69, 64, 64, 0.5);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .font-indicator.active {
-  background-color: white;
+  background-color:   v-bind(primaryColor) !important;
   transform: scale(1.2);
 }
 
@@ -917,11 +1166,7 @@ watch(
   left: 0;
   right: 0;
   height: 120px;
-  background: linear-gradient(
-    to bottom,
-    var(--section-bg-color, rgba(248, 248, 248, 0.8)) 0%,
-    rgba(248, 248, 248, 0) 100%
-  );
+  
   z-index: -1;
   pointer-events: none;
   transition: background 0.3s ease;
@@ -952,7 +1197,7 @@ watch(
 
 .section-title {
   display: inline-block;
-  background-color: var(--accent-color, #ff69b4);
+  background-color: var(--accent-color, v-bind(primaryColor));
   color: white;
   padding: 10px 25px;
   border-radius: 30px;
@@ -966,7 +1211,7 @@ watch(
 
 .title-underline {
   height: 4px;
-  background-color: var(--accent-color, #ff69b4);
+  background-color: var(--accent-color, v-bind(primaryColor));
   width: 50%;
   position: relative;
   left: 25%;
@@ -989,12 +1234,10 @@ watch(
 
 .quote-block {
   background-color: var(--accent-light-color, rgba(255, 105, 180, 0.05));
-  border-left: 4px solid var(--accent-color, #ff69b4);
-  padding: 20px;
+   padding: 20px;
   margin: 20px 0;
   position: relative;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 0 2px 8px var(--accent-light-color, rgba(255, 105, 180, 0.05));
+  border-radius: 9px;
   transition: background-color 0.3s ease, border-color 0.3s ease,
     box-shadow 0.3s ease;
 }
@@ -1012,8 +1255,7 @@ watch(
   top: 15px;
   left: 15px;
   opacity: 0.6;
-  color: var(--accent-color, #ff69b4) !important;
-  transition: color 0.3s ease;
+   transition: color 0.3s ease;
 }
 
 .quote-close {
@@ -1034,12 +1276,12 @@ watch(
   border-radius: 8px;
 }
 
-.license-item:hover {
+/* .license-item:hover {
   background-color: var(
     --accent-light-color,
     rgba(255, 105, 180, 0.05)
   ) !important;
-}
+} */
 
 .license-icon-container {
   background-color: var(--accent-light-color, v-bind(primaryColor));
@@ -1067,13 +1309,8 @@ watch(
 
 .divider-fancy {
   position: relative;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--accent-color, rgba(255, 105, 180, 0.5)),
-    transparent
-  );
+  height: 10px;
+  
   overflow: visible;
   margin: 60px 0;
   transition: background 0.3s ease;
@@ -1085,23 +1322,19 @@ watch(
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background-color: var(--bg-color, white);
-  padding: 0 15px;
-  color: var(--accent-color, #ff69b4);
-  font-size: 16px;
+   padding: 0 15px;
+   font-size: 20px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .support-btn {
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.3));
-  background-color: var(--accent-color, #ff69b4) !important;
+  background-color: var(--accent-color, v-bind(primaryColor)) !important;
   color: white !important;
 }
 
 .support-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--accent-medium-color, rgba(255, 105, 180, 0.4));
 }
 
 .support-icon {
@@ -1121,11 +1354,10 @@ watch(
 }
 
 .team-highlight {
-  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.05));
+  background-color: var(--accent-light-color, v-bind(primaryColor));
   border-radius: 12px;
   padding: 20px;
   margin-top: 20px;
-  box-shadow: 0 2px 10px var(--accent-light-color, rgba(255, 105, 180, 0.05));
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1139,7 +1371,7 @@ watch(
 }
 
 .team-members li {
-  background-color: var(--accent-light-color, rgba(255, 105, 180, 0.1));
+  background-color: var(--accent-light-color, v-bind(primaryColor));
   padding: 8px 15px;
   border-radius: 20px;
   display: inline-block;
@@ -1155,7 +1387,7 @@ watch(
 }
 
 .team-members li:hover {
-  background-color: var(--accent-medium-color, rgba(255, 105, 180, 0.2));
+  background-color: var(--accent-medium-color, v-bind(primaryColor));
   transform: translateY(-2px);
 }
 
@@ -1187,8 +1419,8 @@ watch(
 .font-tag {
   transition: all 0.3s ease;
   cursor: pointer;
-  color: var(--accent-color, #ff69b4) !important;
-  border-color: var(--accent-color, #ff69b4) !important;
+  color: var(--accent-color, v-bind(primaryColor)) !important;
+  border-color: var(--accent-color, v-bind(primaryColor)) !important;
 }
 
 .font-tag:hover {
@@ -1292,6 +1524,91 @@ watch(
     font-size: 0.8rem !important;
     height: auto !important;
     padding: 4px 8px !important;
+  }
+}
+
+.donate-section {
+  margin: 60px 0;
+  padding: 40px 0;
+  background: linear-gradient(
+    135deg,
+    var(--accent-light-color, v-bind(primaryColor)) 0%,
+    rgba(255, 105, 180, 0.1) 100%
+  );
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.donate-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.donate-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.donate-icon {
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.donate-title {
+  font-size: 2rem;
+  color: var(--accent-color, v-bind(primaryColor));
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.donate-text {
+  font-size: 1.2rem;
+  color: var(--text-color, #111);
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.donate-btn {
+  padding: 15px 40px !important;
+  font-size: 1.1rem !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.donate-btn:hover {
+  transform: translateY(-3px);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@media (max-width: 767px) {
+  .donate-section {
+    margin: 40px 0;
+    padding: 30px 0;
+  }
+
+  .donate-title {
+    font-size: 1.6rem;
+  }
+
+  .donate-text {
+    font-size: 1.1rem;
+  }
+
+  .donate-btn {
+    padding: 12px 30px !important;
+    font-size: 1rem !important;
   }
 }
 </style>

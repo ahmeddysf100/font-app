@@ -28,12 +28,7 @@ const routes = [
     component: () => import('../components/FontFamilyView.vue'),
     props: true
   },
-  {
-    path: '/pairs',
-    name: 'Pairs',
-    // Lazy-loading route
-    component: () => import('../components/PairsView.vue')
-  },
+ 
   {
     path: '/licenses',
     name: 'Licenses',
@@ -62,24 +57,7 @@ const routes = [
   //   // Lazy-loading route
   //   component: () => import('../views/FontDemo.vue')
   // },
-  {
-    path: '/font-example',
-    name: 'FontExample',
-    // Lazy-loading route
-    component: () => import('../views/FontExample.vue')
-  },
-  {
-    path: '/dynamic-fonts',
-    name: 'DynamicFonts',
-    // Lazy-loading route
-    component: () => import('../components/DynamicFontTester.vue')
-  },
-  {
-    path: '/honk-font',
-    name: 'HonkFont',
-    // Lazy-loading route
-    component: () => import('../components/HonkFontTester.vue')
-  }
+
 ]
 
 const router = createRouter({

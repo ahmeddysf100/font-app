@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useThemeStore } from "../stores/theme.js";
 import { useSittingsStore } from "../stores/sittings";
 import { useRoute, useRouter } from "vue-router";
@@ -10,6 +10,7 @@ const themeStore = useThemeStore();
 const drawer = ref(false);
 const route = useRoute();
 const router = useRouter();
+const sittingsStore = useSittingsStore();
 const totalFontsCount = computed(() => fontStore.fonts.length);
 const menuItems = [
   { title: "Fonts", count: totalFontsCount, path: "/fonts" },
@@ -17,6 +18,7 @@ const menuItems = [
   { title: "Contact", path: "/contact" },
   { title: "Terms & conditions", path: "/terms" },
 ];
+sittingsStore.menuItems = menuItems;
 
 const navigate = (path) => {
   router.push(path);
@@ -35,8 +37,12 @@ const checkScreenSize = () => {
   isMobile.value = window.innerWidth < 768;
 };
 
-const sittingsStore = useSittingsStore();
+
 const primaryColor = computed(() => sittingsStore.primaryColor);
+
+watch(drawer, (newVal) => {
+  sittingsStore.drawer = newVal;
+});
 
 // Call on component mount
 onMounted(() => {
@@ -51,16 +57,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="nav-container bg-black">
+  <div class="nav-container border-b-2 border-primary" :class="{ 'bg-black': themeStore.darkMode, 'bg-white': !themeStore.darkMode }">
     <!-- Main Horizontal Navigation -->
     <div
-      class="main-nav bg-black d-flex justify-space-between align-center border-primary"
+      class="main-nav d-flex justify-space-between align-center"
       :class="{ 'mobile-nav': isMobile }"
     >
       <!-- Logo Section -->
       <div class="logo-section">
         <div class="p-4 pr-0">
-          <router-link to="/">
+          <router-link to="/" class="logo-link">
             <img
               :src="logoImage"
               alt="Kotype Logo"
@@ -75,32 +81,40 @@ onUnmounted(() => {
       <!-- Desktop Menu -->
       <div
         v-if="!isMobile"
-        class="d-flex justify-center align-center flex-grow-1 h-100"
+        class="d-flex justify-center align-center flex-grow-1 h-100 menu-container"
       >
         <!-- Menu Items -->
         <div
           v-for="item in menuItems"
           :key="item.title"
-          class="menu-item-col px-4 px-md-8 border-primary"
+          class="menu-item-col  border-primary-pages     "
           :class="{ 'active-menu-item': isActive(item.path) }"
           @click="navigate(item.path)"
         >
-          <div
-            @click="navigate"
-            class="menu-item py-2 py-md-4 text-center d-flex flex-column justify-center"
-          >
+          <div class="menu-item py-2 py-md-4 text-center d-flex flex-column justify-center">
             <span class="text-subtitle-1">{{ item.title }}</span>
-            <span v-if="item.count" class="count-text mt-2">{{
-              item.count
-            }}</span>
+            <span v-if="item.count" class="count-text mt-2">{{ item.count }}</span>
           </div>
         </div>
+      </div>
+
+      <!-- Theme Toggle Button -->
+      <div class="theme-toggle-section d-flex align-center">
+        <v-btn
+          icon
+          @click="themeStore.toggleDarkMode()"
+          class="theme-toggle-btn"
+        >
+          <v-icon :color="primaryColor" :size="isMobile ? 'large' : 'x-large'">
+            {{ themeStore.darkMode ? 'mdi-weather-sunny' : 'mdi-weather-night' }}
+          </v-icon>
+        </v-btn>
       </div>
 
       <!-- Hamburger Menu Section -->
       <div
         v-if="isMobile"
-        class="hamburger-section bg-black d-flex justify-end align-center"
+        class="hamburger-section d-flex justify-end align-center"
       >
         <div class="p-3 p-md-4 d-flex justify-center align-center">
           <v-btn icon @click="drawer = !drawer" class="hamburger-btn">
@@ -110,100 +124,82 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Mobile Navigation Drawer -->
-    <v-navigation-drawer
-      v-model="drawer"
-      temporary
-      location="right"
-      width="280"
-      color="black"
-    >
-      <div class="pa-4 drawer-header">
-        <div class="d-flex justify-space-between align-center">
-          <h3 class="text-white">Menu</h3>
-          <v-btn icon @click="drawer = false" :color="primaryColor" class="close-btn">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </div>
-      </div>
-
-      <v-divider class="my-2 bg-grey-darken-3"></v-divider>
-
-      <v-list color="black">
-        <v-list-item
-          v-for="item in menuItems"
-          :key="item.title"
-          :to="item.path"
-          :active="isActive(item.path)"
-          :color="primaryColor"
-          class="drawer-list-item"
-          link
-        >
-          <template v-slot:title>
-            <span class="text-h6">{{ item.title }}</span>
-          </template>
-          <template v-slot:append v-if="item.count">
-            <span class="  count-badge" :style="{ color: primaryColor }">{{ item.count }}</span>
-          </template>
-        </v-list-item>
-
-        <v-divider class="my-4 bg-grey-darken-3"></v-divider>
-
-        <!-- <v-list-item color="white" @click="themeStore.toggleDarkMode()" class="theme-toggle-item">
-          <template v-slot:prepend>
-            <v-icon color="white">
-              {{ themeStore.darkMode ? "mdi-weather-sunny" : "mdi-weather-night" }}
-            </v-icon>
-          </template>
-          <template v-slot:title>
-            <span class="text-body-1">Toggle Theme</span>
-          </template>
-        </v-list-item> -->
-      </v-list>
-    </v-navigation-drawer>
+   
   </div>
 </template>
 
 <style scoped>
+.border-primary {
+  border-color: v-bind(primaryColor);
+}
+
+.border-primary-pages:hover {
+  border-bottom: 5px solid v-bind(primaryColor);
+}
+
 .nav-container {
   width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background-color 0.3s ease;
 }
 
 .main-nav {
-  background-color: #111;
-  height: 150px;
-  border-bottom: 1px solid #333;
-  transition: height 0.3s ease;
+  height: 80px;
+  transition: all 0.3s ease;
 }
 
 .mobile-nav {
-  height: 80px !important;
+  height: 60px !important;
 }
 
 .logo-section {
-  background-color: #000000;
   height: 100%;
   display: flex;
   align-items: center;
 }
 
+.logo-link {
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.logo-link:hover {
+  transform: scale(1.05);
+}
+
+.menu-container {
+  max-width: 800px;
+  margin: 0 auto;
+  justify-content: center;
+}
+
 .menu-item-col {
   height: 100%;
-  border-right: 1px solid #333;
-  border-left: 1px solid #333;
-  color: white;
+  padding: 0 2rem;
+  color: v-bind('themeStore.darkMode ? "white" : "black"');
   cursor: pointer;
-  background-color: black;
   position: relative;
+  transition: all 0.3s ease;
   overflow: hidden;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.border-primary {
-  border-color: v-bind(primaryColor) !important;
-}
-
-.menu-item-col:hover {
-  border-bottom: 2px solid v-bind(primaryColor) !important;
+.menu-item {
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .active-menu-item {
@@ -249,23 +245,21 @@ onUnmounted(() => {
   }
 }
 
-.menu-item {
-  height: 100%;
-  position: relative;
-  z-index: 1;
+.count-text {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
 }
 
-.count-text {
-  font-size: 16px;
+.menu-item-col:hover .count-text {
+  opacity: 1;
 }
 
 .hamburger-section {
-  background-color: #111;
-  color: white;
   height: 100%;
   display: flex;
   align-items: center;
-  border-right: 1px solid #333;
+  padding-right: 1rem;
 }
 
 .hamburger-btn {
@@ -276,18 +270,16 @@ onUnmounted(() => {
   transform: scale(1.1);
 }
 
-.styles-section {
-  background-color: #111;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
 .logo-image {
   max-width: 150px;
   height: auto;
-  display: block; /* Ensures the image is visible */
   transition: max-width 0.3s ease;
+}
+
+.mobile-drawer {
+  background: rgba(0, 0, 0, 0.98) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .drawer-header {
@@ -296,10 +288,9 @@ onUnmounted(() => {
 }
 
 .drawer-list-item {
-  margin-bottom: 8px;
-  padding: 16px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  margin: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .drawer-list-item:hover {
@@ -311,25 +302,17 @@ onUnmounted(() => {
 }
 
 .count-badge {
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 14px;
+  background-color: v-bind(primaryColor);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
-.theme-toggle-item {
-  margin-top: 8px;
-}
-
-/* Media queries for responsive design */
 @media (max-width: 960px) {
   .logo-image {
     max-width: 120px;
-  }
-
-  .menu-item-col {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
   }
 }
 
@@ -337,13 +320,9 @@ onUnmounted(() => {
   .logo-image {
     max-width: 100px;
   }
-
-  .logo-section {
-    padding-left: 8px;
-  }
-
-  .count-text {
-    font-size: 14px;
+  
+  .main-nav {
+    height: 60px;
   }
 }
 
@@ -351,9 +330,17 @@ onUnmounted(() => {
   .logo-image {
     max-width: 90px;
   }
+}
 
-  .hamburger-section {
-    padding-right: 8px;
-  }
+.theme-toggle-section {
+  padding-right: 1rem;
+}
+
+.theme-toggle-btn {
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.1);
 }
 </style>

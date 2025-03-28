@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted, computed } from "vue";
 import { useSittingsStore } from "../stores/sittings";
+import { useThemeStore } from '../stores/theme.js';
 
 const props = defineProps({
   initialSearchQuery: {
@@ -9,6 +10,7 @@ const props = defineProps({
   },
 });
 const settingsStore = useSittingsStore();
+const themeStore = useThemeStore();
 
 const emit = defineEmits([
   "search",
@@ -221,7 +223,7 @@ onMounted(() => {
   document.addEventListener("click", handleClickOutside);
   checkScreenSize();
   window.addEventListener("resize", checkScreenSize);
-  settingsStore.getColorFromLocalStorage();
+  
 });
 
 onUnmounted(() => {
@@ -231,22 +233,40 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="search-filters bg-black dark:bg-black text-white">
+  <div 
+    class="search-filters" 
+    :class="{ 
+      'bg-black': themeStore.darkMode, 
+      'bg-white': !themeStore.darkMode 
+    }"
+    :style="{ 
+      color: themeStore.darkMode ? 'white' : 'black',
+      transition: 'background-color 0.3s ease, color 0.3s ease'
+    }"
+  >
     <!-- Search Bar Row - Always visible -->
     <div class="py-3 md:py-4 border-b border-primary">
       <v-container>
         <div class="flex items-center">
           <div class="search-box flex items-center flex-grow">
-            <v-icon class="mr-2 text-gray-500" :color="selectedColor"
-              >mdi-magnify</v-icon
-            >
-            <input
+            <v-text-field
               v-model="searchQuery"
-              type="text"
               placeholder="Search"
-              class="bg-transparent border-none outline-none text-white w-full"
-              :style="{ 'caret-color': selectedColor }"
-            />
+              variant="outlined"
+              density="comfortable"
+              hide-details
+              class="search-input"
+              :color="selectedColor"
+              :bg-color="themeStore.darkMode ? 'black' : 'white'"
+              :style="{ 
+                'caret-color': selectedColor,
+                color: themeStore.darkMode ? 'white' : 'black'
+              }"
+            >
+              <template v-slot:prepend-inner>
+                <v-icon :color="selectedColor">mdi-magnify</v-icon>
+              </template>
+            </v-text-field>
           </div>
 
           <!-- Mobile Filter Toggle -->
@@ -275,16 +295,14 @@ onUnmounted(() => {
                 variant="outlined"
                 density="comfortable"
                 class="category-select"
-                bg-color="black"
+                :bg-color="themeStore.darkMode ? 'black' : 'white'"
                 hide-details
                 label="Category"
                 clearable
                 :color="selectedColor"
               >
                 <template v-slot:selection="{ item }">
-                  <span :style="{ color: selectedColor }">{{
-                    item.raw.text
-                  }}</span>
+                  <span :style="{ color: selectedColor }">{{ item.raw.text }}</span>
                 </template>
               </v-select>
             </div>
@@ -300,23 +318,19 @@ onUnmounted(() => {
                 variant="outlined"
                 density="comfortable"
                 class="color-select"
-                bg-color="black"
+                :bg-color="themeStore.darkMode ? 'black' : 'white'"
                 hide-details
                 label="Color"
                 :color="selectedColor"
               >
                 <template v-slot:selection="{ item }">
-                  <span :style="{ color: selectedColor }">{{
-                    item.raw.text
-                  }}</span>
+                  <span :style="{ color: selectedColor }">{{ item.raw.text }}</span>
                 </template>
               </v-select>
             </div>
 
             <!-- Font Size (Desktop) -->
             <div class="ml-auto flex items-center">
-              <!-- Replace the custom dropdown with v-select -->
-
               <div class="mr-4 ml-4 w-24">
                 <v-select
                   v-model="fontSize"
@@ -326,16 +340,14 @@ onUnmounted(() => {
                   variant="outlined"
                   density="compact"
                   class="font-size-select"
-                  bg-color="black"
+                  :bg-color="themeStore.darkMode ? 'black' : 'white'"
                   hide-details
                   :color="selectedColor"
                   label="Font Size"
                   @update:model-value="updateFontSize"
                 >
                   <template v-slot:selection="{ item }">
-                    <span :style="{ color: selectedColor }">{{
-                      item.raw.label
-                    }}</span>
+                    <span :style="{ color: selectedColor }">{{ item.raw.label }}</span>
                   </template>
                 </v-select>
               </div>
@@ -356,9 +368,7 @@ onUnmounted(() => {
                   thumb-label
                   @update:model-value="updateFontSize"
                 ></v-slider>
-                <span class="pl-4" :style="{ color: selectedColor }">{{
-                  fontSizeText
-                }}</span>
+                <span class="pl-4" :style="{ color: selectedColor }">{{ fontSizeText }}</span>
               </div>
             </div>
           </div>
@@ -369,8 +379,16 @@ onUnmounted(() => {
     <!-- Mobile Filter Panel - Collapsible -->
     <div
       v-if="isMobile"
-      class="mobile-filter-panel bg-black"
-      :class="{ 'panel-open': isFilterPanelOpen }"
+      class="mobile-filter-panel"
+      :class="{ 
+        'panel-open': isFilterPanelOpen,
+        'bg-black': themeStore.darkMode,
+        'bg-white': !themeStore.darkMode
+      }"
+      :style="{ 
+        color: themeStore.darkMode ? 'white' : 'black',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }"
     >
       <v-container>
         <!-- Categories and Properties in mobile view -->
@@ -387,16 +405,14 @@ onUnmounted(() => {
                 variant="outlined"
                 density="comfortable"
                 class=" "
-                bg-color="black"
+                :bg-color="themeStore.darkMode ? 'black' : 'white'"
                 hide-details
                 label="Category"
                 clearable
                 :color="selectedColor"
               >
-                <template v-slot:selection="{ item }">
-                  <span :style="{ color: selectedColor }">{{
-                    item.raw.text
-                  }}</span>
+              <template v-slot:selection="{ item }">
+                  <span :style="{ color: selectedColor }">{{ item.raw.text }}</span>
                 </template>
               </v-select>
             </div>
@@ -412,7 +428,7 @@ onUnmounted(() => {
                 variant="outlined"
                 density="comfortable"
                 class=""
-                bg-color="black"
+                :bg-color="themeStore.darkMode ? 'black' : 'white'"
                 hide-details
                 label="Color"
                 :color="selectedColor"
@@ -452,15 +468,24 @@ onUnmounted(() => {
         <div class="py-3 border-b border-primary">
           <span class="text-gray-400 text-sm mb-1 block">Sample Text</span>
           <div class="flex items-center w-full">
-            <v-icon class="mr-2" :color="selectedColor">mdi-pencil</v-icon>
-            <input
+            <v-text-field
               v-model="sampleText"
-              type="text"
               placeholder="Type your sample text here"
-              class="bg-transparent border-none outline-none text-white w-full p-2"
-              @input="updateSampleText"
-              :style="{ 'caret-color': selectedColor }"
-            />
+              variant="outlined"
+              density="comfortable"
+              hide-details
+              class="sample-text-input"
+              :color="selectedColor"
+              :bg-color="themeStore.darkMode ? 'black' : 'white'"
+              :style="{ 
+                'caret-color': selectedColor,
+                color: themeStore.darkMode ? 'white' : 'black'
+              }"
+            >
+              <template v-slot:prepend-inner>
+                <v-icon :color="selectedColor">mdi-pencil</v-icon>
+              </template>
+            </v-text-field>
           </div>
         </div>
 
@@ -547,7 +572,7 @@ onUnmounted(() => {
         <!-- Reset Button Mobile -->
         <div class="py-3 flex justify-center">
           <v-btn
-            variant="outlined"
+            :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
             :color="selectedColor"
             class="px-6"
             @click="resetAll"
@@ -563,15 +588,24 @@ onUnmounted(() => {
       <v-container>
         <div class="flex items-center">
           <div class="flex items-center flex-grow">
-            <v-icon class="mr-2" :color="selectedColor">mdi-pencil</v-icon>
-            <input
+            <v-text-field
               v-model="sampleText"
-              type="text"
               placeholder="Type your sample text here"
-              class="bg-transparent border-none outline-none text-white w-full"
-              @input="updateSampleText"
-              :style="{ 'caret-color': selectedColor }"
-            />
+              variant="outlined"
+              density="comfortable"
+              hide-details
+              class="sample-text-input"
+              :color="selectedColor"
+              :bg-color="themeStore.darkMode ? 'black' : 'white'"
+              :style="{ 
+                'caret-color': selectedColor,
+                color: themeStore.darkMode ? 'white' : 'black'
+              }"
+            >
+              <template v-slot:prepend-inner>
+                <v-icon :color="selectedColor">mdi-pencil</v-icon>
+              </template>
+            </v-text-field>
           </div>
 
           <!-- Text Type Selector -->
@@ -644,7 +678,7 @@ onUnmounted(() => {
           <!-- Reset All -->
           <div class="ml-6">
             <v-btn
-              variant="outlined"
+              :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
               :color="selectedColor"
               class="text-caption"
               @click="resetAll"
@@ -774,5 +808,35 @@ input::placeholder {
   padding-top: 0;
   padding-bottom: 0;
   min-height: 32px;
+}
+
+.search-filters {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.mobile-filter-panel {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.search-input :deep(.v-field__input),
+.sample-text-input :deep(.v-field__input) {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 32px;
+}
+
+.search-input :deep(.v-field__prepend-inner),
+.sample-text-input :deep(.v-field__prepend-inner) {
+  padding-right: 8px;
+}
+
+.search-input :deep(.v-field),
+.sample-text-input :deep(.v-field) {
+  background: transparent !important;
+}
+
+.search-input :deep(.v-field__outline),
+.sample-text-input :deep(.v-field__outline) {
+  --v-field-border-width: 0;
 }
 </style>
