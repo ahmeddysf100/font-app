@@ -493,7 +493,7 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
               variant="text"
               class="text-caption px-2"
               :active="viewMode === 'list'"
-              :active-color="primaryColor"
+              active-color="primary"
               @click="viewMode = 'list'"
             >
               List view
@@ -503,7 +503,7 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
               variant="text"
               class="text-caption px-2"
               :active="viewMode === 'grid'"
-              :active-color="primaryColor"
+              active-color="primary"
               @click="viewMode = 'grid'"
             >
               Grid view
@@ -540,7 +540,7 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
               variant="text"
               class="text-caption px-2"
               :active="sortBy === 'new'"
-              :active-color="primaryColor"
+              active-color="primary"
               @click="sortBy = 'new'"
             >
               New
@@ -550,7 +550,7 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
               variant="text"
               class="text-caption px-2"
               :active="sortBy === 'favorite'"
-              :active-color="primaryColor"
+              active-color="primary"
               @click="sortBy = 'favorite'"
             >
               Favorite
@@ -560,7 +560,7 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
               variant="text"
               class="text-caption px-2"
               :active="sortBy === 'alphabetical'"
-              :active-color="primaryColor"
+              active-color="primary"
               @click="sortBy = 'alphabetical'"
             >
               Alphabetical
@@ -610,8 +610,8 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
         >
           <p class="text-gray-400 text-lg">No fonts match your filters</p>
           <v-btn 
-            :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
-            :color="primaryColor" 
+            variant="outlined"
+            color="primary" 
             class="mt-4" 
             @click="handleReset"
           >

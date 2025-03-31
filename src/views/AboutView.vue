@@ -289,7 +289,7 @@ onMounted(async () => {
   scrollObserver = initScrollReveal();
 
   // Set initial divider color
-  updateDividerColor();
+  // updateDividerColor();
 });
 
 // Remove event listener on unmount
@@ -367,7 +367,7 @@ watch([currentFontIndex], () => {
 watch(
   () => themeStore.darkMode,
   () => {
-    updateDividerColor();
+    // updateDividerColor();
   }
 );
 </script>
@@ -395,13 +395,12 @@ watch(
       <div
         class="font-info"
         :style="{
-          color: themeStore.darkMode ? 'rgba(255, 255, 255, 0.9)' : '#000',
+          color: themeStore.darkMode ? 'white' : 'black',
           transition: 'color 0.3s ease',
         }"
       >
         <v-chip
-          :style="{ backgroundColor: primaryColor }"
-          :class="['current-font-chip', { pulse: isFontChanging }]"
+          :class="['current-font-chip bg-primary', { pulse: isFontChanging }]"
           variant="elevated"
           size="large"
         >
@@ -427,7 +426,7 @@ watch(
           v-for="(font, index) in arabicFonts"
           :key="font.id"
           class="font-indicator "
-          :class="{ active: index === currentFontIndex, 'bg-black': themeStore.darkMode, 'bg-white': themeStore.darkMode }"
+          :class="{ active: index === currentFontIndex, 'bg-primary': index === currentFontIndex, 'bg-black': themeStore.darkMode, 'bg-white': themeStore.darkMode }"
           
           @click="currentFontIndex = index"
         ></div>
@@ -474,7 +473,7 @@ watch(
                 >
                   What Is Kotype!
                 </h2>
-                <div class="title-underline"></div>
+                <div class="title-underline bg-primary"></div>
               </div>
               <div
                 class="section-text"
@@ -502,15 +501,14 @@ watch(
             </div>
           </v-col>
         </v-row>
+        <div class=" divider-fancy text-primary" style="visibility: visible; display: block;"></div>
       </v-container>
     </section>
 
-    <div class="my-8 divider-fancy" style="visibility: visible; display: block;"></div>
 
 
     <!-- Content Section -->
     <section
-      class="content-section"
       :class="{
         'bg-black': themeStore.darkMode,
         'bg-card': !themeStore.darkMode,
@@ -535,7 +533,7 @@ watch(
                   >
                     Our Mission
                   </h2>
-                  <div class="title-underline"></div>
+                  <div class="title-underline bg-primary"></div>
                 </div>
                 <div
                   class="section-text"
@@ -546,8 +544,8 @@ watch(
                     transition: 'color 0.3s ease',
                   }"
                 >
-                  <div class="quote-block">
-                    <v-icon color="white" class="quote-icon"
+                  <div class="quote-block bg-primary">
+                    <v-icon  class="quote-icon text-white"
                       >mdi-format-quote-open</v-icon
                     >
                     <p class="mission-quote ">
@@ -556,7 +554,7 @@ watch(
                         man to fish, and you feed him for a lifetime.</em
                       >
                     </p>
-                    <v-icon color="white" class="quote-icon quote-close"
+                    <v-icon  class="quote-icon quote-close text-white"
                       >mdi-format-quote-close</v-icon
                     >
                   </div>
@@ -581,7 +579,7 @@ watch(
                   >
                     Our Vision
                   </h2>
-                  <div class="title-underline"></div>
+                  <div class="title-underline bg-primary"></div>
                 </div>
                 <div
                   class="section-text"
@@ -614,7 +612,7 @@ watch(
                   >
                     Honestly
                   </h2>
-                  <div class="title-underline"></div>
+                  <div class="title-underline bg-primary"></div>
                 </div>
                 <div
                   class="section-text"
@@ -642,7 +640,7 @@ watch(
               </div>
             </div>
 
-            <div class="my-8 divider-fancy" style="visibility: visible; display: block;"></div>
+            <div class="my-8 divider-fancy text-primary" style="visibility: visible; display: block;"></div>
 
             <div class="section mb-5 scroll-reveal">
               <div class="section-heading">
@@ -656,7 +654,7 @@ watch(
                   >
                     Font License
                   </h2>
-                  <div class="title-underline"></div>
+                  <div class="title-underline bg-primary"></div>
                 </div>
                 <div
                   class="section-text"
@@ -689,10 +687,9 @@ watch(
                     >
                       <template v-slot:prepend>
                         <div
-                          class="license-icon-container"
-                          :style="{ backgroundColor: primaryColor }"
+                          class="license-icon-container "
                         >
-                          <v-icon color="black" size="small"
+                          <v-icon class="text-primary" size="25"
                             >mdi-checkbox-marked-circle</v-icon
                           >
                         </div>
@@ -744,7 +741,7 @@ watch(
                   >
                     Support Us
                   </h2>
-                  <div class="title-underline"></div>
+                  <div class="title-underline bg-primary"></div>
                 </div>
                 <div
                   class="section-text"
@@ -769,7 +766,7 @@ watch(
             <div class="donate-section scroll-reveal">
               <div class="donate-container">
                 <div class="donate-content">
-                  <v-icon size="48" color="pink" class="donate-icon"
+                  <v-icon size="48" class="donate-icon text-primary"
                     >mdi-heart</v-icon
                   >
                   <h3 class="donate-title">Support Kotype</h3>
@@ -777,7 +774,7 @@ watch(
                     Help us continue creating and sharing beautiful Arabic fonts
                   </p>
                   <v-btn
-                    color="pink"
+                    color="primary"
                     variant="elevated"
                     size="x-large"
                     class="donate-btn"
@@ -803,7 +800,7 @@ watch(
                   >
                     About the Team
                   </h2>
-                  <div class="title-underline"></div>
+                  <div class="title-underline bg-primary"></div>
                 </div>
                 <div
                   class="section-text"
@@ -834,10 +831,13 @@ watch(
                         <v-btn
                           href="https://www.heyporterposter.com/"
                           target="_blank"
-                          variant="text"
-                          class="pa-0 text-decoration-underline"
-                          color="inherit"
+                          variant="outlined"
+                          class="team-member-btn"
+                          color="primary"
+                          elevation="0"
+                          rounded
                         >
+                          <v-icon start size="small">mdi-account</v-icon>
                           Hey Porter! (Tawfiq Dawi)
                         </v-btn>
                       </li>
@@ -845,10 +845,13 @@ watch(
                         <v-btn
                           href="http://abdomohamed.com/"
                           target="_blank"
-                          variant="text"
-                          class="pa-0 text-decoration-underline"
-                          color="inherit"
+                          variant="outlined"
+                          class="team-member-btn"
+                          color="primary"
+                          elevation="0"
+                          rounded
                         >
+                          <v-icon start size="small">mdi-account</v-icon>
                           Abdo Mohamed
                         </v-btn>
                       </li>
@@ -856,10 +859,13 @@ watch(
                         <v-btn
                           href="https://www.instagram.com/ibrohamdi/"
                           target="_blank"
-                          variant="text"
-                          class="pa-0 text-decoration-underline"
-                          color="inherit"
+                          variant="outlined"
+                          class="team-member-btn"
+                          color="primary"
+                          elevation="0"
+                          rounded
                         >
+                          <v-icon start size="small">mdi-instagram</v-icon>
                           Ibrahim Hamdi
                         </v-btn>
                       </li>
@@ -891,7 +897,7 @@ watch(
               :key="font.id"
               variant="outlined"
               class="font-tag"
-              color="pink"
+              color="primary"
               @click="router.push(`/fonts/${font.id}`)"
             >
               {{ font.name }}
@@ -944,13 +950,9 @@ watch(
   color: rgba(255, 255, 255, 0.95);
 }
 
-.dark-theme .license-list :deep(.v-list-item-title) {
-  color: rgba(255, 255, 255, 0.9);
-}
 
-.dark-theme .team-members li {
-  background-color: rgba(255, 255, 255, 0.1);
-}
+
+
 
  
 
@@ -958,17 +960,11 @@ watch(
   color: rgba(255, 255, 255, 0.9);
 }
 
-.dark-theme .quote-block {
-  background-color: rgba(255, 255, 255, 0.05);
-}
 
-.dark-theme .team-highlight {
-  background-color: rgba(255, 255, 255, 0.05);
-}
 
-.dark-theme .donate-text {
-  color: rgba(255, 255, 255, 0.9);
-}
+
+
+
 
 .section-text,
 .quote-translation,
@@ -1091,8 +1087,7 @@ watch(
 }
 
 .font-indicator.active {
-  background-color:   v-bind(primaryColor) !important;
-  transform: scale(1.2);
+    transform: scale(1.2);
 }
 
 /* Header Section - IMPROVED */
@@ -1101,7 +1096,6 @@ watch(
   background-color: var(--section-bg-color, #f8f8f8);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--section-shadow, 0 5px 15px rgba(0, 0, 0, 0.03));
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1154,7 +1148,6 @@ watch(
 
 /* Content Section - IMPROVED */
 .content-section {
-  padding: 60px 0;
   position: relative;
   z-index: 1;
 }
@@ -1197,15 +1190,14 @@ watch(
 
 .section-title {
   display: inline-block;
-  background-color: var(--accent-color, v-bind(primaryColor));
   color: white;
   padding: 10px 25px;
   border-radius: 30px;
   font-size: 1.6rem;
   margin-bottom: 5px;
   position: relative;
+  @apply bg-primary;
   z-index: 2;
-  box-shadow: 0 4px 15px var(--accent-medium-color, rgba(255, 105, 180, 0.2));
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1284,7 +1276,6 @@ watch(
 } */
 
 .license-icon-container {
-  background-color: var(--accent-light-color, v-bind(primaryColor));
 
   width: 24px;
   height: 24px;
@@ -1299,7 +1290,6 @@ watch(
 .license-list :deep(.v-list-item-title) {
   white-space: normal;
   line-height: 1.6;
-  color: var(--text-color, #111);
   transition: color 0.3s ease;
 }
 
@@ -1354,7 +1344,6 @@ watch(
 }
 
 .team-highlight {
-  background-color: var(--accent-light-color, v-bind(primaryColor));
   border-radius: 12px;
   padding: 20px;
   margin-top: 20px;
@@ -1371,7 +1360,6 @@ watch(
 }
 
 .team-members li {
-  background-color: var(--accent-light-color, v-bind(primaryColor));
   padding: 8px 15px;
   border-radius: 20px;
   display: inline-block;
@@ -1387,7 +1375,6 @@ watch(
 }
 
 .team-members li:hover {
-  background-color: var(--accent-medium-color, v-bind(primaryColor));
   transform: translateY(-2px);
 }
 
@@ -1419,8 +1406,7 @@ watch(
 .font-tag {
   transition: all 0.3s ease;
   cursor: pointer;
-  color: var(--accent-color, v-bind(primaryColor)) !important;
-  border-color: var(--accent-color, v-bind(primaryColor)) !important;
+  
 }
 
 .font-tag:hover {
@@ -1466,9 +1452,7 @@ watch(
     margin-bottom: 20px;
   }
 
-  .content-section {
-    padding: 40px 0;
-  }
+ 
 
   .section-title {
     font-size: 1.3rem;
@@ -1530,11 +1514,7 @@ watch(
 .donate-section {
   margin: 60px 0;
   padding: 40px 0;
-  background: linear-gradient(
-    135deg,
-    var(--accent-light-color, v-bind(primaryColor)) 0%,
-    rgba(255, 105, 180, 0.1) 100%
-  );
+ 
   border-radius: 20px;
   transition: all 0.3s ease;
 }
@@ -1557,14 +1537,12 @@ watch(
 
 .donate-title {
   font-size: 2rem;
-  color: var(--accent-color, v-bind(primaryColor));
   margin-bottom: 15px;
   font-weight: 600;
 }
 
 .donate-text {
   font-size: 1.2rem;
-  color: var(--text-color, #111);
   margin-bottom: 30px;
   opacity: 0.9;
 }

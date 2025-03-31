@@ -580,7 +580,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="font-card-container relative transition-all overflow-hidden"
+    class="font-card-container relative transition-all overflow-hidden  "
     :class="{
       'options-active': showOptions,
     }"
@@ -600,7 +600,7 @@ onUnmounted(() => {
       }"
     >
       <div
-        class="px-6 py-4 flex flex-wrap justify-between items-center border-b-2 border-primary"
+        class="px-6 py-4 flex flex-wrap justify-between items-center border-b-2 border-primary-js"
       >
         <div>
           <h3
@@ -622,7 +622,7 @@ onUnmounted(() => {
                 }"
                 >{{ selectedStyle?.title || "Regular" }}</span
               >
-              <span v-if="styleOptions.length > 1" class="style-count ml-2">
+              <span v-if="styleOptions.length > 1" class="style-count ml-2 text-primary border-[1.5px] border-primary rounded-full px-2 py-0.5">
                 +{{ styleOptions.length - 1 }}
               </span>
             </span>
@@ -657,9 +657,9 @@ onUnmounted(() => {
                   class="slider-thumb compact-slider"
                   hide-details
                   density="compact"
-                  :color="primaryColor"
-                  :thumb-color="primaryColor"
-                  :track-color="primaryColor"
+                  color="primary"
+                  thumb-color="primary"
+                  track-color="primary"
                   @click.stop
                   thumb-label="hover"
                 >
@@ -690,9 +690,9 @@ onUnmounted(() => {
                   class="slider-thumb compact-slider"
                   hide-details
                   density="compact"
-                  :color="primaryColor"
-                  :thumb-color="primaryColor"
-                  :track-color="primaryColor"
+                  color="primary"
+                  thumb-color="primary"
+                  track-color="primary"
                   @click.stop
                   thumb-label="hover"
                 >
@@ -724,9 +724,9 @@ onUnmounted(() => {
                   class="slider-thumb compact-slider"
                   hide-details
                   density="compact"
-                  :color="primaryColor"
-                  :thumb-color="primaryColor"
-                  :track-color="primaryColor"
+                  color="primary"
+                  thumb-color="primary"
+                  track-color="primary"
                   @click.stop
                   thumb-label="hover"
                 >
@@ -751,8 +751,9 @@ onUnmounted(() => {
                 <v-btn
                   icon
                   variant="text"
-                  :color="primaryColor"
-                  v-bind="props"
+                  active-color="primary"
+                  :active="showStyleMenu"
+                   v-bind="props"
                   @click.stop
                   class="style-btn"
                 >
@@ -760,7 +761,7 @@ onUnmounted(() => {
                 </v-btn>
               </template>
               <v-list
-                class="style-list   border border-gray-700 rounded pa-2"
+                class="style-list bg-black  border border-gray-700 rounded pa-2"
                 max-height="300"
               >
                 <v-list-item
@@ -772,24 +773,22 @@ onUnmounted(() => {
                     showStyleMenu = false;
                   "
                   :active="selectedStyle && selectedStyle.title === style.title"
-                  class="style-list-item rounded mb-1 px-3 py-1 "
+                  class="style-list-item rounded mb-1 px-3 py-1 text-primary "
                   :class="{
                     'style-list-item-active':
                       selectedStyle && selectedStyle.title === style.title,
                     'style-list-item-variable': style.isVariable,
                   }"
-                  :style="{
-                    color: primaryColor,
-                  }"
+                  
                 >
                   <template v-slot:prepend>
-                    <div class="radio-circle  mr-2 border border-primary">
+                    <div class="radio-circle  mr-2 border border-primary-js">
                       <div
                         v-if="
                           selectedStyle && selectedStyle.title === style.title
                         "
                         class="radio-dot"
-                        :style="{ 'background-color': primaryColor }"
+                        :style="{ 'background-color': '#ffc107' }"
                       ></div>
                     </div>
                   </template>
@@ -799,8 +798,8 @@ onUnmounted(() => {
                       v-if="style.isVariable"
                       class="variable-badge"
                       :style="{
-                        color: primaryColor,
-                        'background-color': `${primaryColor}50`,
+                        color: '#ffc107',
+                        'background-color': `#ffc10750`,
                         'border-radius': '8px',
                       }"
                       >Variable</span
@@ -815,7 +814,8 @@ onUnmounted(() => {
           <v-btn
             icon
             variant="text"
-            :color="primaryColor"
+            active-color="primary"
+            :active="showOptions"
             class="mr-2"
             @click.stop="toggleOptions"
           >
@@ -826,7 +826,7 @@ onUnmounted(() => {
           <v-btn
             icon
             variant="text"
-            :color="isFavorite ? 'yellow' : primaryColor"
+            :color="isFavorite ? 'primary' : ''"
             class="mr-2"
             @click.stop="addToFavorites"
           >
@@ -834,9 +834,9 @@ onUnmounted(() => {
           </v-btn>
           <v-btn
             icon
+            class=" hover:text-primary"
             variant="text"
-            :color="primaryColor"
-            @click.stop="viewFontDetail"
+             @click.stop="viewFontDetail"
           >
             <v-icon>mdi-arrow-top-right</v-icon>
           </v-btn>
@@ -858,7 +858,8 @@ onUnmounted(() => {
                   <v-btn
                     icon
                     variant="text"
-                    :color="primaryColor"
+                    active-color="primary"
+                    :active="showStyleMenuMobile"
                     v-bind="props"
                     @click.stop
                     class="style-btn"
@@ -883,24 +884,22 @@ onUnmounted(() => {
                     :active="
                       selectedStyle && selectedStyle.title === style.title
                     "
-                    class="style-list-item rounded mb-1 px-3 py-1"
+                    class="style-list-item rounded mb-1 px-3 py-1 text-primary"
                     :class="{
                       'style-list-item-active':
                         selectedStyle && selectedStyle.title === style.title,
                       'style-list-item-variable': style.isVariable,
                     }"
-                    :style="{
-                      color: primaryColor,
-                    }"
+                
                   >
                     <template v-slot:prepend>
-                      <div class="radio-circle mr-2 border border-primary" >
+                      <div class="radio-circle mr-2 border border-primary-js" >
                         <div
                           v-if="
                             selectedStyle && selectedStyle.title === style.title
                           "
                           class="radio-dot "
-                          :style="{ 'background-color': primaryColor }"
+                          :style="{ 'background-color': '#ffc107' }"
                         ></div>
                       </div>
                     </template>
@@ -910,8 +909,8 @@ onUnmounted(() => {
                         v-if="style.isVariable"
                         class="variable-badge"
                         :style="{
-                          color: primaryColor,
-                          'background-color': `${primaryColor}50`,
+                          color: '#ffc107',
+                            'background-color': `#ffc10750`,
                           'border-radius': '8px',
                         }"
                         >Variable</span
@@ -926,7 +925,8 @@ onUnmounted(() => {
             <v-btn
               icon
               variant="text"
-              :color="primaryColor"
+              active-color="primary"
+              :active="showOptions"
               class="mr-2"
               @click.stop="toggleOptions"
             >
@@ -937,7 +937,7 @@ onUnmounted(() => {
             <v-btn
               icon
               variant="text"
-              :color="isFavorite ? 'yellow' : primaryColor"
+              :color="isFavorite ? 'primary' : ''"
               class="mr-2"
               @click.stop="addToFavorites"
             >
@@ -950,7 +950,7 @@ onUnmounted(() => {
             <v-btn
               icon
               variant="text"
-              :color="primaryColor"
+              class="hover:text-primary"
               @click.stop="viewFontDetail"
             >
               <v-icon>mdi-arrow-top-right</v-icon>
@@ -1004,6 +1004,18 @@ onUnmounted(() => {
         ></p>
       </div>
 
+      <!-- Designer Info -->
+      <div
+        v-if="font.designer"
+        class="designer-info flex justify-between items-center px-6 py-3 border-t border-primary-js"
+        :class="{
+          'text-gray-400': themeStore.darkMode,
+          'text-gray-600': !themeStore.darkMode,
+        }"
+      >
+        <div class="text-sm">Designed by {{ font.designer }}</div>
+      </div>
+
       <!-- Font Options Panel (Integrated within card) -->
       <div
         v-show="showOptions"
@@ -1025,9 +1037,9 @@ onUnmounted(() => {
                     step="1"
                     class="slider-thumb flex-grow"
                     density="compact"
-                    :color="primaryColor"
-                    :thumb-color="primaryColor"
-                    :track-color="primaryColor"
+                    color="primary"
+                    thumb-color="primary"
+                    track-color="primary"
                     hide-details
                     @update:model-value="updateFontSize"
                     thumb-label
@@ -1060,9 +1072,9 @@ onUnmounted(() => {
                     step="100"
                     class="slider-thumb flex-grow"
                     density="compact"
-                    :color="primaryColor"
-                    :thumb-color="primaryColor"
-                    :track-color="primaryColor"
+                    color="primary"
+                    thumb-color="primary"
+                    track-color="primary"
                     hide-details
                     @update:model-value="updateFontWeight"
                     thumb-label
@@ -1083,11 +1095,8 @@ onUnmounted(() => {
             <!-- Variable Font Controls for mobile -->
             <div
               v-if="isVariableFont && hasVariableFontAxes"
-              class="variable-font-controls border-b border-primary border-gray-700 pb-4 mb-4"
-              :class="{
-                'bg-card': themeStore.darkMode,
-                'bg-white': !themeStore.darkMode,
-              }"
+              class="variable-font-controls border-b border-primary-js border-gray-700 pb-4 mb-4"
+             
             >
               <div class="text-white text-sm font-medium mb-3">
                 Variable Font Controls
@@ -1117,9 +1126,9 @@ onUnmounted(() => {
                       :step="axis.step"
                       class="slider-thumb flex-grow"
                       density="compact"
-                      :color="primaryColor"
-                      :thumb-color="primaryColor"
-                      :track-color="primaryColor"
+                      color="primary"
+                      thumb-color="primary"
+                      track-color="primary"
                       hide-details
                       thumb-label
                     >
@@ -1156,9 +1165,9 @@ onUnmounted(() => {
               step="0.05"
               class="slider-thumb flex-grow"
               density="compact"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
-              :track-color="primaryColor"
+              color="primary"
+              thumb-color="primary"
+              track-color="primary"
               hide-details
               @update:model-value="updateLeading"
             >
@@ -1191,9 +1200,9 @@ onUnmounted(() => {
               step="0.5"
               class="slider-thumb flex-grow"
               density="compact"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
-              :track-color="primaryColor"
+              color="primary"
+              thumb-color="primary"
+              track-color="primary"
               hide-details
               @update:model-value="updateTracking"
             >
@@ -1230,7 +1239,7 @@ onUnmounted(() => {
                   size="small"
                   class="touch-btn"
                   :active="textAlign === 'left'"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   @click="textAlign = 'left'"
                 ></v-btn>
                 <v-btn
@@ -1240,7 +1249,7 @@ onUnmounted(() => {
                   size="small"
                   class="touch-btn"
                   :active="textAlign === 'center'"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   @click="textAlign = 'center'"
                 ></v-btn>
                 <v-btn
@@ -1250,7 +1259,7 @@ onUnmounted(() => {
                   size="small"
                   class="touch-btn"
                   :active="textAlign === 'right'"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   @click="textAlign = 'right'"
                 ></v-btn>
               </div>
@@ -1263,7 +1272,8 @@ onUnmounted(() => {
                 <v-btn
                   :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
                   size="small"
-                  :color="primaryColor"
+                  active-color="primary"
+                  :active="isAllCaps"
                   class="text-transform-btn"
                   :class="{ 'btn-active': isAllCaps }"
                   @click="toggleAllCaps"
@@ -1273,7 +1283,7 @@ onUnmounted(() => {
                       : 'transparent',
                   }"
                 >
-                  <span class="font-bold mr-2" :style="{ color: primaryColor }"
+                  <span class="font-bold mr-2  "
                     >A</span
                   >
                   <span class="text-xs">All Caps</span>
@@ -1283,7 +1293,8 @@ onUnmounted(() => {
                 <v-btn
                   :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
                   size="small"
-                  :color="primaryColor"
+                  active-color="primary"
+                  :active="fontStyle === 'italic'"
                   class="text-transform-btn"
                   :class="{ 'btn-active': fontStyle === 'italic' }"
                   @click="toggleItalic"
@@ -1294,7 +1305,7 @@ onUnmounted(() => {
                         : 'transparent',
                   }"
                 >
-                  <span class="italic mr-2" :style="{ color: primaryColor }"
+                  <span class="italic mr-2"
                     >I</span
                   >
                   <span class="text-xs">Italic</span>
@@ -1384,8 +1395,7 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  border-color: transparent;
-  border-width: 2px;
+   border-width: 2px;
   border-style: solid;
   will-change: transform, border-color;
 }
@@ -1395,7 +1405,7 @@ onUnmounted(() => {
 }
 
 .font-card-container:hover .font-card {
-  border-color: v-bind(primaryColor) !important;
+  border-color: #ffc107 !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -1417,7 +1427,7 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.border-primary {
+.border-primary-js {
   border-color: v-bind(primaryColor) !important;
 }
 
@@ -1803,12 +1813,9 @@ onUnmounted(() => {
 /* Style count badge */
 .style-count {
   display: inline-block;
-  background-color: rgba(255, 193, 7, 0.2);
-  color: v-bind(primaryColor);
+ 
   font-size: 11px;
   padding: 1px 4px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
 /* Style button active state */

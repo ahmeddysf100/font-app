@@ -110,9 +110,9 @@ onMounted(() => {
       <v-container>
         <div class="header-content">
           <h1 
-            class="page-title"
+            class="page-title   bg-primary"
             :style="{
-              backgroundColor: primaryColor,
+           
               color: '#fff',
               transition: 'background-color 0.3s ease'
             }"
@@ -120,9 +120,8 @@ onMounted(() => {
             Contact Us
           </h1>
           <div 
-            class="title-underline"
+            class="title-underline bg-primary"
             :style="{
-              backgroundColor: primaryColor,
               transition: 'background-color 0.3s ease'
             }"
           ></div>
@@ -138,7 +137,6 @@ onMounted(() => {
               <h2 
                 class="section-title"
                 :style="{
-                  color: primaryColor,
                   transition: 'color 0.3s ease'
                 }"
               >
@@ -179,9 +177,8 @@ onMounted(() => {
                 Feel free to reach out:
                 <a 
                   :href="'contact.kotype@gmail.com'" 
-                  class="email-link"
+                  class="email-link text-primary"
                   :style="{
-                    color: primaryColor,
                     transition: 'color 0.3s ease'
                   }"
                 >
@@ -201,7 +198,7 @@ onMounted(() => {
                 donating. This will allow us to continue distributing new
                 quality, free fonts and improving our existing catalogue.
                 <v-btn
-                  :color="primaryColor"
+                  color="primary"
                   variant="elevated"
                   size="large"
                   class="mt-3 donation-btn d-flex align-center"
@@ -219,7 +216,6 @@ onMounted(() => {
           <div 
             class="contact-form-wrapper"
             :style="{
-              backgroundColor: themeStore.darkMode ? '#151515' : '#f8f8f8',
               boxShadow: themeStore.darkMode ? '0 5px 20px rgba(0, 0, 0, 0.2)' : '0 5px 20px rgba(0, 0, 0, 0.05)',
               transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
             }"
@@ -231,12 +227,11 @@ onMounted(() => {
                   v-model="formData.name"
                   placeholder="Name*"
                   required
-                  class="form-input"
+                  class="form-input  !border-primary "
                   :style="{
+                    transition: 'all 0.3s ease',
                     backgroundColor: themeStore.darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                    color: themeStore.darkMode ? '#f5f5f5' : '#111',
-                    borderColor: primaryColor,
-                    transition: 'all 0.3s ease'
+
                   }"
                 />
               </div>
@@ -247,7 +242,7 @@ onMounted(() => {
                   v-model="formData.email"
                   placeholder="Email*"
                   required
-                  class="form-input"
+                  class="form-input !border-primary "
                   :style="{
                     backgroundColor: themeStore.darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                     color: themeStore.darkMode ? '#f5f5f5' : '#111',
@@ -262,7 +257,7 @@ onMounted(() => {
                   v-model="formData.message"
                   placeholder="Message / Message"
                   rows="5"
-                  class="form-input"
+                  class="form-input !border-primary "
                   :style="{
                     backgroundColor: themeStore.darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                     color: themeStore.darkMode ? '#f5f5f5' : '#111',
@@ -275,7 +270,7 @@ onMounted(() => {
               <div class="form-group submit-group mt-4">
                 <v-btn
                   type="submit"
-                  class="submit-btn"
+                  class="submit-btn !bg-primary"
                   :disabled="isSubmitting"
                   :style="{
                     backgroundColor: primaryColor,
@@ -372,6 +367,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
+
+
 .contact-view {
   min-height: 100vh;
   position: relative;
@@ -491,7 +489,6 @@ onMounted(() => {
 }
 
 .form-input::placeholder {
-  color: #999;
   opacity: 0.7;
 }
 

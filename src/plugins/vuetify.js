@@ -15,14 +15,14 @@ const vuetify = createVuetify({
     themes: {
       light: {
         colors: {
-          primary: '#1867C0',
+          primary: '#FA82D1',
           secondary: '#5CBBF6',
           // You can customize other colors here
         },
       },
       dark: {
         colors: {
-          primary: '#2196F3',
+          primary: '#FA82D1',
           secondary: '#424242',
           // Dark theme colors
         },

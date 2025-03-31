@@ -58,12 +58,12 @@ onMounted(() => {
       <router-view></router-view>
     </v-main>
 
-    <v-footer class="py-4 text-center " :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }">
+    <v-footer class="py-4 text-center  " :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }">
       <div class="w-full">
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-primary dark:text-gray-400">
           © {{ new Date().getFullYear() }} Kotype. All rights reserved.
         </p>
-        <div class="mt-2 flex justify-center space-x-4">
+        <div class="mt-2 flex justify-center space-x-4 ">
           <v-btn icon variant="text" size="small">
             <v-icon>mdi-twitter</v-icon>
           </v-btn>
@@ -72,9 +72,6 @@ onMounted(() => {
           </v-btn>
           <v-btn icon variant="text" size="small">
             <v-icon>mdi-github</v-icon>
-          </v-btn>
-          <v-btn icon variant="text" size="small">
-            <v-icon>mdi-dribbble</v-icon>
           </v-btn>
         </div>
       </div>
@@ -86,13 +83,13 @@ onMounted(() => {
       temporary
       location="right"
       width="280"
-      class="mobile-drawer"
+      class="mobile-drawer dark:bg-black"
     >
       <div class="pa-4 drawer-header">
         <div class="d-flex justify-space-between align-center">
           <h3 class="text-h5 font-weight-bold">Menu</h3>
           <v-btn icon @click="sittingsStore.drawer = false" class="close-btn">
-            <v-icon :color="primaryColor">mdi-close</v-icon>
+            <v-icon class="text-primary">mdi-close</v-icon>
           </v-btn>
         </div>
       </div>
@@ -105,7 +102,7 @@ onMounted(() => {
           :key="item.title"
           :to="item.path"
           :active="isActive(item.path)"
-          :color="primaryColor"
+          color="primary"
           class="drawer-list-item"
           link
         >

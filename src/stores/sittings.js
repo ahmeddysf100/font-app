@@ -6,7 +6,7 @@ export const useSittingsStore = defineStore("sittings", () => {
   const fontSize = ref(60);
   const fontAlignment = ref("center");
   const textSample = ref("");
-  const primaryColor = ref("#FA82D1");
+  const primaryColor = ref("#1F1F1F");
   const drawer = ref(false); 
   const menuItems = ref([]);
   function updateResetFlag() {
@@ -18,10 +18,10 @@ export const useSittingsStore = defineStore("sittings", () => {
   }
 
   function getColorFromLocalStorage() {
-    const color = localStorage.getItem("primaryColor");
-    if (color) {
-      primaryColor.value = color;
-    }
+    // const color = localStorage.getItem("primaryColor");
+    // if (color) {
+    //   primaryColor.value = color;
+    // }
   }
   return {
     resetFlag,

@@ -62,7 +62,7 @@ const updateThemeVariables = () => {
 onMounted(() => {
   checkScreenSize();
   window.addEventListener("resize", checkScreenSize);
-  updateThemeVariables();
+  // updateThemeVariables();
 });
 </script>
 
@@ -70,15 +70,14 @@ onMounted(() => {
   <div
     class="terms-view"
     :style="{
-      backgroundColor: themeStore.darkMode ? '#0d0d0d' : '#fff',
-      color: themeStore.darkMode ? '#f5f5f5' : '#111',
+      backgroundColor: themeStore.darkMode ? 'black' : 'white',
       transition: 'background-color 0.3s ease, color 0.3s ease'
     }"
   >
     <div 
       class="page-header"
       :style="{
-        backgroundColor: themeStore.darkMode ? '#151515' : '#f8f8f8',
+        backgroundColor: themeStore.darkMode ? 'black' : 'white',
         boxShadow: themeStore.darkMode ? '0 5px 15px rgba(0, 0, 0, 0.2)' : '0 5px 15px rgba(0, 0, 0, 0.03)',
         transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
       }"
@@ -86,20 +85,17 @@ onMounted(() => {
       <v-container>
         <div class="header-content">
           <h1 
-            class="page-title"
+            class="page-title bg-primary !text-white"
             :style="{
-              backgroundColor: primaryColor,
-              color: '#fff',
-              boxShadow: `0 4px 15px ${themeStore.darkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 105, 180, 0.2)'}`,
-              transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
+              transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+              color: 'white'
             }"
           >
             Terms & Conditions
           </h1>
           <div 
-            class="title-underline"
+            class="title-underline bg-primary"
             :style="{
-              backgroundColor: primaryColor,
               transition: 'background-color 0.3s ease'
             }"
           ></div>
@@ -119,11 +115,8 @@ onMounted(() => {
             }"
           >
             <div 
-              class="terms-header-pill"
+              class="terms-header-pill bg-primary"
               :style="{
-                backgroundColor: primaryColor,
-                color: '#fff',
-                boxShadow: `0 4px 10px ${themeStore.darkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 105, 180, 0.2)'}`,
                 transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
               }"
             >
@@ -143,9 +136,8 @@ onMounted(() => {
                 class="term-item"
               >
                 <span 
-                  class="term-number"
+                  class="term-number text-primary "
                   :style="{
-                    color: primaryColor,
                     transition: 'color 0.3s ease'
                   }"
                 >
@@ -180,7 +172,7 @@ onMounted(() => {
                 quality, free fonts and improving our existing catalogue.
               </p>
               <v-btn
-                :color="primaryColor"
+                color="primary"
                 variant="elevated"
                 size="large"
                 class="mt-3 donation-btn"
@@ -339,7 +331,6 @@ onMounted(() => {
   right: -5%;
   font-size: 30rem;
   transform: rotate(-10deg);
-  color: var(--accent-color, #ff69b4);
   white-space: nowrap;
   line-height: 1;
 }

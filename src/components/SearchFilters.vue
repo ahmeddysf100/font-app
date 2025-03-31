@@ -255,16 +255,16 @@ onUnmounted(() => {
               variant="outlined"
               density="comfortable"
               hide-details
-              class="search-input"
-              :color="selectedColor"
-              :bg-color="themeStore.darkMode ? 'black' : 'white'"
+              class="search-input "
+              color="primary"
+               :bg-color="themeStore.darkMode ? 'black' : 'white'"
               :style="{ 
-                'caret-color': selectedColor,
+                'caret-color': 'primary',
                 color: themeStore.darkMode ? 'white' : 'black'
               }"
             >
               <template v-slot:prepend-inner>
-                <v-icon :color="selectedColor">mdi-magnify</v-icon>
+                <v-icon color="primary" >mdi-magnify</v-icon>
               </template>
             </v-text-field>
           </div>
@@ -274,7 +274,7 @@ onUnmounted(() => {
             <v-btn
               icon
               variant="text"
-              :color="selectedColor"
+              color="primary"
               @click="toggleFilterPanel"
               class="filter-toggle-btn"
             >
@@ -299,16 +299,16 @@ onUnmounted(() => {
                 hide-details
                 label="Category"
                 clearable
-                :color="selectedColor"
+                color="primary"
               >
                 <template v-slot:selection="{ item }">
-                  <span :style="{ color: selectedColor }">{{ item.raw.text }}</span>
+                  <span  >{{ item.raw.text }}</span>
                 </template>
               </v-select>
             </div>
 
             <!-- Color Selector -->
-            <div class="ml-8 relative">
+            <!-- <div class="ml-8 relative">
               <v-select
                 v-model="selectedColor"
                 @update:model-value="updateColor"
@@ -321,13 +321,13 @@ onUnmounted(() => {
                 :bg-color="themeStore.darkMode ? 'black' : 'white'"
                 hide-details
                 label="Color"
-                :color="selectedColor"
+                color="primary"
               >
                 <template v-slot:selection="{ item }">
                   <span :style="{ color: selectedColor }">{{ item.raw.text }}</span>
                 </template>
               </v-select>
-            </div>
+            </div> -->
 
             <!-- Font Size (Desktop) -->
             <div class="ml-auto flex items-center">
@@ -342,12 +342,12 @@ onUnmounted(() => {
                   class="font-size-select"
                   :bg-color="themeStore.darkMode ? 'black' : 'white'"
                   hide-details
-                  :color="selectedColor"
+                  color="primary"
                   label="Font Size"
                   @update:model-value="updateFontSize"
                 >
                   <template v-slot:selection="{ item }">
-                    <span :style="{ color: selectedColor }">{{ item.raw.label }}</span>
+                    <span  >{{ item.raw.label }}</span>
                   </template>
                 </v-select>
               </div>
@@ -362,13 +362,13 @@ onUnmounted(() => {
                   class="slider-thumb mt-0 pt-0"
                   density="compact"
                   hide-details
-                  :color="selectedColor"
-                  :track-color="`${selectedColor}50`"
-                  :thumb-color="selectedColor"
+                  color="primary"
+                  track-color="primary"
+                  thumb-color="primary"
                   thumb-label
                   @update:model-value="updateFontSize"
                 ></v-slider>
-                <span class="pl-4" :style="{ color: selectedColor }">{{ fontSizeText }}</span>
+                <span class="pl-4" >{{ fontSizeText }}</span>
               </div>
             </div>
           </div>
@@ -409,16 +409,16 @@ onUnmounted(() => {
                 hide-details
                 label="Category"
                 clearable
-                :color="selectedColor"
+                color="primary"
               >
               <template v-slot:selection="{ item }">
-                  <span :style="{ color: selectedColor }">{{ item.raw.text }}</span>
+                  <span  >{{ item.raw.text }}</span>
                 </template>
               </v-select>
             </div>
 
             <!-- Color Selector Mobile -->
-            <div class="mobile-dropdown mb-3 mt-3 w-full">
+            <!-- <div class="mobile-dropdown mb-3 mt-3 w-full">
               <v-select
                 v-model="selectedColor"
                 @update:model-value="updateColor"
@@ -431,15 +431,15 @@ onUnmounted(() => {
                 :bg-color="themeStore.darkMode ? 'black' : 'white'"
                 hide-details
                 label="Color"
-                :color="selectedColor"
+                color="primary"
               >
                 <template v-slot:selection="{ item }">
-                  <span :style="{ color: selectedColor }">{{
+                  <span  >{{
                     item.raw.text
                   }}</span>
                 </template>
               </v-select>
-            </div>
+            </div> -->
           </div>
         </div>
 
@@ -447,7 +447,7 @@ onUnmounted(() => {
         <div class="py-3 border-b border-primary">
           <div class="flex items-center justify-between mb-2">
             <span class="text-gray-400 text-sm">Font Size</span>
-            <span :style="{ color: selectedColor }">{{ fontSizeText }}</span>
+            <span  >{{ fontSizeText }}</span>
           </div>
           <v-slider
             v-model="fontSize"
@@ -456,9 +456,9 @@ onUnmounted(() => {
             step="1"
             class="mobile-slider mt-0 pt-0"
             density="compact"
-            :color="selectedColor"
-            :track-color="`${selectedColor}50`"
-            :thumb-color="selectedColor"
+            color="primary"
+            track-color="primary"
+            thumb-color="primary"
             thumb-label
             @update:model-value="updateFontSize"
           ></v-slider>
@@ -475,15 +475,15 @@ onUnmounted(() => {
               density="comfortable"
               hide-details
               class="sample-text-input"
-              :color="selectedColor"
+              color="primary"
               :bg-color="themeStore.darkMode ? 'black' : 'white'"
               :style="{ 
-                'caret-color': selectedColor,
+                'caret-color': 'primary',
                 color: themeStore.darkMode ? 'white' : 'black'
               }"
             >
               <template v-slot:prepend-inner>
-                <v-icon :color="selectedColor">mdi-pencil</v-icon>
+                <v-icon color="primary" >mdi-pencil</v-icon>
               </template>
             </v-text-field>
           </div>
@@ -496,7 +496,7 @@ onUnmounted(() => {
             <v-btn
               variant="text"
               :active="cityNames"
-              :active-color="selectedColor"
+              active-color="primary"
               class="text-caption mr-3 mb-2 px-3 py-2"
               :class="{ 'mobile-active-btn': cityNames }"
               @click="updateTextType('cities')"
@@ -507,7 +507,7 @@ onUnmounted(() => {
             <v-btn
               variant="text"
               :active="excerpts"
-              :active-color="selectedColor"
+              active-color="primary"
               class="text-caption mr-3 mb-2 px-3 py-2"
               :class="{ 'mobile-active-btn': excerpts }"
               @click="updateTextType('excerpts')"
@@ -518,7 +518,7 @@ onUnmounted(() => {
             <v-btn
               variant="text"
               :active="namesSelected"
-              :active-color="selectedColor"
+              active-color="primary"
               class="text-caption mb-2 px-3 py-2"
               :class="{ 'mobile-active-btn': namesSelected }"
               @click="updateTextType('names')"
@@ -538,7 +538,7 @@ onUnmounted(() => {
                 <v-btn
                   variant="text"
                   :active="alignment === 'left'"
-                  :active-color="selectedColor"
+                  active-color="primary"
                   class="text-caption mr-3 mb-2 px-3 py-2 flex-1"
                   @click="updateAlignment('left')"
                 >
@@ -548,7 +548,7 @@ onUnmounted(() => {
                 <v-btn
                   variant="text"
                   :active="alignment === 'center'"
-                  :active-color="selectedColor"
+                  active-color="primary"
                   class="text-caption mr-3 mb-2 px-3 py-2 flex-1"
                   @click="updateAlignment('center')"
                 >
@@ -558,7 +558,7 @@ onUnmounted(() => {
                 <v-btn
                   variant="text"
                   :active="alignment === 'right'"
-                  :active-color="selectedColor"
+                  active-color="primary"
                   class="text-caption mb-2 px-3 py-2 flex-1"
                   @click="updateAlignment('right')"
                 >
@@ -573,7 +573,7 @@ onUnmounted(() => {
         <div class="py-3 flex justify-center">
           <v-btn
             :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
-            :color="selectedColor"
+            color="primary"
             class="px-6"
             @click="resetAll"
           >
@@ -595,15 +595,15 @@ onUnmounted(() => {
               density="comfortable"
               hide-details
               class="sample-text-input"
-              :color="selectedColor"
+              color="primary"
               :bg-color="themeStore.darkMode ? 'black' : 'white'"
               :style="{ 
-                'caret-color': selectedColor,
+                'caret-color': 'primary',
                 color: themeStore.darkMode ? 'white' : 'black'
               }"
             >
               <template v-slot:prepend-inner>
-                <v-icon :color="selectedColor">mdi-pencil</v-icon>
+                <v-icon color="primary" >mdi-pencil</v-icon>
               </template>
             </v-text-field>
           </div>
@@ -614,7 +614,7 @@ onUnmounted(() => {
               variant="text"
               class="text-caption mr-2"
               :active="selectedTextType === 'cities'"
-              :active-color="selectedColor"
+              active-color="primary"
               @click="updateTextType('cities')"
             >
               Cities
@@ -623,7 +623,7 @@ onUnmounted(() => {
             <v-btn
               variant="text"
               :active="selectedTextType === 'excerpts'"
-              :active-color="selectedColor"
+              active-color="primary"
               class="text-caption mr-2"
               @click="updateTextType('excerpts')"
             >
@@ -633,7 +633,7 @@ onUnmounted(() => {
             <v-btn
               variant="text"
               :active="selectedTextType === 'names'"
-              :active-color="selectedColor"
+              active-color="primary"
               class="text-caption"
               @click="updateTextType('names')"
             >
@@ -649,7 +649,7 @@ onUnmounted(() => {
               class="flex-1"
               variant="text"
               :active="alignment === 'left'"
-              :active-color="selectedColor"
+              active-color="primary"
             >
               <v-icon>mdi-format-align-left</v-icon></v-btn
             >
@@ -659,7 +659,7 @@ onUnmounted(() => {
               class="flex-1"
               variant="text"
               :active="alignment === 'center'"
-              :active-color="selectedColor"
+              active-color="primary"
             >
               <v-icon>mdi-format-align-center</v-icon></v-btn
             >
@@ -669,7 +669,7 @@ onUnmounted(() => {
               class="flex-1"
               variant="text"
               :active="alignment === 'right'"
-              :active-color="selectedColor"
+              active-color="primary"
             >
               <v-icon>mdi-format-align-right</v-icon></v-btn
             >
@@ -679,7 +679,7 @@ onUnmounted(() => {
           <div class="ml-6">
             <v-btn
               :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
-              :color="selectedColor"
+              color="primary"
               class="text-caption"
               @click="resetAll"
             >

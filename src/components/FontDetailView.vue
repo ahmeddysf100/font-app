@@ -384,6 +384,61 @@ const fontStyles = computed(() => {
   return styles;
 });
 
+const fontStylesCharacter = computed(() => {
+  const fontFamily =
+    currentFontFamily.value ||
+    currentFontData.value?.fontFamily ||
+    getFontFamilyForFont(font.value);
+
+  // Build font feature settings string
+  let featureSettings = "";
+
+  // Enable ligatures by default for Arabic fonts
+  if (features.value.ligatures || isArabicFont.value)
+    featureSettings += '"liga" 1, ';
+  if (features.value.discretionaryLigatures) featureSettings += '"dlig" 1, ';
+  if (features.value.fractions) featureSettings += '"frac" 1, ';
+  if (features.value.ordinals) featureSettings += '"ordn" 1, ';
+  if (features.value.stylisticAlternates) featureSettings += '"salt" 1, ';
+  if (features.value.proportionalNumerals) featureSettings += '"pnum" 1, ';
+  if (features.value.tabularNumerals) featureSettings += '"tnum" 1, ';
+
+  // Add stylistic sets
+  if (stylisticSets.value.alternateT) featureSettings += '"ss01" 1, ';
+  if (stylisticSets.value.alternateQ) featureSettings += '"ss02" 1, ';
+  if (stylisticSets.value.alternateG) featureSettings += '"ss03" 1, ';
+  if (stylisticSets.value.alternateSmallG) featureSettings += '"ss04" 1, ';
+
+  // Remove trailing comma and space if any features are enabled
+  if (featureSettings.length > 0) {
+    featureSettings = featureSettings.slice(0, -2);
+  }
+
+  // Add additional styling properties
+  const styles = {
+    fontFamily,
+    fontWeight: fontWeight.value,
+    fontStyle: fontStyle.value,
+    fontSize: isMobile.value
+      ? `${fontSize.value}px`
+      : `${fontSize.value * 0.8}px`,
+    textAlign: 'center',
+    direction: textDirection.value,
+  };
+
+  // Add font feature settings if any are enabled
+  if (featureSettings.length > 0) {
+    styles.fontFeatureSettings = featureSettings;
+  }
+
+  // Add variable font settings if applicable
+  if (isVariableFont.value) {
+    styles.fontVariationSettings = `'wght' ${fontWeight.value}`;
+  }
+
+  return styles;
+});
+
 // Goto family view
 const goToFontFamily = () => {
   router.push(`/fonts/${route.params.id}/family`);
@@ -546,7 +601,7 @@ onUnmounted(() => {
     <!-- Back button -->
     <div class="px-6 pt-4">
       <v-btn
-        :color="primaryColor"
+        color="primary"
         variant="text"
         @click="backToFonts"
         class="mb-4"
@@ -562,7 +617,7 @@ onUnmounted(() => {
 
     <!-- Font Detail Header -->
     <div
-      class="border border-primary p-6"
+      class="border border-primary-js p-6"
       :style="{
         backgroundColor: themeStore.darkMode ? 'black' : 'white',
         color: themeStore.darkMode ? '#f5f5f5' : '#111',
@@ -581,14 +636,14 @@ onUnmounted(() => {
             </h1>
             <v-icon
               class="mr-3 cursor-pointer"
-              :color="isFavorite ? 'yellow' : 'gray-400'"
+              color="primary"
               @click="addToFavorites"
             >
               {{ isFavorite ? "mdi-star" : "mdi-star-outline" }}
             </v-icon>
             <span
-              class="text-gray-400 variable-tag"
-              :class="{ 'variable-tag-active': isVariableFont }"
+              class="text-gray-400 variable-tag border-[1.1px] border-gray-400 dark:border-white"
+              :class="{ 'variable-tag-active border-[1.1px] border-primary': isVariableFont }"
               >{{ isVariableFont ? "Variable" : "Static" }}</span
             >
             <span
@@ -605,11 +660,10 @@ onUnmounted(() => {
             v-if="isMobile"
             icon
             variant="text"
-            :color="primaryColor"
+            active-color="primary"
             class="ml-3"
             @click="toggleControls"
             :active="!!isControlsVisible"
-            :active-color="primaryColor"
           >
             <v-icon> mdi-filter </v-icon>
           </v-btn>
@@ -629,18 +683,20 @@ onUnmounted(() => {
                 <v-btn
                   icon
                   variant="text"
-                  :color="primaryColor"
                   v-bind="props"
+                  active-color="primary"
+                  :active="showStyleMenu"
+
                   class="style-btn"
                   :style="{
                     color: themeStore.darkMode ? '#f5f5f5' : '#111',
                   }"
                 >
-                  <v-icon>mdi-format-font</v-icon>
+                  <v-icon >mdi-format-font</v-icon>
                 </v-btn>
               </template>
               <v-list
-                class="style-list   border border-gray-700 rounded pa-2"
+                class="style-list   border border-primary rounded pa-2"
                 max-height="300"
                 :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
               >
@@ -653,15 +709,13 @@ onUnmounted(() => {
                     showStyleMenu = false;
                   "
                   :active="selectedStyle && selectedStyle.title === style.title"
-                  class="style-list-item rounded mb-1 px-3 py-1"
+                  class="style-list-item rounded mb-1 px-3 py-1 text-primary"
                   :class="{
                     'style-list-item-active':
                       selectedStyle && selectedStyle.title === style.title,
                     'style-list-item-variable': style.isVariable,
                   }"
-                  :style="{
-                    color: themeStore.darkMode ? 'white' : 'black',
-                  }"
+             
                 >
                   <template v-slot:prepend>
                     <div class="radio-circle mr-2">
@@ -669,8 +723,7 @@ onUnmounted(() => {
                         v-if="
                           selectedStyle && selectedStyle.title === style.title
                         "
-                        class="radio-dot"
-                        :style="{ 'background-color': primaryColor }"
+                        class="radio-dot bg-primary"
                       ></div>
                     </div>
                   </template>
@@ -696,9 +749,11 @@ onUnmounted(() => {
               class="slider-thumb d-inline-block w-24"
               density="compact"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
+
             ></v-slider>
           </div>
 
@@ -713,9 +768,11 @@ onUnmounted(() => {
               class="slider-thumb d-inline-block w-24"
               density="compact"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
+
             ></v-slider>
           </div>
 
@@ -730,9 +787,11 @@ onUnmounted(() => {
               class="slider-thumb d-inline-block w-24"
               density="compact"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
+
             ></v-slider>
           </div>
 
@@ -747,10 +806,14 @@ onUnmounted(() => {
               class="slider-thumb d-inline-block w-24"
               density="compact"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
-            ></v-slider>
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
+
+            >
+          
+          </v-slider>
           </div>
 
           <!-- Info and License -->
@@ -774,24 +837,24 @@ onUnmounted(() => {
               :close-on-content-click="false"
               location="bottom"
               offset="5"
-              :color="primaryColor"
+              color="primary"
             >
               <template v-slot:activator="{ props }">
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
+                  color="primary"
                   v-bind="props"
                   class="style-select-btn text-truncate"
                   style="max-width: 180px"
                   :active="showStyleMenu"
-                  :active-color="primaryColor"
+                  active-color="primary"
                 >
                   {{ selectedStyle ? selectedStyle.title : "Select Style" }}
                   <v-icon end>mdi-chevron-down</v-icon>
                 </v-btn>
               </template>
               <v-list
-                class="style-list   border border-gray-700 rounded pa-2"
+                class="style-list   border border-primary rounded pa-2"
                 max-height="300"
                 :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
               >
@@ -804,15 +867,13 @@ onUnmounted(() => {
                     showStyleMenu = false;
                   "
                   :active="selectedStyle && selectedStyle.title === style.title"
-                  class="style-list-item rounded mb-1 px-3 py-2"
+                  class="style-list-item rounded mb-1 px-3 py-2 text-primary"
                   :class="{
                     'style-list-item-active':
                       selectedStyle && selectedStyle.title === style.title,
                     'style-list-item-variable': style.isVariable,
                   }"
-                  :style="{
-                    color: themeStore.darkMode ? '#f5f5f5' : '#111',
-                  }"
+                
                 >
                   <template v-slot:prepend>
                     <div class="radio-circle mr-2">
@@ -820,14 +881,12 @@ onUnmounted(() => {
                         v-if="
                           selectedStyle && selectedStyle.title === style.title
                         "
-                        class="radio-dot"
-                        :style="{ 'background-color': primaryColor }"
+                        class="radio-dot bg-primary"
                       ></div>
                     </div>
                   </template>
                   <v-list-item-title
-                    class="text-sm"
-                    :style="{ color: themeStore.darkMode ? '#f5f5f5' : '#111', backgroundColor }"
+                    class="text-sm text-primary"
                   >
                     {{ style.title }}
                     <span
@@ -864,10 +923,10 @@ onUnmounted(() => {
               step="1"
               class="mobile-slider"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
-              :disabled="!isVariableFont"
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
             ></v-slider>
           </div>
 
@@ -884,9 +943,10 @@ onUnmounted(() => {
               step="1"
               class="mobile-slider"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
             ></v-slider>
           </div>
 
@@ -903,9 +963,10 @@ onUnmounted(() => {
               step="0.1"
               class="mobile-slider"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
             ></v-slider>
           </div>
 
@@ -922,9 +983,10 @@ onUnmounted(() => {
               step="1"
               class="mobile-slider"
               hide-details
-              :track-color="primaryColor"
-              :color="primaryColor"
-              :thumb-color="primaryColor"
+              track-color="primary"
+              color="primary"
+              thumb-color="primary"
+              thumb-label="hover"
             ></v-slider>
           </div>
         </div>
@@ -972,10 +1034,10 @@ onUnmounted(() => {
         <v-btn
           icon
           variant="text"
-          :color="primaryColor"
+          color="primary"
           @click="isControlsSectionVisible = !isControlsSectionVisible"
           :active="isControlsSectionVisible"
-          :active-color="primaryColor"
+          active-color="primary"
         >
           <v-icon>mdi-filter</v-icon>
         </v-btn>
@@ -996,8 +1058,7 @@ onUnmounted(() => {
               <!-- Text Alignment -->
               <div class="alignment-controls">
                 <v-btn
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="textAlign === 'left'"
                   value="left"
                   icon="mdi-format-align-left"
@@ -1005,8 +1066,7 @@ onUnmounted(() => {
                   @click="textAlign = 'left'"
                 ></v-btn>
                 <v-btn
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="textAlign === 'center'"
                   value="center"
                   icon="mdi-format-align-center"
@@ -1014,8 +1074,7 @@ onUnmounted(() => {
                   @click="textAlign = 'center'"
                 ></v-btn>
                 <v-btn
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="textAlign === 'right'"
                   value="right"
                   icon="mdi-format-align-right"
@@ -1029,8 +1088,7 @@ onUnmounted(() => {
                 <span class="text-gray-400 text-sm mr-2">Columns</span>
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="columns === 'single'"
                   value="single"
                   @click="columns = 'single'"
@@ -1038,8 +1096,7 @@ onUnmounted(() => {
                 >
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="columns === 'double'"
                   value="double"
                   @click="columns = 'double'"
@@ -1047,8 +1104,7 @@ onUnmounted(() => {
                 >
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="columns === 'triple'"
                   value="triple"
                   @click="columns = 'triple'"
@@ -1056,13 +1112,12 @@ onUnmounted(() => {
                 >
               </div>
               <!-- Color Mode -->
-              <div class="color-mode-control ml-6">
+              <!-- <div class="color-mode-control ml-6">
                 <span class="text-gray-400 text-sm mr-2">Color mode</span>
 
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="colorMode === 'white'"
                   value="white"
                   @click="colorMode = 'white'"
@@ -1070,14 +1125,13 @@ onUnmounted(() => {
                 >
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="colorMode === 'black'"
                   value="black"
                   @click="colorMode = 'black'"
                   >Black</v-btn
                 >
-              </div>
+              </div> -->
             </div>
           </div>
 
@@ -1086,7 +1140,7 @@ onUnmounted(() => {
             <!-- <v-btn :color="primaryColor" @click="applyToAll"
               >Apply to All</v-btn
             > -->
-            <v-btn variant="outlined" :color="primaryColor" @click="resetStyles"
+            <v-btn variant="outlined" color="primary" @click="resetStyles"
               >Reset</v-btn
             >
           </div>
@@ -1105,8 +1159,7 @@ onUnmounted(() => {
               <div class="flex-1">
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="textAlign === 'left'"
                   value="left"
                   icon="mdi-format-align-left"
@@ -1116,8 +1169,7 @@ onUnmounted(() => {
               <div class="flex-1">
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="textAlign === 'center'"
                   value="center"
                   icon="mdi-format-align-center"
@@ -1127,8 +1179,7 @@ onUnmounted(() => {
               <div class="flex-1">
                 <v-btn
                   variant="text"
-                  :color="primaryColor"
-                  :active-color="primaryColor"
+                  active-color="primary"
                   :active="textAlign === 'right'"
                   value="right"
                   icon="mdi-format-align-right"
@@ -1143,8 +1194,7 @@ onUnmounted(() => {
 
               <v-btn
                 variant="text"
-                :color="primaryColor"
-                :active-color="primaryColor"
+                active-color="primary"
                 :active="columns === 'single'"
                 value="single"
                 @click="columns = 'single'"
@@ -1153,8 +1203,7 @@ onUnmounted(() => {
               >
               <v-btn
                 variant="text"
-                :color="primaryColor"
-                :active-color="primaryColor"
+                active-color="primary"
                 :active="columns === 'double'"
                 value="double"
                 @click="columns = 'double'"
@@ -1163,8 +1212,7 @@ onUnmounted(() => {
               >
               <v-btn
                 variant="text"
-                :color="primaryColor"
-                :active-color="primaryColor"
+                active-color="primary"
                 :active="columns === 'triple'"
                 value="triple"
                 @click="columns = 'triple'"
@@ -1174,7 +1222,7 @@ onUnmounted(() => {
             </div>
 
             <!-- Color Mode (Mobile) -->
-            <div class="mobile-control-group flex items-center justify-between">
+            <!-- <div class="mobile-control-group flex items-center justify-between">
               <span class="text-gray-400 text-sm block mb-2 mr-2"
                 >Color Mode</span
               >
@@ -1182,7 +1230,7 @@ onUnmounted(() => {
               <v-btn
                 variant="text"
                 :active="colorMode === 'white'"
-                :active-color="primaryColor"
+                active-color="primary"
                 value="white"
                 class="flex-1"
                 >White</v-btn
@@ -1190,12 +1238,12 @@ onUnmounted(() => {
               <v-btn
                 variant="text"
                 :active="colorMode === 'black'"
-                :active-color="primaryColor"
+                active-color="primary"
                 value="black"
                 class="flex-1"
                 >Black</v-btn
               >
-            </div>
+            </div> -->
 
             <!-- Action Buttons (Mobile) -->
             <div
@@ -1207,7 +1255,7 @@ onUnmounted(() => {
               > -->
               <v-btn
                 variant="outlined"
-                :color="primaryColor"
+                color="primary"
                 @click="resetStyles"
                 class="py-3"
                 block
@@ -1592,7 +1640,7 @@ onUnmounted(() => {
     </div>
 
     <!-- font letter -->
-    <div class="font-letters border-primary border-b-[1px]">
+    <div class="font-letters border-primary-js border-b-[1px]">
       <!-- Character Anatomy Section -->
       <div class="character-anatomy p-6 pb-10">
         <div class="section-label mb-6">Character Anatomy</div>
@@ -1631,7 +1679,7 @@ onUnmounted(() => {
               <div
                 v-for="char in displayChars"
                 :key="char"
-                class="character-cell border-2 border-primary-hover p-1   overflow-x-hidden overflow-y-hidden"
+                class="character-cell border-2 hover:border-primary p-1   overflow-x-hidden overflow-y-hidden"
                 :class="{
                   'border-primary   ':
                     char === selectedCharacter,
@@ -1640,8 +1688,8 @@ onUnmounted(() => {
                 @click="setSelectedCharacter(char)"
               >
                 <div
-                  class="showcase-char cursor-pointer p-1"
-                  :style="fontStyles, { color: themeStore.darkMode ? 'white' : 'black' }"
+                  class="showcase-char cursor-pointer p-1 "
+                  :style="fontStylesCharacter, { color: themeStore.darkMode ? 'white' : 'black' }"
                   :dir="textDirection"
                 >
                   {{ char }}
@@ -1655,14 +1703,14 @@ onUnmounted(() => {
                 <div
                   v-for="char in displayLowerChars"
                   :key="char"
-                  class="character-cell border-2 border-primary-hover p-1   overflow-x-hidden overflow-y-hidden"
+                  class="character-cell border-2 hover:border-primary p-1   overflow-x-hidden overflow-y-hidden"
                   :class="{
                     'border-primary    ': char === selectedCharacter,
                   }"
                   :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }"
                   @click="setSelectedCharacter(char)"
                 >
-                  <div class="showcase-char cursor-pointer" :style="fontStyles, { color: themeStore.darkMode ? 'white' : 'black' }">
+                  <div class="showcase-char cursor-pointer" :style="fontStylesCharacter, { color: themeStore.darkMode ? 'white' : 'black' }">
                     {{ char }}
                   </div>
                 </div>
@@ -1675,7 +1723,7 @@ onUnmounted(() => {
                 <div
                   v-for="char in specialChars"
                   :key="char"
-                  class="character-cell border-2 border-primary-hover p-1 "
+                  class="character-cell border-2 hover:border-primary p-1 "
                   :class="{
                     'border-primary    ': char === selectedCharacter,
                   }"
@@ -1683,7 +1731,7 @@ onUnmounted(() => {
                 >
                   <div
                     class="showcase-char cursor-pointer  "
-                    :style="fontStyles, { color: themeStore.darkMode ? 'white' : 'black' }"
+                    :style="fontStylesCharacter, { color: themeStore.darkMode ? 'white' : 'black' }"
                   >
                     {{ char }}
                   </div>
@@ -1769,11 +1817,11 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.border-primary {
+.border-primary-js {
   border-color: v-bind(primaryColor) !important;
 }
 
-.border-primary-hover:hover {
+.border-primary-js-hover:hover {
   border-color: v-bind(primaryColor) !important;
 }
 
@@ -1795,7 +1843,6 @@ onUnmounted(() => {
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .sample-text {

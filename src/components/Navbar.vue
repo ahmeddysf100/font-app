@@ -71,7 +71,7 @@ onUnmounted(() => {
               :src="logoImage"
               alt="Kotype Logo"
               class="logo-image"
-              width="200px"
+              width="100px"
               height="auto"
             />
           </router-link>
@@ -87,8 +87,8 @@ onUnmounted(() => {
         <div
           v-for="item in menuItems"
           :key="item.title"
-          class="menu-item-col  border-primary-pages     "
-          :class="{ 'active-menu-item': isActive(item.path) }"
+          class="menu-item-col   hover:border-b-4   hover:border-primary   "
+          :class="{ 'active-menu-item ': isActive(item.path) }"
           @click="navigate(item.path)"
         >
           <div class="menu-item py-2 py-md-4 text-center d-flex flex-column justify-center">
@@ -105,7 +105,7 @@ onUnmounted(() => {
           @click="themeStore.toggleDarkMode()"
           class="theme-toggle-btn"
         >
-          <v-icon :color="primaryColor" :size="isMobile ? 'large' : 'x-large'">
+          <v-icon class="text-primary" :size="isMobile ? 'large' : 'x-large'">
             {{ themeStore.darkMode ? 'mdi-weather-sunny' : 'mdi-weather-night' }}
           </v-icon>
         </v-btn>
@@ -118,7 +118,7 @@ onUnmounted(() => {
       >
         <div class="p-3 p-md-4 d-flex justify-center align-center">
           <v-btn icon @click="drawer = !drawer" class="hamburger-btn">
-            <v-icon :color="primaryColor" :size="isMobile ? 'large' : 'x-large'">mdi-menu</v-icon>
+            <v-icon class="text-primary" :size="isMobile ? 'large' : 'x-large'">mdi-menu</v-icon>
           </v-btn>
         </div>
       </div>
@@ -129,12 +129,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.border-primary {
+.border-primary-js {
   border-color: v-bind(primaryColor);
 }
 
-.border-primary-pages:hover {
-  border-bottom: 5px solid v-bind(primaryColor);
+.border-primary-js-pages:hover {
+  border-bottom: 5px solid ;
 }
 
 .nav-container {
@@ -219,8 +219,8 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 0;
-  background-color: v-bind(primaryColor);
   z-index: 1;
+  @apply bg-primary;
   animation: fillUp 0.3s ease forwards;
 }
 
