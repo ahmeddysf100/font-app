@@ -209,9 +209,9 @@ export const initializeFonts = () => {
   const fontStore = useFontStore();
   
   // Add each font to the store
-  fonts.forEach((font) => {
+  fonts.forEach((font, index) => {
     fontStore.addFont({
-      id: font.id,
+      id: index + 1,
       name: font.name,
       category: font.category,
       style: font?.styles?.[0]?.name,

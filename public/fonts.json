@@ -1,6 +1,5 @@
 [
     {
-        "id": 1,
         "name": "Ko_Banzeen",
         "fontFamily": "Ko_Banzeen",
         "category": "Display",
@@ -32,7 +31,6 @@
         "downloadUrl": "https://fonts.gstatic.com/s/amiriquran/v17/_Xmo-Hk0rD6DbUL4_vH8Zq5t7Cycsu-2.ttf"
     },
     {
-        "id": 2,
         "name": "KOAynama",
         "fontFamily": "KOAynama",
         "category": "Sans-serif",
@@ -56,7 +54,6 @@
         "downloadUrl": ""
     },
     {
-        "id": 3,
         "name": "KoDongol",
         "fontFamily": "KoDongol",
         "category": "Serif",
@@ -72,7 +69,6 @@
         "downloadUrl": ""
     },
     {
-        "id": 4,
         "name": "KoGaliModern",
         "fontFamily": "KoGaliModern",
         "category": "Mono",
@@ -132,7 +128,6 @@
         "downloadUrl": ""
     },
     {
-        "id": 5,
         "name": "KoKhalaya",
         "fontFamily": "KoKhalaya",
         "category": "Sans-serif",
@@ -300,7 +295,6 @@
         "downloadUrl": ""
     },
     {
-        "id": 6,
         "name": "KOLemaza",
         "fontFamily": "KOLemaza",
         "category": "Display",
@@ -340,7 +334,6 @@
         "downloadUrl": ""
     },
     {
-        "id": 7,
         "name": "KORubbama",
         "fontFamily": "KORubbama",
         "category": "Script",
@@ -362,7 +355,6 @@
         "downloadUrl": ""
     },
     {
-        "id": 8,
         "name": "KoShareb",
         "fontFamily": "KoShareb",
         "category": "Serif",
@@ -377,7 +369,6 @@
         "designer": "Kotype"
     },
     {
-        "id": 9,
         "name": "Satoshi",
         "fontFamily": "Satoshi",
         "category": "Sans-serif",
@@ -497,7 +488,6 @@
         "downloadUrl": "https://fonts.google.com/download?family=Satoshi"
     },
     {
-        "id": 10,
         "name": "Monsieur La Doulaise",
         "fontFamily": "Monsieur La Doulaise, cursive",
         "category": "Display",
