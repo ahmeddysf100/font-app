@@ -182,7 +182,7 @@ const fontStore = useFontStore();
 const searchQuery = ref("");
 const fontSize = ref(60);
 const sampleText = ref("");
-const textAlignment = ref("left");
+const textAlignment = ref("center");
 const fontWeight = ref(400);
 const fontStyle = ref("normal");
 const leading = ref(1.2);
@@ -452,6 +452,7 @@ watch(
     primaryColor.value = color;
   }
 );
+
 const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); // Dynamic style
 </script>
 
@@ -599,6 +600,7 @@ const borderStyle = ref({ borderColor: `${primaryColor.value}50 !important` }); 
               :sample-text="getSampleTextForFontComputed(font)"
               :key="`${font.id}-${filterState.textType}-${textDarkMode}`"
               :text-dark-mode="textDarkMode"
+              :viewMode="viewMode"
             />
           </v-col>
         </v-row>

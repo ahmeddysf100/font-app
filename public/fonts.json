@@ -28,7 +28,8 @@
                 "variationSettings": "'slnt' 15"
             }
         ],
-        "designer": "Kotype"
+        "designer": "Kotype",
+        "downloadUrl": "https://fonts.gstatic.com/s/amiriquran/v17/_Xmo-Hk0rD6DbUL4_vH8Zq5t7Cycsu-2.ttf"
     },
     {
         "id": 2,
@@ -51,7 +52,8 @@
                 "fontFamily": "KOAynama-Curved"
             }
         ],
-        "designer": "Kotype"
+        "designer": "Kotype",
+        "downloadUrl": ""
     },
     {
         "id": 3,
@@ -66,7 +68,8 @@
                 "weight": 400
             }
         ],
-        "designer": "Kotype"
+        "designer": "Kotype",
+        "downloadUrl": ""
     },
     {
         "id": 4,
@@ -126,7 +129,7 @@
             }
         ],
         "designer": "Kotype",
-        "imageUrl": null
+        "downloadUrl": ""
     },
     {
         "id": 5,
@@ -294,7 +297,7 @@
             }
         ],
         "designer": "Kotype",
-        "imageUrl": null
+        "downloadUrl": ""
     },
     {
         "id": 6,
@@ -333,7 +336,8 @@
                 "weight": 900
             }
         ],
-        "designer": "Kotype"
+        "designer": "Kotype",
+        "downloadUrl": ""
     },
     {
         "id": 7,
@@ -354,7 +358,8 @@
                 "fontFamily": "KORubbama-Expanded"
             }
         ],
-        "designer": "Kotype"
+        "designer": "Kotype",
+        "downloadUrl": ""
     },
     {
         "id": 8,
@@ -488,7 +493,8 @@
                 "variationSettings": "'wght' 100 900, 'slnt' -15 15"
             }
         ],
-        "designer": "Deni Anggara"
+        "designer": "Deni Anggara",
+        "downloadUrl": "https://fonts.google.com/download?family=Satoshi"
     },
     {
         "id": 10,
@@ -502,6 +508,7 @@
                 "weight": 400
             }
         ],
-        "designer": "Monsieur La Doulaise"
+        "designer": "Monsieur La Doulaise",
+        "downloadUrl": ""
     }
 ]

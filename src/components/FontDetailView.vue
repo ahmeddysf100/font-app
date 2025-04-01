@@ -526,6 +526,27 @@ useSeo((route) => {
   };
 });
 
+// Add downloadFont method
+const downloadFont = async () => {
+  if (!font.value?.downloadUrl) {
+    alert(`Download URL not available for ${font.value.name} font`);
+    return;
+  }
+
+  try {
+    const response = await fetch(font.value.downloadUrl);
+    if (!response.ok) throw new Error('Download failed');
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error downloading font:', error);
+    alert('Failed to download font. Please try again later.');
+  }
+};
+
 onMounted(() => {
   // Set current font in store
   fontStore.setCurrentFont(fontId);
@@ -716,7 +737,7 @@ onUnmounted(() => {
                     'style-list-item-variable': style.isVariable,
                   }"
              
-                >
+                > 
                   <template v-slot:prepend>
                     <div class="radio-circle mr-2">
                       <div
@@ -1054,9 +1075,11 @@ onUnmounted(() => {
           <div class="text-controls">
             <h2 class="text-xl mb-4">Text</h2>
 
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-4 ">
+              <span class="text-gray-400 text-sm mr-2">Alignment</span>
+
               <!-- Text Alignment -->
-              <div class="alignment-controls">
+              <div class="alignment-controls mr-12">
                 <v-btn
                   active-color="primary"
                   :active="textAlign === 'left'"
@@ -1134,15 +1157,27 @@ onUnmounted(() => {
               </div> -->
             </div>
           </div>
-
+          
           <!-- Apply and Reset -->
-          <div class="action-buttons flex items-center space-x-4" :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }">
+          <div class="action-buttons flex items-center space-x-4 mt-12" :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }">
             <!-- <v-btn :color="primaryColor" @click="applyToAll"
               >Apply to All</v-btn
             > -->
             <v-btn variant="outlined" color="primary" @click="resetStyles"
               >Reset</v-btn
             >
+            <!-- Download Button -->
+            <v-btn
+              variant="outlined"
+              color="primary"
+              class="download-btn"
+              @click="downloadFont"
+            >
+              <span class="font-bold mr-2">
+                <v-icon class="download-icon">mdi-download</v-icon>
+              </span>
+              <span>Download</span>
+            </v-btn>
           </div>
         </div>
 
@@ -1261,7 +1296,20 @@ onUnmounted(() => {
                 block
                 >Reset</v-btn
               >
+              <!-- Download Button -->
+              <v-btn
+               variant="outlined"
+               color="primary"
+               class="download-btn"
+               @click="downloadFont"
+             >
+               <span class="font-bold mr-2">
+                 <v-icon class="download-icon">mdi-download</v-icon>
+               </span>
+               <span>Download</span>
+             </v-btn>
             </div>
+
           </div>
         </div>
 
@@ -2296,6 +2344,20 @@ onUnmounted(() => {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Download button animation */
+.download-btn:hover .download-icon {
+  animation: rotate360 0.5s ease-in-out;
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

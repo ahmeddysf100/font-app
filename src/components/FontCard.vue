@@ -32,6 +32,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  viewMode: {
+    type: String,
+    default: "list",
+  },
 });
 
 const router = useRouter();
@@ -54,6 +58,18 @@ const features = ref({
   fractions: false,
   ordinals: false,
 });
+
+const isGrid = ref(false);
+watch(
+  () => props.viewMode,
+  (newVal) => {
+    if (newVal === "grid") {
+      isGrid.value = true;
+    } else {
+      isGrid.value = false;
+    }
+  }
+);
 
 // Add these variables for variable font parameters
 const variableFontParams = ref({});
@@ -264,9 +280,24 @@ const updateTracking = (value) => {
 };
 
 // Download font
-const downloadFont = () => {
-  // Implementation of downloadFont method
-  alert(`Downloading ${props.font.name} font`);
+const downloadFont = async () => {
+  if (!props.font?.downloadUrl) {
+    alert(`Download URL not available for ${props.font.name} font`);
+    return;
+  }
+
+  try {
+    const response = await fetch(props.font.downloadUrl);
+    if (!response.ok) throw new Error('Download failed');
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error downloading font:', error);
+    alert('Failed to download font. Please try again later.');
+  }
 };
 
 // Add to favorites using the store
@@ -274,6 +305,7 @@ const addToFavorites = (e) => {
   e.stopPropagation();
   fontStore.toggleFavorite(props.font.id);
 };
+
 
 // Local sample text
 const localSampleText = ref(props.sampleText);
@@ -570,11 +602,11 @@ watch(
 );
 
 onMounted(() => {
-  checkMobile();
-  window.addEventListener("resize", checkMobile);
+  // checkMobile();
+  // window.addEventListener("resize", checkMobile);
 });
 onUnmounted(() => {
-  window.removeEventListener("resize", checkMobile);
+  // window.removeEventListener("resize", checkMobile);
 });
 </script>
 
@@ -582,13 +614,13 @@ onUnmounted(() => {
   <div
     class="font-card-container relative transition-all overflow-hidden  "
     :class="{
-      'options-active': showOptions,
+      'options-active border-primary': showOptions,
     }"
     style="border-radius: 15px;"
   >
     <!-- Main Card with integrated options panel -->
     <div
-      class="font-card relative overflow-hidden border-2 border-primary"
+      class="font-card relative overflow-hidden border-4 border-primary-js hover:!border-primary"
       :class="{
         'bg-black': themeStore.darkMode,
         'bg-card': !themeStore.darkMode
@@ -643,7 +675,11 @@ onUnmounted(() => {
         </div>
 
         <!-- Font controls moved to header -->
-        <div class="font-controls flex items-center desktop-only">
+        <div class="font-controls flex items-center desktop-only"
+        :class="{
+          '!hidden': isGrid
+        }"
+        >
           <!-- Size Slider (replacing dropdown) - desktop only -->
           <div class="size-selector mr-4">
             <div class="flex items-center">
@@ -761,7 +797,7 @@ onUnmounted(() => {
                 </v-btn>
               </template>
               <v-list
-                class="style-list bg-black  border border-gray-700 rounded pa-2"
+                class="style-list dark:bg-black  border border-gray-700 rounded pa-2"
                 max-height="300"
               >
                 <v-list-item
@@ -787,18 +823,16 @@ onUnmounted(() => {
                         v-if="
                           selectedStyle && selectedStyle.title === style.title
                         "
-                        class="radio-dot"
-                        :style="{ 'background-color': '#ffc107' }"
+                        class="radio-dot bg-primary"
                       ></div>
                     </div>
                   </template>
-                  <v-list-item-title class="text-sm">
+                  <v-list-item-title class="text-sm !text-primary">
                     {{ style.title }}
                     <span
                       v-if="style.isVariable"
-                      class="variable-badge"
+                      class="variable-badge !text-primary"
                       :style="{
-                        color: '#ffc107',
                         'background-color': `#ffc10750`,
                         'border-radius': '8px',
                       }"
@@ -843,7 +877,11 @@ onUnmounted(() => {
         </div>
 
         <!-- Mobile-only controls for the header -->
-        <div class="mobile-only font-controls-mobile">
+        <div class=" font-controls-mobile" 
+        :class="{
+          'show-mobile-controls': isGrid, 'mobile-only': !isGrid
+        }"
+        >
           <div class="flex items-center">
             <!-- Style Menu Button -->
             <div class="style-menu-container mr-2">
@@ -898,16 +936,15 @@ onUnmounted(() => {
                           v-if="
                             selectedStyle && selectedStyle.title === style.title
                           "
-                          class="radio-dot "
-                          :style="{ 'background-color': '#ffc107' }"
+                          class="radio-dot bg-primary"
                         ></div>
                       </div>
                     </template>
-                    <v-list-item-title class="text-sm">
+                    <v-list-item-title class="text-sm !text-primary">
                       {{ style.title }}
                       <span
                         v-if="style.isVariable"
-                        class="variable-badge"
+                        class="variable-badge !text-primary"
                         :style="{
                           color: '#ffc107',
                             'background-color': `#ffc10750`,
@@ -965,7 +1002,7 @@ onUnmounted(() => {
         :class="{
           'preview-collapsed': showOptions,
           'auto-height': fontSize > 80,
-          'arabic-font': font.category === 'Arabic',
+          'arabic-font': font.name.toLowerCase().startsWith('ko'),
           'bg-dark-btn': themeStore.darkMode,
           'bg-light-btn': themeStore.darkMode,
         }"
@@ -996,7 +1033,7 @@ onUnmounted(() => {
           v-text="localSampleText"
           :class="[
             `weight-${fontWeight}`,
-            { 'rtl-text': font.category === 'Arabic' },
+            { 'rtl-text': font.name.toLowerCase().startsWith('ko') },
             { 'text-black !important': !themeStore.darkMode },
             { 'text-white !important': !!themeStore.darkMode },
           ]"
@@ -1019,12 +1056,15 @@ onUnmounted(() => {
       <!-- Font Options Panel (Integrated within card) -->
       <div
         v-show="showOptions"
-        class="font-options-panel px-6 py-4 border-t border-yellow-500 animate-fadeIn"
+        class="font-options-panel px-6 py-4 border-t  animate-fadeIn"
         @click.stop
       >
         <div class="grid grid-cols-1 gap-4">
           <!-- Mobile version of all controls -->
-          <div class="mobile-only">
+          <div class="" :class="{
+            'show-mobile-controls': isGrid ,
+            'mobile-only': !isGrid
+          }">
             <!-- Size Slider -->
             <div class="option-row flex items-center mb-4">
               <div class="option-label   text-sm w-20" :class="{'text-black': !themeStore.darkMode, 'text-white': themeStore.darkMode}">Size</div>
@@ -1264,11 +1304,30 @@ onUnmounted(() => {
                 ></v-btn>
               </div>
             </div>
+
+                <!-- Download Button -->
+                <v-btn
+                  :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
+                  size="small"
+                  class="text-transform-btn download-btn"
+                  @click="downloadFont"
+                  :style="{
+                    backgroundColor: 'transparent',
+                  }"
+                >
+                  <span class="font-bold mr-2">
+                    <v-icon class="download-icon">mdi-download</v-icon>
+                  </span>
+                  <span class="text-xs">Download</span>
+                </v-btn>
+
             <div class="w-full md:w-auto">
               <!-- Text Transform (All Caps) and Italic - mobile-optimized -->
               <div
                 class="option-row text-transform flex items-center justify-start gap-4 mt-1"
               >
+
+
                 <v-btn
                   :variant="themeStore.darkMode ? 'outlined' : 'tonal'"
                   size="small"
@@ -1405,7 +1464,6 @@ onUnmounted(() => {
 }
 
 .font-card-container:hover .font-card {
-  border-color: #ffc107 !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -1469,7 +1527,7 @@ onUnmounted(() => {
 }
 
 .options-active .font-card {
-  border-color: v-bind(isDarkMode) !important;
+  @apply border-primary;
 }
 
 /* Slider styles */
@@ -1658,13 +1716,6 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
-.style-list-item-active {
-  background: rgba(255, 193, 7, 0.1) !important;
-}
-
-.style-list-item-active .v-list-item-title {
-  color: #ffc107 !important;
-}
 
 .radio-circle {
   width: 16px;
@@ -1679,7 +1730,6 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #ffc107;
   animation: dotAppear 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
@@ -1964,6 +2014,10 @@ onUnmounted(() => {
   }
 }
 
+.show-mobile-controls {
+  display: block !important;
+}
+
 @media (min-width: 768px) {
   .mobile-only {
     display: none !important;
@@ -1999,6 +2053,20 @@ onUnmounted(() => {
 }
 
 .bg-card {
-  background-color: rgba(226, 252, 252, 0.478) !important;
+  background-color: rgb(255, 255, 255) !important;
+}
+
+/* Download button animation */
+.download-btn:hover .download-icon {
+  animation: rotate360 0.5s ease-in-out;
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

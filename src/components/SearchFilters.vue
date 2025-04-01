@@ -188,12 +188,10 @@ const updateAlignment = (align) => {
 };
 
 const updateSampleText = (text) => {
-  let sampleText = text.target.value;
-  if (sampleText.length <= 0) {
-    sampleText = "السلام عليكم";
-  }
-  settingsStore.textSample = sampleText;
-  emit("filter-change", { type: "sampleText", value: sampleText });
+  console.log('Sample text updated:', text);
+  const finalText = text.length <= 0 ? "السلام عليكم" : text;
+  settingsStore.textSample = finalText;
+  emit("filter-change", { type: "sampleText", value: finalText });
 };
 
 const textDarkMode = ref(false);
@@ -470,6 +468,7 @@ onUnmounted(() => {
           <div class="flex items-center w-full">
             <v-text-field
               v-model="sampleText"
+              @update:model-value="updateSampleText"
               placeholder="Type your sample text here"
               variant="outlined"
               density="comfortable"
@@ -590,6 +589,8 @@ onUnmounted(() => {
           <div class="flex items-center flex-grow">
             <v-text-field
               v-model="sampleText"
+              @update:model-value="updateSampleText"
+
               placeholder="Type your sample text here"
               variant="outlined"
               density="comfortable"

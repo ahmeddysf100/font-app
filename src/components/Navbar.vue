@@ -57,7 +57,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="nav-container border-b-2 border-primary" :class="{ 'bg-black': themeStore.darkMode, 'bg-white': !themeStore.darkMode }">
+  <div class="nav-container border-b-[1.5px] border-primary-js" :class="{ 'bg-black': themeStore.darkMode, 'bg-white': !themeStore.darkMode }">
     <!-- Main Horizontal Navigation -->
     <div
       class="main-nav d-flex justify-space-between align-center"

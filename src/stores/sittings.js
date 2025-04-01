@@ -28,6 +28,7 @@ export const useSittingsStore = defineStore("sittings", () => {
     updateResetFlag,
     fontAlignment,
     primaryColor,
+    textSample,
     storeColorInLocalStorage,
     getColorFromLocalStorage,
   };

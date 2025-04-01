@@ -226,6 +226,7 @@ export const initializeFonts = () => {
         weight: s.weight,
         style: s.style || "normal",
       })),
+      downloadUrl: font.downloadUrl,
     });
   });
 
