@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, computed, watch } from "vue";
+import { onMounted, computed, watch, ref } from "vue";
 import { useHead } from "@vueuse/head";
 import { useThemeStore } from "./stores/theme.js";
 import { useSittingsStore } from "./stores/sittings";
@@ -17,6 +17,20 @@ const menuItems = computed(() => sittingsStore.menuItems);
 // Compute which menu item is active based on current route
 const isActive = (path) => {
   return route.path.startsWith(path);
+};
+
+// For scroll to top button
+const showScrollBtn = ref(false);
+
+const handleScroll = () => {
+  showScrollBtn.value = window.scrollY > 100;
+};
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 };
 
 // Setup global SEO meta tags
@@ -46,6 +60,7 @@ useHead({
 onMounted(() => {
   themeStore.initTheme();
   sittingsStore.getColorFromLocalStorage();
+  window.addEventListener('scroll', handleScroll);
 });
 </script>
 
@@ -57,6 +72,21 @@ onMounted(() => {
       <!-- Using router-view to display the current route component -->
       <router-view></router-view>
     </v-main>
+
+    <!-- Scroll to top button moved outside of other components -->
+    <v-fade-transition>
+      <v-btn
+        v-show="showScrollBtn"
+        icon
+        color="primary"
+        size="large"
+        elevation="4"
+        class="scroll-to-top-btn"
+        @click="scrollToTop"
+      >
+        <v-icon>mdi-arrow-up</v-icon>
+      </v-btn>
+    </v-fade-transition>
 
     <v-footer class="py-4 text-center  " :style="{ backgroundColor: themeStore.darkMode ? 'black' : 'white' }">
       <div class="w-full">
@@ -140,172 +170,18 @@ html {
   }
 }
 
-/* Font families */
-.font-koaynama-sharp {
-  font-family: "KOAynama-Sharp", sans-serif;
+
+/* Scroll to top button styling */
+.scroll-to-top-btn {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 9999 !important;
 }
 
-.font-koaynama-curved {
-  font-family: "KOAynama-Curved", sans-serif;
+@media (min-width: 1400px) {
+  .scroll-to-top-btn {
+    right: calc((100% - 1400px) / 2 + 24px);
+  }
 }
-
-.font-koshareb {
-  font-family: "KoShareb", serif;
-}
-
-.font-kobanzeen {
-  font-family: "Ko_Banzeen", sans-serif;
-}
-
-.font-kodongol {
-  font-family: "KoDongol", serif;
-}
-
-.font-kolemaza {
-  font-family: "KOLemaza", sans-serif;
-}
-
-.font-kokhalaya {
-  font-family: "KoKhalaya", sans-serif;
-}
-
-.font-kokhalaya-variable {
-  font-family: "KoKhalaya-Variable", sans-serif;
-}
-
-.font-korubbama {
-  font-family: "KORubbama", cursive;
-  font-weight: 900;
-}
-
-.font-kogalimodern {
-  font-family: "KoGaliModern", monospace;
-}
-
-/* @font-face {
-  font-family: 'Ko_Banzeen ';
-  src: url('./assets/fonts/Ko_Banzeen/Ko_Banzeen-Normal.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Ko_Banzeen Slanted Left';
-  src: url('./assets/fonts/Ko_Banzeen/Ko_Banzeen-SlantedL.otf') format('opentype');
-  font-weight: normal;
-  font-style: italic;
-}
-@font-face {
-  font-family: 'Ko_Banzeen Slanted Right';
-  src: url('./assets/fonts/Ko_Banzeen/Ko_Banzeen-SlantedR.otf') format('opentype');
-  font-weight: normal;
-  font-style: oblique;
-}
-
-
-@font-face {
-  font-family: 'KOAynama Curved';
-  src: url('./assets/fonts/KOAynama/KOAynama-Curved.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'KOAynama Sharp';
-  src: url('./assets/fonts/KOAynama/KOAynama-Sharp.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'KoDongol';
-  src: url('./assets/fonts/KoDongol/KoDongol-Regular.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-
-
-
-@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-Black.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-Bold.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-ExtraBold.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-Medium.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-SemiBold.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-Thin.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-UltraLight.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-Light.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-ExtraLight.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-Regular.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-Heavy.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'KoGaliModern';
-  src: url('./assets/fonts/KoGaliModern/KoGaliModern-SemiBold.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-
-
-
-
-@font-face {
-  font-family: 'KoKhalaya Variable';
-  src: url('./assets/fonts/KoKhalaya/variable/KoKhalayaVF.ttf') format('truetype');
-  font-weight: 300 900;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'KoKhalaya';
-  src: url('./assets/fonts/KoKhalaya/weights/KoKhalaya-5-5.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-} */
 </style>

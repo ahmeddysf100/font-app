@@ -739,7 +739,7 @@ onUnmounted(() => {
              
                 > 
                   <template v-slot:prepend>
-                    <div class="radio-circle mr-2">
+                    <div class="radio-circle mr-2 border border-primary-js">
                       <div
                         v-if="
                           selectedStyle && selectedStyle.title === style.title
@@ -748,7 +748,7 @@ onUnmounted(() => {
                       ></div>
                     </div>
                   </template>
-                  <v-list-item-title class="text-sm">
+                  <v-list-item-title class="text-sm !text-primary" >
                     {{ style.title }}
                     <span v-if="style.isVariable" class="variable-badge"
                       >Variable</span
@@ -897,7 +897,7 @@ onUnmounted(() => {
                 
                 >
                   <template v-slot:prepend>
-                    <div class="radio-circle mr-2">
+                    <div class="radio-circle mr-2 border border-primary-js">
                       <div
                         v-if="
                           selectedStyle && selectedStyle.title === style.title
@@ -907,12 +907,12 @@ onUnmounted(() => {
                     </div>
                   </template>
                   <v-list-item-title
-                    class="text-sm text-primary"
+                    class="text-sm !text-primary"
                   >
                     {{ style.title }}
                     <span
                       v-if="style.isVariable"
-                      class="variable-badge"
+                      class="variable-badge !text-primary"
                       :style="{ color: themeStore.darkMode ? '#f5f5f5' : '#111' }"
                       >Variable</span
                     >
@@ -2135,9 +2135,7 @@ onUnmounted(() => {
   background: rgba(255, 193, 7, 0.1) !important;
 }
 
-.style-list-item-active .v-list-item-title {
-  color: #ffc107 !important;
-}
+
 
 .style-list-item-variable {
   border-left: 2px solid #ffc107;
@@ -2167,7 +2165,6 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #ffc107;
   animation: dotAppear 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
