@@ -10,7 +10,7 @@ export const defaultSeoMeta = {
   ogTitle: 'Kotype - Font Library',
   ogDescription: 'Explore beautiful fonts for your next project',
   ogType: 'website',
-  ogUrl: 'https://yourdomain.com/font-app/',
+  ogUrl: 'https://yourdomain.com/kotype/',
   twitterCard: 'summary_large_image',
 }
 

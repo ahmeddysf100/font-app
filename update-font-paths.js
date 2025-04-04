@@ -13,9 +13,9 @@ let fonts = JSON.parse(fs.readFileSync(fontsJsonPath, 'utf8'));
 
 // Function to update font paths
 function updateFontPath(oldPath) {
-  // Remove the /font-app/public/ prefix and add /fonts/ prefix
-  if (oldPath && oldPath.includes('/font-app/public/')) {
-    return '/fonts/' + oldPath.split('/font-app/public/')[1];
+  // Remove the /kotype/public/ prefix and add /fonts/ prefix
+  if (oldPath && oldPath.includes('/kotype/public/')) {
+    return '/fonts/' + oldPath.split('/kotype/public/')[1];
   }
   return oldPath;
 }

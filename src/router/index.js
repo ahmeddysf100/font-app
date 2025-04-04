@@ -61,7 +61,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory('/font-app/'),
+  history: createWebHistory('/kotype/'),
   routes
 })
 

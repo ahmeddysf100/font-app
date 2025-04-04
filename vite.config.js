@@ -19,7 +19,7 @@ export default defineConfig({
   plugins: [
     vue(),
     sitemap({
-      hostname: 'https://yourdomain.com/font-app',
+      hostname: 'https://yourdomain.com/kotype',
       lastmod: new Date().toISOString(),
       routes,
       changefreq: 'weekly',
@@ -27,7 +27,7 @@ export default defineConfig({
       exclude: ['/404']
     }),
     robots({
-      sitemap: 'https://yourdomain.com/font-app/sitemap.xml',
+      sitemap: 'https://yourdomain.com/kotype/sitemap.xml',
       policies: [
         {
           userAgent: '*',

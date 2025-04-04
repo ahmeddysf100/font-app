@@ -19,7 +19,7 @@ useHead(
       "font collection, typography, design fonts, arabic fonts, latin fonts, kotype library",
     ogTitle: "Explore Our Font Collection | Kotype",
     ogDescription: "Discover beautiful typography for your design projects",
-    canonicalUrl: "https://yourdomain.com/font-app/fonts",
+    canonicalUrl: "https://yourdomain.com/kotype/fonts",
   })
 );
 

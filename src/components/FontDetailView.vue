@@ -522,7 +522,7 @@ useSeo((route) => {
     ogTitle: `${fontName} Font | Kotype`,
     ogDescription: `Discover the beauty of ${fontName} typography`,
     ogImage: fontData.previewImage || undefined,
-    canonicalUrl: `https://yourdomain.com/font-app/fonts/${id}`,
+    canonicalUrl: `https://yourdomain.com/kotype/fonts/${id}`,
   };
 });
 
